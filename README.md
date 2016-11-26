@@ -66,6 +66,12 @@ To create and activate your virtual environment. Now install all python dependen
 
 This documentation includes some UML diagrams. UML diagrams are rendered with PlantUML. For building a documentation with all diagrams download PlantUML jar file from this [link](http://plantuml.com/download) and install it at ```/opt/plantuml```.
 
+PlantUML also needs ```graphviz``` to be installed. Install it by running;
+
+```
+apt-get install graphviz
+```
+
 ### Web Documentation
 
 After activating the *Virtual Environment* and installing all requirements, build the documentation by running;
