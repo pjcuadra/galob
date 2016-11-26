@@ -62,6 +62,10 @@ To create and activate your virtual environment. Now install all python dependen
 (docs-virt)$ pip install -r <project-root-dir>/docs/requirements
 ```
 
+### PlantUML
+
+This documentation includes some UML diagrams. UML diagrams are rendered with PlantUML. For building a documentation with all diagrams download PlantUML jar file from this [link](http://plantuml.com/download) and install it at ```/opt/plantuml```.
+
 ### Web Documentation
 
 After activating the *Virtual Environment* and installing all requirements, build the documentation by running;
