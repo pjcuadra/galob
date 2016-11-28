@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'examples.OnesCounting'
+
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile 'org.bitbucket.fwilhelm:org.jenetics:3.6.0'
+    testCompile 'junit:junit:4.12'
+}
+
+jar {
+    baseName = 'galob-gradle'
+    version =  '0.1.0'
+}
