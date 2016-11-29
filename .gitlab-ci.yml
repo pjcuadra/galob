@@ -34,3 +34,9 @@ test:
   stage: test
   script:
     - gradle -g /cache./gradle check
+
+# Build docs using Sphinx
+docs:
+  stage: docs
+  script:
+    - cd docs && make html
