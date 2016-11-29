@@ -13,7 +13,6 @@ image: java:8
 # It is expected that any modern gradle project has a wrapper
 before_script:
     - apt-get update -qq && apt-get install -y -qq gradle
-    - chmod +x gradlew
 
 # We redirect the gradle user home using -g so that it caches the
 # wrapper and dependencies.
