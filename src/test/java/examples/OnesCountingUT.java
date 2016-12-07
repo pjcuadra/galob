@@ -1,6 +1,5 @@
 package examples;
 
-import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +48,6 @@ public class OnesCountingUT
     public void runMain()
     {
       String[] args = {};
-      boolean myBool = false;
       System.out.println("Ran Tests!");
 
       OnesCounting.main(args);
