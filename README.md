@@ -27,9 +27,7 @@ The workflow for adding code to `master` will be as follows:
 $ git checkout master
 $ git pull master
 ```
-2. Create a personal branch from current master named
-```
-personal/<my-name>/<my-change-name>`
+2. Create a personal branch from current master named ```personal/<my-name>/<my-change-name>```
 ```
 $ git checkout -b personal/<my-name>/<change-name>
 ```
