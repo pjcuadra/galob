@@ -23,45 +23,62 @@ Issues are being tracked through both [Taiga.io](https://taiga.io/) and Gitlab.
 
 The workflow for adding code to `master` will be as follows:
 1. Pull master
+
 ```
 $ git checkout master
 $ git pull master
 ```
+
 2. Create a personal branch from current master named
    `personal/<my-name>/<my-change-name>`
+   
 ```
 $ git checkout -b personal/<my-name>/<change-name>
 ```
+
 3. Implement the change on this branch and commit the changes
+
 ```
 $ git add <file-names>
 $ git commit -m "<type-of-change>: <audience>: <description-of-change>"
 ```
-4.Change back to master branch
+
+4. Change back to master branch
+
 ```
 $ git checkout master
 $ git pull master
 ```
-5.Change back to your branch
+
+5. Change back to your branch
+
 ```
 $ git checkout personal/<my-name>/<change-name>
 ```
-6.Rebase your branch to sync with the master
+
+6. Rebase your branch to sync with the master
+
 ```
 $ git rebase master
 ```
-7.Push the branch
+
+7. Push the branch
+
 ```
+$ git push --set-upstream origin personal/<my-name>/<change-name> (only once for a new branch)
 $ git push
 ```
-8.Create a *Merge Request* on Gitlab
 
-9.Wait for the review of your team mate who will merge the change into master
-10.In case of review changes, repeat steps 3 to 8
-11.If the master has been changed, then after rebasing use this command to commit changes
+8. Create a *Merge Request* on Gitlab
+
+9. Wait for the review of your teammate who will merge the change into master
+10. In case of review changes, repeat steps 3 to 8
+11. If the master has been changed, then after rebasing use this command to push changes
+
 ```
 $ git push -f
 ```
+
 **Note:** `master` branch is protected to prevent nasty things to happen.
 
 ## Commit messages
