@@ -17,6 +17,7 @@ package alg;
 
 public class LoadBalancingComOverhead {
 
-	// TODO: Add all necessary functions for execution time optimization
+	// TODO: Add all necessary functions for load balancing with dependencies and 
+	// communication overhead optimization
 	
 }

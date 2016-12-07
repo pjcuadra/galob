@@ -16,6 +16,6 @@ package alg;
 
 public class LoadBalancingWithDependencies {
 
-	// TODO: Add all necessary functions for execution time optimization
+	// TODO: Add all necessary functions for load balancing with dependencies
 	
 }
