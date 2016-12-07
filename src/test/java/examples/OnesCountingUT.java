@@ -49,10 +49,10 @@ public class OnesCountingUT
     public void runMain()
     {
       String[] args = {};
+      boolean myBool = false;
       System.out.println("Ran Tests!");
 
-      OnesCounting testCounter = new OnesCounting();
-      testCounter.main(args);
+      OnesCounting.main(args);
 
     }
 
