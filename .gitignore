@@ -3,3 +3,7 @@ build
 *.class
 .gradle
 /bin/
+.classpath
+.project
+.settings
+*.swp
