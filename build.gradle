@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
 
-mainClassName = 'examples.OnesCounting'
+mainClassName = 'examples.ExecutionTimeExample'
 
 repositories {
     // Use 'jcenter' for resolving your dependencies.
@@ -19,6 +19,6 @@ dependencies {
 }
 
 jar {
-    baseName = 'galob-gradle'
+    baseName = 'galob-executionTime-gradle'
     version =  '0.1.0'
 }
