@@ -138,6 +138,30 @@ public class ExecutionTime {
 		return totalTime;
 	}
 	
+	/**
+	 * The fitness function to calculate fitness of a given Chromosome
+	 * 
+	 * According to "Load Balancing Task Scheduling based on 
+	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
+	 * LI Jun), equation (7)
+	 * 
+	 * @param chromosome allocation nodes array indexed by 
+	 * 					 task index
+	 * @param Etfactor factor to use when adding dependencies to the fitness func; 
+	 *          Etfactor can be modified to tweak the fitness function ass reqd;
+	 *          set to 1 as of now.
+	 * @return fitness of a given Chromosome
+	 */
+	public double getFitness(int[] chromosome, double Etfactor)
+	{
+		double TotalTime = getTotalTime(chromosome);
+		double Fitness = 0;
+				
+		Fitness = Etfactor*(1/TotalTime);
+		
+		return Fitness;
+	}
+	
 	
 	/**
 	 * Get the load imbalance of given Chromosome

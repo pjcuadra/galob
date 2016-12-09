@@ -141,7 +141,27 @@ public class ExecutionTimeUT {
 		 * Since our ETC matrix has only ones the total execution time 
 		 * should be the amount of tasks.
 		 */	
+
 		assertEquals(expectedTotalTime, totalTime,0.01);
+		
+	}
+	
+	@Test
+	public void calculateFitness(){
+		double fitness;
+		
+		/*becuase we only have execution time as a factor to 
+		calculate fitness for now we set the ETfactor to 1
+		*/
+		
+		fitness = executionTimeGA.getFitness(chromosome,1);
+		
+		/* 
+		 * Since our ETC matrix has only ones the fitness value
+		 * should be 1/number of tasks.
+		 */	
+		assertEquals(fitness, ((double)1/numTask), 0.01);
+		System.out.println(fitness);
 	}
 	
 	@Test
