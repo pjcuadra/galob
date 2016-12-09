@@ -13,6 +13,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import alg.util.ExecutionTimeUtil;
+
 /**
  * @author Pedro Cuadra
  *
@@ -26,6 +28,7 @@ public class ExecutionTimeUT {
 	private ExecutionTime executionTimeGA;
 	private int numTask;
 	private int executors;
+	private int[][] convMatrix;
 	final static int maxNumTask = 16 /* Actual max*/ - 1 /* 0 is not possible so add 1 after*/;
 	final static int maxNumExecutors = 16 /* Actual max*/  - 1 /* 0 is not possible so add 1 after*/;
 
@@ -54,7 +57,7 @@ public class ExecutionTimeUT {
 		numTask =  1 + randomGen.nextInt(maxNumTask);
 		executors =  1 + randomGen.nextInt(maxNumExecutors);
 		
-		ones = new double[executors][numTask];
+		ones = ExecutionTimeUtil.getOnesMatrix(executors, numTask);
 		chromosome = new int[numTask];
 		
 		// Randomly initialize the chormosome allocating to a random node
@@ -63,16 +66,9 @@ public class ExecutionTimeUT {
 			chromosome[currTask] =  randomGen.nextInt(executors);
 		}
 		
-		// Initialize ones matrix with ones}
-		for (int currRow = 0; currRow < ones.length; currRow++)
-		{
-			for (int currCol = 0; currCol < ones[0].length; currCol++)
-			{
-				ones[currRow][currCol] = 1;
-			}
-		}
-		
 		executionTimeGA =  new ExecutionTime(ones);
+		
+		convMatrix = executionTimeGA.createCONVMatrix(chromosome);
 		
 	}
 
@@ -106,11 +102,10 @@ public class ExecutionTimeUT {
 	}
 
 	@Test
-	public void getSumTime()
-	{
+	public void getSumTime(){
 		double[] sumTime;
 		
-		sumTime = executionTimeGA.getSumTime(chromosome);
+		sumTime = executionTimeGA.getSumTime(convMatrix);
 		
 		/* 
 		 * Since our ETC matrix has only ones the execution time per node
@@ -125,9 +120,10 @@ public class ExecutionTimeUT {
 	
 	@Test
 	public void calculateTotalTime(){
+		
 		double totalTime;
 		
-		totalTime = executionTimeGA.getTotalTime(chromosome);
+		totalTime = executionTimeGA.getTotalTime(convMatrix);
 		
 		/* 
 		 * Since our ETC matrix has only ones the total execution time 
@@ -137,8 +133,9 @@ public class ExecutionTimeUT {
 	}
 	
 	@Test
-	public void loadImabalance(){
-		executionTimeGA.getLoad(chromosome);
+	public void loadImbalance(){
+		
+		executionTimeGA.getLoad(convMatrix);
 	}
 
 }

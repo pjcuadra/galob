@@ -13,6 +13,10 @@
 
 package alg;
 
+import org.jenetics.*;
+import org.jenetics.engine.Codec;
+import org.jenetics.util.IntRange;
+
 public class ExecutionTime {
 	
 	/* 
@@ -22,10 +26,30 @@ public class ExecutionTime {
 	private double[][] ETC;
 	
 	// The ETC is need from the beginning of time
-	public ExecutionTime(double[][] ETC)
+	/**
+	 * Constructor
+	 * @param ETCMatrix Execution times matrix
+	 */
+	public ExecutionTime(double[][] ETCMatrix)
 	{
-		this.ETC = ETC;
+		ETC = ETCMatrix;
 	}
+	
+	/**
+	 * Create a Jenetics codec for IntegerChromosome/Conv matrix encoding/decoding 
+	 * @return Jenetics codec
+	 */
+	public Codec<int[][], IntegerGene> ofCONV()
+	{		
+		int numExecutors = ETC.length - 1;
+		int numTask = ETC[0].length;
+		
+		return Codec.of(
+				Genotype.of(IntegerChromosome.of(IntRange.of(0, numExecutors), numTask)), /*Encoder*/ 
+				gt->createCONVMatrix(((IntegerChromosome)gt.getChromosome()).toArray()) /*Decoder*/
+				);
+	}
+	
 	
 	/**
 	 * Calculate the CONV matrix from a Chromosome
@@ -39,9 +63,9 @@ public class ExecutionTime {
 	 * 					  
 	 * @return CONV matrix
 	 */
-	private double[][] createCONVMatrix(int[] chromosome)
+	public int[][] createCONVMatrix(int[] chromosome)
 	{
-		double[][] CONV = new double[ETC.length][ETC[0].length];
+		int[][] CONV = new int[ETC.length][ETC[0].length];
 		int currTask = 0;
 		
 		// Just set to one where it is allocated
@@ -61,27 +85,26 @@ public class ExecutionTime {
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (1)
 	 * 
-	 * @param chromosome allocation nodes array indexed by 
-	 * 					 task index
+	 * @param convMatrix allocation nodes matrix
+	 * 
 	 * @return the sum of execution times per node as an array
 	 *         indexed by node index 
 	 */
-	public double[] getSumTime(int[] chromosome)
+	public double[] getSumTime(int[][] convMatrix)
 	{
-		double[][] CONV = createCONVMatrix(chromosome);
-		double[] sumTime = new double[CONV.length];
+		double[] sumTime = new double[convMatrix.length];
 		int i = 0, j = 0;
 		
 		// Iterate over the tasks
-		for (i = 0; i < CONV.length; i++)
+		for (i = 0; i < convMatrix.length; i++)
 		{
 			sumTime[i] = 0;
 					
 			// Iterate over the nodes
-			for (j = 0; j < CONV[i].length; j++)
+			for (j = 0; j < convMatrix[i].length; j++)
 			{
 				// Add all execution times
-				sumTime[i] += CONV[i][j]*ETC[i][j];
+				sumTime[i] += convMatrix[i][j]*ETC[i][j];
 			}
 		}		
 		
@@ -95,14 +118,13 @@ public class ExecutionTime {
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (2)
 	 * 
-	 * @param chromosome allocation nodes array indexed by 
-	 * 					 task index
+	 * @param convMatrix allocation nodes matrix
 	 * 
 	 * @return total execution time of a given Chromosome
 	 */
-	public double getTotalTime(int[] chromosome)
+	public double getTotalTime(int[][] convMatrix)
 	{
-		double[] sumTime = getSumTime(chromosome);
+		double[] sumTime = getSumTime(convMatrix);
 		double totalTime = 0;
 		
 		for (double time : sumTime)
@@ -121,15 +143,15 @@ public class ExecutionTime {
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (4)
 	 * 
-	 * @param chromosome allocation nodes array indexed by 
-	 * 					 task index
+	 * @param convMatrix allocation nodes matrix
+	 * 
 	 * @return load imbalance of a Chromosome
 	 */
-	public double getLoad(int[] chromosome)
+	public double getLoad(int[][] convMatrix)
 	{
-		double[] sumTime = getSumTime(chromosome);
+		double[] sumTime = getSumTime(convMatrix);
 		double load = 0;
-		double avgTime = getTotalTime(chromosome)/chromosome.length;
+		double avgTime = getTotalTime(convMatrix)/convMatrix.length;
 		
 		// First calculate sum = (sumTime(i) - averageTime)^2
 		for (double time: sumTime)
