@@ -60,7 +60,7 @@ public class ExecutionTimeUT {
 		ones = ExecutionTimeUtil.getOnesMatrix(executors, numTask);
 		chromosome = new int[numTask];
 		
-		// Randomly initialize the chormosome allocating to a random node
+		// Randomly initialize the chromosome allocating to a random node
 		for (int currTask = 0; currTask < chromosome.length; currTask++)
 		{
 			chromosome[currTask] =  randomGen.nextInt(executors);
@@ -113,7 +113,7 @@ public class ExecutionTimeUT {
 		 */		
 		for (int currNodeTime = 0; currNodeTime < executors; currNodeTime++)
 		{
-			assertEquals(sumTime[currNodeTime], getTaskAllocateOnNode(currNodeTime), 0.01);
+			assertEquals(getTaskAllocateOnNode(currNodeTime), sumTime[currNodeTime], 0.01);
 		}
 
 	}
@@ -121,15 +121,27 @@ public class ExecutionTimeUT {
 	@Test
 	public void calculateTotalTime(){
 		
-		double totalTime;
+		double totalTime = 0;
+		double expectedTotalTime = 0;
+		double tempTotalTime = 0;
 		
 		totalTime = executionTimeGA.getTotalTime(convMatrix);
+		
+		for (int i = 0; i < executors; i++)
+		{
+			tempTotalTime = getTaskAllocateOnNode(i);
+			
+			if (tempTotalTime > expectedTotalTime)
+			{
+				expectedTotalTime = tempTotalTime;
+			}
+		}
 		
 		/* 
 		 * Since our ETC matrix has only ones the total execution time 
 		 * should be the amount of tasks.
 		 */	
-		assertEquals(totalTime, numTask, 0.01);
+		assertEquals(expectedTotalTime, totalTime,0.01);
 	}
 	
 	@Test
