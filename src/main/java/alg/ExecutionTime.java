@@ -129,7 +129,10 @@ public class ExecutionTime {
 		
 		for (double time : sumTime)
 		{
-			totalTime += time;
+			if (time > totalTime)
+			{
+				totalTime = time;
+			}
 		}
 		
 		return totalTime;
