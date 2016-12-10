@@ -3,6 +3,7 @@
  */
 package alg;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import alg.util.ExecutionTimeUtil;
+import alg.util.Util;
 
 /**
  * @author Pedro Cuadra
@@ -57,7 +58,7 @@ public class ExecutionTimeUT {
 		numTask =  1 + randomGen.nextInt(maxNumTask);
 		executors =  1 + randomGen.nextInt(maxNumExecutors);
 		
-		ones = ExecutionTimeUtil.getOnesMatrix(executors, numTask);
+		ones = Util.getOnesMatrix(executors, numTask);
 		chromosome = new int[numTask];
 		
 		// Randomly initialize the chromosome allocating to a random node
@@ -72,7 +73,7 @@ public class ExecutionTimeUT {
 		
 	}
 
-	/**
+	/**r
 	 * @throws java.lang.Exception
 	 */
 	@After
@@ -168,6 +169,16 @@ public class ExecutionTimeUT {
 		}
 		assertEquals(fitness, ((double)1/maxnumtasks), 0.01);
 		System.out.println(fitness);
+	}
+	
+	@Test
+	public void checkDPNDMatrix()
+	{
+		int[][] matrix;
+		
+		matrix = Util.getDPNDMatrix(numTask);		
+				
+        System.out.println("mat"+ Arrays.deepToString(matrix));
 	}
 	
 	@Test

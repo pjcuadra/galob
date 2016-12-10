@@ -13,7 +13,7 @@ import org.jenetics.SinglePointCrossover;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionStatistics;
 
-import alg.util.ExecutionTimeUtil;
+import alg.util.Util;
 
 public class ExecutionTimeExample {
 	
@@ -22,7 +22,7 @@ public class ExecutionTimeExample {
 	
 	public static void main(String[] args)
 	{
-		double[][] myETC = ExecutionTimeUtil.getOnesMatrix(numExecutors, numTask);
+		double[][] myETC = Util.getOnesMatrix(numExecutors, numTask);
 		ExecutionTime etOpt = new ExecutionTime(myETC);
 		
 		for (int o = 0; o < myETC[0].length; o++)
