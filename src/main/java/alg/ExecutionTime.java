@@ -203,13 +203,13 @@ public class ExecutionTime extends Scheduler{
 	 */
 
 	public static boolean getValidityOfChrm(double[][]DPNDMatrix,int[]TaskArray){	
-		
+
 		int numtasks = DPNDMatrix.length; //square matrix with rows=cols=num of tasks
 		double[][]tempmat = new double[numtasks][numtasks];
 		int numofones = 0;
 
 		tempmat = Util.copyMatrix(DPNDMatrix,tempmat);
-		
+
 		//only execute as long as order is valid
 		for(int iterator:TaskArray)
 		{
@@ -228,7 +228,7 @@ public class ExecutionTime extends Scheduler{
 			for(int j=0;j<numtasks;j++){
 				tempmat[iterator][j] = 0;
 			}
-			
+
 
 		}
 

@@ -57,7 +57,7 @@ public class Util {
 	
 	
 
-	
+
 	/**
 	 * Copy contents of matrix1 to matrix2 and return matrix2
 	 * @param Mat1 reference matrix to be copied
@@ -66,15 +66,15 @@ public class Util {
 	 */
 
 	static public double[][] copyMatrix(double[][]Mat1,double[][]Mat2){
-		
+
 		for(int i=0; i<Mat1.length; i++)
 		{
-			  for(int j=0; j<Mat1[i].length; j++)
-			  {
-				  Mat2[i][j]=Mat1[i][j];
-			  }
+			for(int j=0; j<Mat1[i].length; j++)
+			{
+				Mat2[i][j]=Mat1[i][j];
+			}
 		}
 		return Mat2;
-		
+
 	}
 }
