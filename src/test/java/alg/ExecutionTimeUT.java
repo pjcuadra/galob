@@ -183,6 +183,26 @@ public class ExecutionTimeUT {
 	}
 
 	@Test
+	public void checkvalidity()
+	{
+		double[][] matrix = new double[4][4];
+		int[] chrome1 = {0,1,2,3};
+		int[] chrome2 = {2,1,3,0};
+
+
+		matrix[0][1] = 1;
+		matrix[0][2] = 1;
+		matrix[1][2] = 1;
+		matrix[1][3] = 1;
+		matrix[2][3] = 1;
+
+		System.out.println("mat"+ Arrays.deepToString(matrix));
+		assertEquals((ExecutionTime.getValidityOfChrm(matrix,chrome1)),true);
+		assertEquals((ExecutionTime.getValidityOfChrm(matrix,chrome2)),false);
+
+	}
+
+	@Test
 	public void loadImbalance(){
 
 		executionTimeGA.getLoad(convMatrix);
