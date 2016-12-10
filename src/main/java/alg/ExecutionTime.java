@@ -17,22 +17,14 @@ import org.jenetics.*;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.IntRange;
 
-public class ExecutionTime {
+public class ExecutionTime extends Scheduler{
 
-	/* 
-	 * Execution Time Cost matrix with ETC[i][j] where i is the
-	 * node and j is the task index. 
-	 */ 
-	private double[][] ETC;
-
-	// The ETC is need from the beginning of time
 	/**
-	 * Constructor
+	 * Constructor 
 	 * @param ETCMatrix Execution times matrix
 	 */
-	public ExecutionTime(double[][] ETCMatrix)
-	{
-		ETC = ETCMatrix;
+	public ExecutionTime(double[][] ETCMatrix) {
+		super(ETCMatrix);
 	}
 
 	/**

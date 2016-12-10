@@ -4,14 +4,13 @@ import java.util.Random;
 
 public class Util {
 
-	private static Random randomGen;
 	/**
 	 * Get ones matrix of size rows*cols
 	 * @param rows rows of the matrix
 	 * @param cols columns of the matrix
 	 * @return ones matrix
 	 */
-	static public double[][] getOnesMatrix(int rows, int cols)
+	public static double[][] getOnesMatrix(int rows, int cols)
 	{
 		double[][] ones = new double[rows][cols];
 		// Initialize ones matrix with ones}
@@ -35,7 +34,7 @@ public class Util {
 	 */
 
 	public static int[][] getDPNDMatrix(int numTasks){
-		randomGen = new Random();
+		Random randomGen = new Random();
 
 		int[][] depend = new int[numTasks][numTasks];
 		// Initialize the upper triangular matrix with ones randomly
@@ -55,5 +54,7 @@ public class Util {
 
 		return depend;
 	}
+	
+	
 
 }
