@@ -25,6 +25,7 @@ public class ExecutionTimeUT {
 	private Random randomGen;
 
 	private double[][] ones;
+	private int[][] delta;
 	private int[] chromosome;
 	private ExecutionTime executionTimeGA;
 	private int numTask;
@@ -59,6 +60,7 @@ public class ExecutionTimeUT {
 		executors =  1 + randomGen.nextInt(maxNumExecutors);
 
 		ones = Util.getOnesMatrix(executors, numTask);
+		delta = Util.getDPNDMatrix(maxNumTask);
 		chromosome = new int[numTask];
 
 		// Randomly initialize the chromosome allocating to a random node
@@ -67,7 +69,7 @@ public class ExecutionTimeUT {
 			chromosome[currTask] =  randomGen.nextInt(executors);
 		}
 
-		executionTimeGA =  new ExecutionTime(ones);
+		executionTimeGA =  new ExecutionTime(ones, delta);
 
 		convMatrix = executionTimeGA.createCONVMatrix(chromosome);
 

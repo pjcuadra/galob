@@ -17,7 +17,12 @@ import java.util.Arrays;
 import alg.util.*;
 import org.jenetics.*;
 import org.jenetics.engine.Codec;
-import org.jenetics.util.IntRange;
+import org.jenetics.util.ISeq;
+
+import alg.util.Scheduler;
+import alg.util.genetics.ScheduleAllel;
+import alg.util.genetics.ScheduleChromosome;
+import alg.util.genetics.ScheduleGene;
 
 public class ExecutionTime extends Scheduler{
 
@@ -25,22 +30,21 @@ public class ExecutionTime extends Scheduler{
 	 * Constructor 
 	 * @param ETCMatrix Execution times matrix
 	 */
-	public ExecutionTime(double[][] ETCMatrix) {
-		super(ETCMatrix);
+	public ExecutionTime(double[][] ETCMatrix, int[][] delta) {
+		super(ETCMatrix, delta);
 	}
 
 	/**
 	 * Create a Jenetics codec for IntegerChromosome/Conv matrix encoding/decoding 
 	 * @return Jenetics codec
 	 */
-	public Codec<int[][], IntegerGene> ofCONV()
+	public Codec<int[][], ScheduleGene> ofCONV()
 	{		
-		int numExecutors = ETC.length - 1;
-		int numTask = ETC[0].length;
+		int numExecutors = ETC.length;
 
 		return Codec.of(
-				Genotype.of(IntegerChromosome.of(IntRange.of(0, numExecutors), numTask)), /*Encoder*/ 
-				gt->createCONVMatrix(((IntegerChromosome)gt.getChromosome()).toArray()) /*Decoder*/
+				Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
+				gt->createCONVMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq()) /*Decoder*/
 				);
 	}
 
@@ -52,20 +56,49 @@ public class ExecutionTime extends Scheduler{
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun) 
 	 * 
-	 * @param chromosome allocation nodes array indexed by 
+	 * @param iSeq allocation nodes array indexed by 
 	 * 					 task index
 	 * 					  
 	 * @return CONV matrix
 	 */
+	public int[][] createCONVMatrix(ISeq<ScheduleGene> iSeq)
+	{
+		int[][] CONV = new int[ETC.length][ETC[0].length];
+		ScheduleAllel currAllel = null;
+
+		// Just set to one where it is allocated
+		for (ScheduleGene gene: iSeq)
+		{
+			currAllel = gene.getAllele();
+			CONV[currAllel.getExecutorID()][currAllel.getTaskID()] = 1;
+		}
+
+		return CONV;
+	}
+	
 	public int[][] createCONVMatrix(int[] chromosome)
 	{
 		int[][] CONV = new int[ETC.length][ETC[0].length];
-		int currTask = 0;
 
 		// Just set to one where it is allocated
-		for (currTask = 0; currTask < chromosome.length; currTask++)
+		for (int gene: chromosome)
 		{
-			CONV[chromosome[currTask]][currTask] = 1;
+			CONV[chromosome[gene]][gene] = 1;
+		}
+
+		return CONV;
+	}
+	
+	public int[][] createCONVMatrix(ScheduleChromosome chromosome)
+	{
+		int[][] CONV = new int[ETC.length][ETC[0].length];
+		ScheduleAllel currAllel = null;
+
+		// Just set to one where it is allocated
+		for (ScheduleGene gene: chromosome)
+		{
+			currAllel = gene.getAllele();
+			CONV[currAllel.getExecutorID()][currAllel.getTaskID()] = 1;
 		}
 
 		return CONV;
@@ -151,10 +184,11 @@ public class ExecutionTime extends Scheduler{
 		double TotalTime = getTotalTime(convMatrix);
 		double Fitness = 0;
 
-		Fitness = (1/TotalTime);
+		Fitness = TotalTime;
 
 		return Fitness;
 	}
+	
 
 
 	/**

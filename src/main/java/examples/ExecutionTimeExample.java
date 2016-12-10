@@ -1,10 +1,10 @@
 package examples;
 
 import alg.ExecutionTime;
+
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 import static org.jenetics.engine.limit.bySteadyFitness;
 
-import org.jenetics.IntegerGene;
 import org.jenetics.Mutator;
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
@@ -14,24 +14,30 @@ import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionStatistics;
 
 import alg.util.Util;
+import alg.util.genetics.ScheduleGene;
 
 public class ExecutionTimeExample {
 
-	final static int numTask = 16;
-	final static int numExecutors = 3;
-
+	final static int numTasks = 16;
+	final static int numExecutors = 4;
+	static ExecutionTime etOpt;
+	
 	public static void main(String[] args)
 	{
-		double[][] myETC = Util.getOnesMatrix(numExecutors, numTask);
-		ExecutionTime etOpt = new ExecutionTime(myETC);
+		double[][] myETC = Util.getOnesMatrix(numExecutors, numTasks);
+		int[][] delta = Util.getDPNDMatrix(numTasks);
+		ExecutionTime etOpt = new ExecutionTime(myETC, delta);
+		
 
 		for (int o = 0; o < myETC[0].length; o++)
 		{
-			myETC[0][o] = 1.5;
+//			myETC[0][o] = 1.5;
 		}
+		
+		
 
 		// Configure and build the evolution engine.
-		final Engine<IntegerGene, Double> engine = Engine
+		final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
 				.builder(
 						etOpt::getFitness,
 						etOpt.ofCONV())
@@ -47,7 +53,7 @@ public class ExecutionTimeExample {
 		final EvolutionStatistics<Double, ?>
 		statistics = EvolutionStatistics.ofNumber();
 
-		final Phenotype<IntegerGene, Double> best = engine.stream()
+		final Phenotype<ScheduleGene, Double> best = engine.stream()
 				// Truncate the evolution stream after 7 "steady"
 				// generations.
 				.limit(bySteadyFitness(7))
@@ -60,6 +66,8 @@ public class ExecutionTimeExample {
 				// Collect (reduce) the evolution stream to
 				// its best phenotype.
 				.collect(toBestPhenotype());
+		
+		System.out.println("Finished!");
 
 		System.out.println(statistics);
 		System.out.println(best);
