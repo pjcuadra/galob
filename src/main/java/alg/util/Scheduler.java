@@ -9,13 +9,6 @@ package alg.util;
  *
  */
 public class Scheduler {
-
-	public Scheduler(double[][] ETCMatrix, int[][] delta) {
-		ETC = ETCMatrix;
-		this.delta = delta;
-	}
-
-
 	/**
 	 * Execution Time matrix with ETC[i][j] where i is the
 	 * node and j is the task index. 
@@ -26,7 +19,17 @@ public class Scheduler {
 	 * Dependency matrix, where i is independent task ID and j 
 	 * dependent task ID and delta[i][j] is the communication cost
 	 */
-	protected int[][] delta;
+	protected double[][] delta;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param etc execution time matrix
+	 * @param delta dependency matrix
+	 */
+	public Scheduler(double[][] etc, double[][] delta) {
+		this.ETC = etc;
+		this.delta = delta;
+	}
 
 }

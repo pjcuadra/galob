@@ -7,6 +7,7 @@ import java.util.Iterator;
 import org.jenetics.Chromosome;
 import org.jenetics.util.ISeq;
 
+import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
 
 /**
@@ -25,46 +26,56 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 	 * Scheduling sequence of ScheduleItem's genes
 	 */
 	public ISeq<ScheduleGene> scheduleSeq;
+	/**
+	 * Number of tasks
+	 */
 	private int numTasks;
+	/**
+	 * Number of executing units
+	 */
 	private int numExecutors;
-	private int[][] delta;
+	/**
+	 * Dependencies matrix, delta
+	 */
+	private double[][] delta;
 
 
-	public ScheduleChromosome(int[][] delta, int numExecutors) {
-		ArrayList<ScheduleAllel> toSchedule = new ArrayList<ScheduleAllel>();
+	/**
+	 * Constructor
+	 * 
+	 * @param delta dependency matrix, delta
+	 * @param numExecutors number of executing units
+	 */
+	public ScheduleChromosome(double[][] delta, int numExecutors) {
+		ArrayList<ScheduleAllele> toSchedule = new ArrayList<ScheduleAllele>();
 		ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
-		ArrayList<ScheduleAllel> allocable = null;
+		ArrayList<ScheduleAllele> allocable = null;
 		ScheduleGene gene =  null;;
 		boolean clean = false;
 		
-		this.delta = new int[delta.length][delta.length];
+		this.delta = Util.copyMatrix(delta);
 
-		for (int i = 0; i < delta.length; i++)
-		{
-			for (int j = 0; j < delta.length; j++)
-			{
-				this.delta[i][j] = delta[i][j];
-			}
-		}
-		
 		this.numTasks = delta.length;
 		this.numExecutors = numExecutors;
 		
+		// Create a gene to use it as factory
 		gene =  ScheduleGene.of(numTasks, numExecutors);
 
-		scheduleSeq = ISeq.of();
-
+		// Initialize the alleles list
 		for (int i = 0; i < numTasks; i++)
 		{
-			toSchedule.add(new ScheduleAllel(numTasks, numExecutors, i));
+			toSchedule.add(new ScheduleAllele(numTasks, numExecutors, i));
 		}
 
+		// Finish until everything is allocated (assuming no cycles)
 		while (!toSchedule.isEmpty())
 		{
-			allocable =  new ArrayList<ScheduleAllel>();
+			// New allocable list
+			allocable =  new ArrayList<ScheduleAllele>();
 
-			for (ScheduleAllel currItem: toSchedule)
+			for (ScheduleAllele currItem: toSchedule)
 			{
+				// If no dependency pending is allocable
 				clean = true;
 				for (int j = 0; j < delta.length; j++)
 				{
@@ -78,32 +89,40 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 
 				if (!clean) continue;
 
+				// Add to allocable list
 				allocable.add(currItem);
 
 			}
 			
-			if (allocable.isEmpty())
-			{
-				break;
-			}
-
+			// Randomly shuffle the allocable domain
 			Collections.shuffle(allocable);
 
+			// Add first element to the sequence
 			myList.add(gene.newInstance(allocable.get(0)));
 
+			// Remove from un allocated list
 			toSchedule.remove(allocable.get(0));
 			
+			// Set dependency for all other task to zero
 			for (int j = 0; j < delta.length; j++)
 			{
-				this.delta[allocable.get(0).taskID][j] = 0;
+				this.delta[allocable.get(0).getTaskID()][j] = 0;
 			}
 		}
 
+		// Convert to Sequence
 		scheduleSeq = ISeq.of(myList);
 
 	}
 
-	public ScheduleChromosome(int[][] delta, int numExecutors, ISeq<ScheduleGene> genes) {
+	/**
+	 * Constructor
+	 * 
+	 * @param delta dependency matrix, delta
+	 * @param numExecutors number of executing units
+	 * @param genes sequence of already created genes
+	 */
+	public ScheduleChromosome(double[][] delta, int numExecutors, ISeq<ScheduleGene> genes) {
 		
 		this.delta = delta;
 		this.numTasks = delta.length;
@@ -118,31 +137,34 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 	@Override
 	public boolean isValid() {
 		
-		boolean[] allocated = new boolean[numTasks];
-		
-		for (ScheduleGene currGene: scheduleSeq)
+		int numtasks = delta.length; //square matrix with rows=cols=num of tasks
+		double[][]tempmat = new double[numtasks][numtasks];
+		int numofones = 0;
+
+		tempmat = Util.copyMatrix(delta);
+
+		//only execute as long as order is valid
+		for(ScheduleGene gene: scheduleSeq)
 		{
-			if (allocated[currGene.getAllele().getTaskID()])
+
+			for(int i = 0; i < numtasks ;i++)
+			{
+				/*check if there is a dependency with a successive task
+				check for ones in the column*/
+				numofones += tempmat[i][gene.getAllele().getTaskID()];
+			}
+			if (numofones != 0)
 			{
 				return false;
 			}
-			
-			for (int j = 0; j < delta.length; j++)
-			{
-				if (this.delta[j][currGene.getAllele().getTaskID()] != 0)
-				{
-					return false;
-				}
+			//to clear the elements of the row		
+			for(int j = 0; j < numtasks; j++){
+				tempmat[gene.getAllele().getTaskID()][j] = 0;
 			}
-			
-			allocated[currGene.getAllele().getTaskID()] = true;
-			
-			for (int j = 0; j < delta.length; j++)
-			{
-				this.delta[currGene.getAllele().getTaskID()][j] = 0;
-			}
+
+
 		}
-		
+
 		return true;
 	}
 
@@ -199,12 +221,13 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 	}
 
 	/**
-	 * TODO: Fill this
-	 * @param delta
-	 * @param numExecutors
+	 * Static constructor
+	 * 
+	 * @param delta dependency matrix, delta
+	 * @param numExecutors number of executing units
 	 * @return
 	 */
-	public static Chromosome<ScheduleGene> of(int[][] delta, int numExecutors) {
+	public static Chromosome<ScheduleGene> of(double[][] delta, int numExecutors) {
 		return new ScheduleChromosome(delta, numExecutors);
 	}
 

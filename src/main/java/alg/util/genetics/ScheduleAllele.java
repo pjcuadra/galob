@@ -9,15 +9,21 @@ import java.util.Random;
  * Genetics algorithm's gene
  *
  */
-public class ScheduleAllel{
+public class ScheduleAllele{
 
-	public int taskID;
-	public int executorID;
+	/**
+	 * ID of the task
+	 */
+	private int taskID;
+	/**
+	 * ID of the executor
+	 */
+	private int executorID;
 
 	/**
 	 * Constructor
 	 */
-	public ScheduleAllel(int numTasks, int numExecutors)
+	public ScheduleAllele(int numTasks, int numExecutors)
 	{
 		Random randGen = new Random();
 		
@@ -27,9 +33,11 @@ public class ScheduleAllel{
 			
 	/**
 	 * Constructor
-	 * @param taskID task ID
+	 * @param numTask number of tasks
+	 * @param numExecutors number of executing units
+	 * @param taskID ID of the task
 	 */
-	public ScheduleAllel(int numTask, int numExecutors, int taskID)
+	public ScheduleAllele(int numTask, int numExecutors, int taskID)
 	{
 		Random randGen = new Random();
 		this.taskID = taskID;
@@ -40,7 +48,7 @@ public class ScheduleAllel{
 	 * Get task ID
 	 * @return task ID
 	 */
-	public Integer getTaskID() {
+	public int getTaskID() {
 		return taskID;
 	}
 
@@ -48,10 +56,13 @@ public class ScheduleAllel{
 	 * Get executor ID
 	 * @return executor ID
 	 */
-	public Integer getExecutorID() {
+	public int getExecutorID() {
 		return executorID;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString(){
 		return "{ " + taskID +" : " + executorID + " }" ;
 	}

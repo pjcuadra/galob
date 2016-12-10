@@ -13,14 +13,12 @@
 
 package alg;
 
-import java.util.Arrays;
-import alg.util.*;
 import org.jenetics.*;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
 
 import alg.util.Scheduler;
-import alg.util.genetics.ScheduleAllel;
+import alg.util.genetics.ScheduleAllele;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
 
@@ -30,7 +28,7 @@ public class ExecutionTime extends Scheduler{
 	 * Constructor 
 	 * @param ETCMatrix Execution times matrix
 	 */
-	public ExecutionTime(double[][] ETCMatrix, int[][] delta) {
+	public ExecutionTime(double[][] ETCMatrix, double[][] delta) {
 		super(ETCMatrix, delta);
 	}
 
@@ -56,18 +54,17 @@ public class ExecutionTime extends Scheduler{
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun) 
 	 * 
-	 * @param iSeq allocation nodes array indexed by 
-	 * 					 task index
+	 * @param scheduleSeq genes sequence of a valid chromosome
 	 * 					  
 	 * @return CONV matrix
 	 */
-	public int[][] createCONVMatrix(ISeq<ScheduleGene> iSeq)
+	public int[][] createCONVMatrix(ISeq<ScheduleGene> scheduleSeq)
 	{
 		int[][] CONV = new int[ETC.length][ETC[0].length];
-		ScheduleAllel currAllel = null;
+		ScheduleAllele currAllel = null;
 
 		// Just set to one where it is allocated
-		for (ScheduleGene gene: iSeq)
+		for (ScheduleGene gene: scheduleSeq)
 		{
 			currAllel = gene.getAllele();
 			CONV[currAllel.getExecutorID()][currAllel.getTaskID()] = 1;
@@ -76,35 +73,6 @@ public class ExecutionTime extends Scheduler{
 		return CONV;
 	}
 	
-	public int[][] createCONVMatrix(int[] chromosome)
-	{
-		int[][] CONV = new int[ETC.length][ETC[0].length];
-
-		// Just set to one where it is allocated
-		for (int gene: chromosome)
-		{
-			CONV[chromosome[gene]][gene] = 1;
-		}
-
-		return CONV;
-	}
-	
-	public int[][] createCONVMatrix(ScheduleChromosome chromosome)
-	{
-		int[][] CONV = new int[ETC.length][ETC[0].length];
-		ScheduleAllel currAllel = null;
-
-		// Just set to one where it is allocated
-		for (ScheduleGene gene: chromosome)
-		{
-			currAllel = gene.getAllele();
-			CONV[currAllel.getExecutorID()][currAllel.getTaskID()] = 1;
-		}
-
-		return CONV;
-	}
-
-
 	/**
 	 * Get the execution time of every node given a chromosome
 	 * 
@@ -222,53 +190,5 @@ public class ExecutionTime extends Scheduler{
 
 		return load;
 	}
-
-	/**
-	 * Check the validity of given Chromosome
-	 * 
-	 * A fast hybrid genetic algorithm in heterogeneous computing environment
-	 * Zhiyang Jiang, Shengzhong Feng
-	 * Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences 
-	 * 
-	 * @param DPNDMatrix dependency of tasks matrix
-	 * 
-	 * @return Validity  boolean to represent validity of Chromosome acc to 
-	 * 				     dependency matrix
-	 */
-
-	public static boolean getValidityOfChrm(double[][]DPNDMatrix,int[]TaskArray){	
-
-		int numtasks = DPNDMatrix.length; //square matrix with rows=cols=num of tasks
-		double[][]tempmat = new double[numtasks][numtasks];
-		int numofones = 0;
-
-		tempmat = Util.copyMatrix(DPNDMatrix,tempmat);
-
-		//only execute as long as order is valid
-		for(int iterator:TaskArray)
-		{
-
-			for(int i=0;i<numtasks;i++)
-			{
-				/*check if there is a dependency with a successive task
-				check for ones in the cloumn*/
-				numofones += tempmat[i][iterator];
-			}
-			if (numofones != 0)
-			{
-				return false;
-			}
-			//to clear the elements of the row		
-			for(int j=0;j<numtasks;j++){
-				tempmat[iterator][j] = 0;
-			}
-
-
-		}
-
-		return true;
-
-	}
-
 
 }

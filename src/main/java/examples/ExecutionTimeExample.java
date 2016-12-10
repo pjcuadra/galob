@@ -25,17 +25,28 @@ public class ExecutionTimeExample {
 	public static void main(String[] args)
 	{
 		double[][] myETC = Util.getOnesMatrix(numExecutors, numTasks);
-		int[][] delta = Util.getDPNDMatrix(numTasks);
-		ExecutionTime etOpt = new ExecutionTime(myETC, delta);
+		double[][] delta = Util.getDPNDMatrix(numTasks);
+		ExecutionTime etOpt = null;
 		
 
 		for (int o = 0; o < myETC[0].length; o++)
 		{
-//			myETC[0][o] = 1.5;
+			myETC[0][o] = 2;
 		}
 		
+		for (int o = 0; o < myETC[0].length; o++)
+		{
+			myETC[1][o] = 3;
+		}
 		
-
+		for (int o = 0; o < myETC[0].length; o++)
+		{
+			myETC[2][o] = 5;
+		}
+		
+		 etOpt = new ExecutionTime(myETC, delta);
+		
+		
 		// Configure and build the evolution engine.
 		final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
 				.builder(
