@@ -33,7 +33,7 @@ public class ExecutionTimeExample {
 		// Configure and build the evolution engine.
 		final Engine<IntegerGene, Double> engine = Engine
 			.builder(
-				etOpt::getTotalTime, // TODO: Define a proper fitness function
+				etOpt::getFitness,
 				etOpt.ofCONV())
 			.populationSize(500)
 			.optimize(Optimize.MINIMUM)

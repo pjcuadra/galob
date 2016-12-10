@@ -152,12 +152,12 @@ public class ExecutionTime {
 	 *          set to 1 as of now.
 	 * @return fitness of a given Chromosome
 	 */
-	public double getFitness(int[] chromosome, double Etfactor)
+	public double getFitness(int[][] convMatrix)
 	{
-		double TotalTime = getTotalTime(chromosome);
+		double TotalTime = getTotalTime(convMatrix);
 		double Fitness = 0;
 				
-		Fitness = Etfactor*(1/TotalTime);
+		Fitness = (1/TotalTime);
 		
 		return Fitness;
 	}

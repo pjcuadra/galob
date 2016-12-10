@@ -149,12 +149,8 @@ public class ExecutionTimeUT {
 	@Test
 	public void calculateFitness(){
 		double fitness;
-		
-		/*becuase we only have execution time as a factor to 
-		calculate fitness for now we set the ETfactor to 1
-		*/
-		
-		fitness = executionTimeGA.getFitness(chromosome,1);
+					
+		fitness = executionTimeGA.getFitness(convMatrix);
 		
 		/* 
 		 * Since our ETC matrix has only ones the fitness value
