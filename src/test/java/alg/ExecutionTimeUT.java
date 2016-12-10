@@ -21,9 +21,9 @@ import alg.util.Util;
  *
  */
 public class ExecutionTimeUT {
-	
+
 	private Random randomGen;
-	
+
 	private double[][] ones;
 	private int[] chromosome;
 	private ExecutionTime executionTimeGA;
@@ -52,25 +52,25 @@ public class ExecutionTimeUT {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
+
 		randomGen = new Random();
-		
+
 		numTask =  1 + randomGen.nextInt(maxNumTask);
 		executors =  1 + randomGen.nextInt(maxNumExecutors);
-		
+
 		ones = Util.getOnesMatrix(executors, numTask);
 		chromosome = new int[numTask];
-		
+
 		// Randomly initialize the chromosome allocating to a random node
 		for (int currTask = 0; currTask < chromosome.length; currTask++)
 		{
 			chromosome[currTask] =  randomGen.nextInt(executors);
 		}
-		
+
 		executionTimeGA =  new ExecutionTime(ones);
-		
+
 		convMatrix = executionTimeGA.createCONVMatrix(chromosome);
-		
+
 	}
 
 	/**
@@ -79,8 +79,8 @@ public class ExecutionTimeUT {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
-	
+
+
 	/**
 	 * Get the amount of task allocated to a given node
 	 * @param node node index
@@ -89,7 +89,7 @@ public class ExecutionTimeUT {
 	private int getTaskAllocateOnNode(int node)
 	{
 		int amount = 0;
-		
+
 		for (int currGen: chromosome)
 		{
 			if (currGen == node)
@@ -97,11 +97,11 @@ public class ExecutionTimeUT {
 				amount++;
 			}
 		}
-		
+
 		return amount;
-		
+
 	}
-	
+
 	/**
 	 * Get the maximum number of task allocated to one node
 	 * of all the given nodes in the chromosome
@@ -112,22 +112,22 @@ public class ExecutionTimeUT {
 		int tempmaxnumtasks = 0;
 		for (int i = 0; i < executors; i++)
 		{
-		tempmaxnumtasks = getTaskAllocateOnNode(i);
-		
-		if (tempmaxnumtasks > maxnumtasks)
-		{
-			maxnumtasks = tempmaxnumtasks;
-		}
+			tempmaxnumtasks = getTaskAllocateOnNode(i);
+
+			if (tempmaxnumtasks > maxnumtasks)
+			{
+				maxnumtasks = tempmaxnumtasks;
+			}
 		}
 		return maxnumtasks;
 	}
-	
+
 	@Test
 	public void getSumTime(){
 		double[] sumTime;
-		
+
 		sumTime = executionTimeGA.getSumTime(convMatrix);
-		
+
 		/* 
 		 * Since our ETC matrix has only ones the execution time per node
 		 * should be the amount of nodes assigned to it.
@@ -138,15 +138,15 @@ public class ExecutionTimeUT {
 		}
 
 	}
-	
+
 	@Test
 	public void calculateTotalTime(){
-		
+
 		double totalTime = 0;
 		double expectedTotalTime = 0;
-		
+
 		totalTime = executionTimeGA.getTotalTime(convMatrix);
-		
+
 		expectedTotalTime = getMaxTasksAllocToOneNode();
 		/* 
 		 * Since our ETC matrix has only ones the total execution time 
@@ -154,37 +154,37 @@ public class ExecutionTimeUT {
 		 */	
 
 		assertEquals(expectedTotalTime, totalTime,0.01);
-		
+
 	}
-	
+
 	@Test
 	public void calculateFitness(){
 		double fitness;
-		
+
 		fitness = executionTimeGA.getFitness(convMatrix);
-		
+
 		/* 
 		 * Since our ETC matrix has only ones the fitness value
 		 * should be 1/number of tasks in one node.
 		 */	
-				
+
 		assertEquals(fitness, ((double)1/getMaxTasksAllocToOneNode()), 0.01);
 		System.out.println(fitness);
 	}
-	
+
 	@Test
 	public void checkDPNDMatrix()
 	{
 		int[][] matrix;
-		
+
 		matrix = Util.getDPNDMatrix(numTask);		
-				
-        System.out.println("mat"+ Arrays.deepToString(matrix));
+
+		System.out.println("mat"+ Arrays.deepToString(matrix));
 	}
-	
+
 	@Test
 	public void loadImbalance(){
-		
+
 		executionTimeGA.getLoad(convMatrix);
 	}
 

@@ -3,7 +3,7 @@ package alg.util;
 import java.util.Random;
 
 public class Util {
-	
+
 	private static Random randomGen;
 	/**
 	 * Get ones matrix of size rows*cols
@@ -22,7 +22,7 @@ public class Util {
 				ones[currRow][currCol] = 1;
 			}
 		}
-		
+
 		return ones;
 	}
 
@@ -34,26 +34,26 @@ public class Util {
 	 * @return dependency matrix
 	 */
 
-    public static int[][] getDPNDMatrix(int numTasks){
-   	   randomGen = new Random();
+	public static int[][] getDPNDMatrix(int numTasks){
+		randomGen = new Random();
 
-	   int[][] depend = new int[numTasks][numTasks];
-	   // Initialize the upper triangular matrix with ones randomly
+		int[][] depend = new int[numTasks][numTasks];
+		// Initialize the upper triangular matrix with ones randomly
 
-	   for (int currRow = 0; currRow < numTasks; currRow++)
-	   {  
-  
-		   for (int currCol = currRow+1; currCol < numTasks; currCol++)
-		   {
-			   if((randomGen.nextInt(20))>9) // Randomly fill 0 or 1 with a randomness probability of 49%
-			   {
-				   depend[currRow][currCol] = 1;
-			   }
-		   }
-		   
-	   }
+		for (int currRow = 0; currRow < numTasks; currRow++)
+		{  
 
-	   return depend;
-   }
+			for (int currCol = currRow+1; currCol < numTasks; currCol++)
+			{
+				if((randomGen.nextInt(20))>9) // Randomly fill 0 or 1 with a randomness probability of 49%
+				{
+					depend[currRow][currCol] = 1;
+				}
+			}
+
+		}
+
+		return depend;
+	}
 
 }
