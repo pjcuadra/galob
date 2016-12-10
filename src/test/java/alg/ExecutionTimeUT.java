@@ -149,14 +149,24 @@ public class ExecutionTimeUT {
 	@Test
 	public void calculateFitness(){
 		double fitness;
-					
+		int maxnumtasks = 0;
+		int tempmaxnumtasks = 0;
 		fitness = executionTimeGA.getFitness(convMatrix);
 		
 		/* 
 		 * Since our ETC matrix has only ones the fitness value
 		 * should be 1/number of tasks.
 		 */	
-		assertEquals(fitness, ((double)1/numTask), 0.01);
+		for (int i = 0; i < executors; i++)
+		{
+			tempmaxnumtasks = getTaskAllocateOnNode(i);
+			
+			if (tempmaxnumtasks > maxnumtasks)
+			{
+				maxnumtasks = tempmaxnumtasks;
+			}
+		}
+		assertEquals(fitness, ((double)1/maxnumtasks), 0.01);
 		System.out.println(fitness);
 	}
 	
