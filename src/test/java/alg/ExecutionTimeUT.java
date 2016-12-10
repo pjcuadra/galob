@@ -73,7 +73,7 @@ public class ExecutionTimeUT {
 		
 	}
 
-	/**r
+	/**
 	 * @throws java.lang.Exception
 	 */
 	@After
@@ -101,7 +101,27 @@ public class ExecutionTimeUT {
 		return amount;
 		
 	}
-
+	
+	/**
+	 * Get the maximum number of task allocated to one node
+	 * of all the given nodes in the chromosome
+	 * @return maximum amount of tasks allocated to a node
+	 */
+	private int getMaxTasksAllocToOneNode(){
+		int maxnumtasks = 0;
+		int tempmaxnumtasks = 0;
+		for (int i = 0; i < executors; i++)
+		{
+		tempmaxnumtasks = getTaskAllocateOnNode(i);
+		
+		if (tempmaxnumtasks > maxnumtasks)
+		{
+			maxnumtasks = tempmaxnumtasks;
+		}
+		}
+		return maxnumtasks;
+	}
+	
 	@Test
 	public void getSumTime(){
 		double[] sumTime;
@@ -124,20 +144,10 @@ public class ExecutionTimeUT {
 		
 		double totalTime = 0;
 		double expectedTotalTime = 0;
-		double tempTotalTime = 0;
 		
 		totalTime = executionTimeGA.getTotalTime(convMatrix);
 		
-		for (int i = 0; i < executors; i++)
-		{
-			tempTotalTime = getTaskAllocateOnNode(i);
-			
-			if (tempTotalTime > expectedTotalTime)
-			{
-				expectedTotalTime = tempTotalTime;
-			}
-		}
-		
+		expectedTotalTime = getMaxTasksAllocToOneNode();
 		/* 
 		 * Since our ETC matrix has only ones the total execution time 
 		 * should be the amount of tasks.
@@ -150,24 +160,15 @@ public class ExecutionTimeUT {
 	@Test
 	public void calculateFitness(){
 		double fitness;
-		int maxnumtasks = 0;
-		int tempmaxnumtasks = 0;
+		
 		fitness = executionTimeGA.getFitness(convMatrix);
 		
 		/* 
 		 * Since our ETC matrix has only ones the fitness value
-		 * should be 1/number of tasks.
+		 * should be 1/number of tasks in one node.
 		 */	
-		for (int i = 0; i < executors; i++)
-		{
-			tempmaxnumtasks = getTaskAllocateOnNode(i);
-			
-			if (tempmaxnumtasks > maxnumtasks)
-			{
-				maxnumtasks = tempmaxnumtasks;
-			}
-		}
-		assertEquals(fitness, ((double)1/maxnumtasks), 0.01);
+				
+		assertEquals(fitness, ((double)1/getMaxTasksAllocToOneNode()), 0.01);
 		System.out.println(fitness);
 	}
 	
