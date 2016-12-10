@@ -13,6 +13,8 @@
 
 package alg;
 
+import java.util.Arrays;
+import alg.util.*;
 import org.jenetics.*;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.IntRange;
@@ -186,5 +188,53 @@ public class ExecutionTime extends Scheduler{
 
 		return load;
 	}
+
+	/**
+	 * Check the validity of given Chromosome
+	 * 
+	 * A fast hybrid genetic algorithm in heterogeneous computing environment
+	 * Zhiyang Jiang, Shengzhong Feng
+	 * Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences 
+	 * 
+	 * @param DPNDMatrix dependency of tasks matrix
+	 * 
+	 * @return Validity  boolean to represent validity of Chromosome acc to 
+	 * 				     dependency matrix
+	 */
+
+	public static boolean getValidityOfChrm(double[][]DPNDMatrix,int[]TaskArray){	
+		
+		int numtasks = DPNDMatrix.length; //square matrix with rows=cols=num of tasks
+		double[][]tempmat = new double[numtasks][numtasks];
+		int numofones = 0;
+
+		tempmat = Util.copyMatrix(DPNDMatrix,tempmat);
+		
+		//only execute as long as order is valid
+		for(int iterator:TaskArray)
+		{
+
+			for(int i=0;i<numtasks;i++)
+			{
+				/*check if there is a dependency with a successive task
+				check for ones in the cloumn*/
+				numofones += tempmat[i][iterator];
+			}
+			if (numofones != 0)
+			{
+				return false;
+			}
+			//to clear the elements of the row		
+			for(int j=0;j<numtasks;j++){
+				tempmat[iterator][j] = 0;
+			}
+			
+
+		}
+
+		return true;
+
+	}
+
 
 }
