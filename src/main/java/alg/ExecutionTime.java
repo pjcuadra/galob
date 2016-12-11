@@ -1,10 +1,10 @@
-/* 
+/*
  * This class should implement all the necessary methods to implement
  * Load Balancing Task Scheduling based on Multi-Population Genetic in
- * Cloud Computing (Wang Bei, LI Jun). Note that this is not actually 
- * taking into account the load balancing we try to achieve but the final 
- * result will be built on top of this. Also we are limiting the 
- * implementation to a single population. 
+ * Cloud Computing (Wang Bei, LI Jun). Note that this is not actually
+ * taking into account the load balancing we try to achieve but the final
+ * result will be built on top of this. Also we are limiting the
+ * implementation to a single population.
  *
  * Author:
  *    Pedro Cuadra
@@ -13,7 +13,7 @@
 
 package alg;
 
-import org.jenetics.*;
+import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
 
@@ -23,7 +23,12 @@ import alg.util.genetics.ScheduleAllele;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
 
-public class ExecutionTime extends Scheduler{
+/**
+ * Scheduler representation
+ * @author Pedro Cuadra
+ *
+ */
+public class ExecutionTime extends Scheduler {
 
 	/**
 	 * Constructor 

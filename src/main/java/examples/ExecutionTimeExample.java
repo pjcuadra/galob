@@ -21,32 +21,24 @@ public class ExecutionTimeExample {
 	final static int numTasks = 16;
 	final static int numExecutors = 4;
 	static ExecutionTime etOpt;
-	
+
 	public static void main(String[] args)
 	{
 		double[][] myETC = Util.getOnesMatrix(numExecutors, numTasks);
 		double[][] delta = Util.getDPNDMatrix(numTasks);
 		ExecutionTime etOpt = null;
-		
+
 
 		for (int o = 0; o < myETC[0].length; o++)
 		{
 			myETC[0][o] = 2;
-		}
-		
-		for (int o = 0; o < myETC[0].length; o++)
-		{
 			myETC[1][o] = 3;
-		}
-		
-		for (int o = 0; o < myETC[0].length; o++)
-		{
 			myETC[2][o] = 5;
 		}
-		
-		 etOpt = new ExecutionTime(myETC, delta);
-		
-		
+
+		etOpt = new ExecutionTime(myETC, delta);
+
+
 		// Configure and build the evolution engine.
 		final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
 				.builder(
@@ -77,7 +69,7 @@ public class ExecutionTimeExample {
 				// Collect (reduce) the evolution stream to
 				// its best phenotype.
 				.collect(toBestPhenotype());
-		
+
 		System.out.println("Finished!");
 
 		System.out.println(statistics);
