@@ -1,3 +1,6 @@
+/**
+ * Schedule Chromosome unit testing.
+ */
 
 package alg.util.genetics;
 
@@ -15,6 +18,13 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Schedule Chromosome unit testing.
+ * 
+ * @author Pedro Cuadra
+ * @author Sudheera Bandi
+ *
+ */
 public class ScheduleChromosomeUt {
 
   private Random randomGen;
@@ -78,7 +88,7 @@ public class ScheduleChromosomeUt {
 
 
     // Already known invalid solution
-    int[] chromosomeSeq2 = {0, 1, 2, 3};
+    int[] chromosomeSeq2 = {0, 2, 1, 3};
     
     // Create second chromosom
     allelList = new ArrayList<ScheduleGene>();
@@ -107,7 +117,7 @@ public class ScheduleChromosomeUt {
 
   @Test
   public void createCheckValid() {
-    double[][] matrix = Util.getDPNDMatrix(numTask);
+    double[][] matrix = Util.getDeltaMatrix(numTask);
     ScheduleChromosome chromosome = new ScheduleChromosome(matrix, 4);
 
     // This shall be true everytime. If not we are creating invalid solutions

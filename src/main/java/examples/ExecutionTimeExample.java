@@ -36,7 +36,7 @@ public class ExecutionTimeExample {
    */
   public static void main(String[] args) {
     double[][] myetc = Util.getOnesMatrix(numExecutors, numTasks);
-    double[][] delta = Util.getDPNDMatrix(numTasks);
+    double[][] delta = Util.getDeltaMatrix(numTasks);
     ExecutionTime etOpt = null;
 
 
@@ -53,7 +53,7 @@ public class ExecutionTimeExample {
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
             etOpt::getFitness,
-            etOpt.ofCONV())
+            etOpt.ofOmega())
         .populationSize(500)
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())

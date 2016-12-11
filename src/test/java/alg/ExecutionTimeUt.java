@@ -1,5 +1,5 @@
 /**
- * 
+ * Execution Time optimization unit testing.
  */
 
 package alg;
@@ -19,7 +19,7 @@ import org.junit.Test;
 import java.util.Random;
 
 /**
- * Exection Time optimization unit testing.
+ * Execution Time optimization unit testing.
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
@@ -61,7 +61,7 @@ public class ExecutionTimeUt {
     executors =  1 + randomGen.nextInt(maxNumExecutors);
 
     ones = Util.getOnesMatrix(executors, numTask);
-    delta = Util.getDPNDMatrix(numTask);
+    delta = Util.getDeltaMatrix(numTask);
 
     chromosome = new ScheduleChromosome(delta, executors);
 

@@ -1,5 +1,5 @@
 /**
- * 
+ * Scheduler class abstraction.
  */
 
 package alg.util;

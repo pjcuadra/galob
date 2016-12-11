@@ -1,5 +1,5 @@
 /**
- * 
+ * Utils unit testing.
  */
 
 package alg.util;
@@ -57,7 +57,7 @@ public class UtilUt {
   public void checkDeltaMatrix() {
     double[][] matrix;
 
-    matrix = Util.getDPNDMatrix(numTask);
+    matrix = Util.getDeltaMatrix(numTask);
 
     System.out.println("mat" + Arrays.deepToString(matrix));
   }

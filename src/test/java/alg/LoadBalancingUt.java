@@ -1,5 +1,5 @@
 /**
- * 
+ * Load balancing optimization unit testing.
  */
 
 package alg;
@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Load balacing optimization unit testing.
+ * Load balancing optimization unit testing.
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi

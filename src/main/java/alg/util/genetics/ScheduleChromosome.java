@@ -49,7 +49,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     ScheduleGene gene =  null;
     boolean clean = false;
     
-    gene =  ScheduleGene.of(this.numTasks, numExecutors);
+    gene =  ScheduleGene.of(delta.length, numExecutors);
 
     this.delta = Util.copyMatrix(delta);
 
