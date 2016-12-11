@@ -42,7 +42,7 @@ public class ExecutionTime extends Scheduler {
    * @return Jenetics codec
    */
   public Codec<int[][], ScheduleGene> ofOmega() {
-    int numExecutors = ETC.length;
+    int numExecutors = etc.length;
 
     return Codec.of(
         Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
@@ -63,13 +63,13 @@ public class ExecutionTime extends Scheduler {
    * @return CONV matrix
    */
   public int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq) {  
-    int[][] omega = new int[ETC.length][ETC[0].length];
+    int[][] omega = new int[etc.length][etc[0].length];
     ScheduleAllele currAllel = null;
 
     // Just set to one where it is allocated
     for (ScheduleGene gene: scheduleSeq) {
       currAllel = gene.getAllele();
-      omega[currAllel.getExecutorID()][currAllel.getTaskID()] = 1;
+      omega[currAllel.getExecutorId()][currAllel.getTaskId()] = 1;
     }
 
     return omega;
@@ -93,7 +93,7 @@ public class ExecutionTime extends Scheduler {
     int row = 0;
 
     // Get the execution costs for our allocation
-    costsMatrix = Util.matrixParallelMultiply(Util.intMatrixtoDouble(omega), ETC);
+    costsMatrix = Util.matrixParallelMultiply(Util.intMatrixtoDouble(omega), etc);
 
     // Iterate over the tasks
     for (row = 0; row < omega.length; row++) {

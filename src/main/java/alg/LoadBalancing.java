@@ -15,7 +15,4 @@ package alg;
 // class is implemented.
 
 public class LoadBalancing {
-
-	// TODO: Add all necessary functions for load balacing optimization
-	
 }
