@@ -52,12 +52,12 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 		ArrayList<ScheduleAllele> allocable = null;
 		ScheduleGene gene =  null;;
 		boolean clean = false;
-		
+
 		this.delta = Util.copyMatrix(delta);
 
 		this.numTasks = delta.length;
 		this.numExecutors = numExecutors;
-		
+
 		// Create a gene to use it as factory
 		gene =  ScheduleGene.of(numTasks, numExecutors);
 
@@ -93,7 +93,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 				allocable.add(currItem);
 
 			}
-			
+
 			// Randomly shuffle the allocable domain
 			Collections.shuffle(allocable);
 
@@ -102,7 +102,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 
 			// Remove from unallocated list
 			toSchedule.remove(allocable.get(0));
-			
+
 			// Set dependency for all other task to zero
 			for (int j = 0; j < delta.length; j++)
 			{
@@ -123,11 +123,11 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 	 * @param genes sequence of already created genes
 	 */
 	public ScheduleChromosome(double[][] delta, int numExecutors, ISeq<ScheduleGene> genes) {
-		
+
 		this.delta = delta;
 		this.numTasks = delta.length;
 		this.numExecutors = numExecutors;
-		
+
 		scheduleSeq = genes;
 	}
 
@@ -136,7 +136,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 	 */
 	@Override
 	public boolean isValid() {
-		
+
 		int numtasks = delta.length; //square matrix with rows=cols=num of tasks
 		double[][]tempmat = new double[numtasks][numtasks];
 		int numofones = 0;
@@ -157,12 +157,13 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 			{
 				return false;
 			}
+
 			//to clear the elements of the row		
 			for(int j = 0; j < numtasks; j++){
 				tempmat[gene.getAllele().getTaskID()][j] = 0;
 			}
 
-
+			tempmat[gene.getAllele().getTaskID()][gene.getAllele().getTaskID()] = 1;
 		}
 
 		return true;

@@ -59,31 +59,32 @@ public class ScheduleChromosomeUT {
 	public void checkvalidity()
 	{
 		double[][] matrix = new double[4][4];
-		int[] chrome1 = {0,1,2,3};
-		int[] chrome2 = {2,1,3,0};
+		int[] chrome1 = {0,1,2,3}; // Already known valid solution
+		int[] chrome2 = {2,1,3,0}; // Already known invalid solution
+		int[] chrome3 = {0,1,2,0}; // Already known invalid solution (repeat task)
 		ArrayList<ScheduleGene> allelList = new ArrayList<ScheduleGene>();
 		ScheduleChromosome chromosome;
 		ScheduleAllele allel = null;
-		
+
 		// Define a delta matrix
 		matrix[0][1] = 1;
 		matrix[0][2] = 1;
 		matrix[1][2] = 1;
 		matrix[1][3] = 1;
 		matrix[2][3] = 1;
-		
-		
+
+
 		// Create first chromosome
 		for (int task: chrome1)
 		{
 			allel = new ScheduleAllele(4, 4, task);
 			allelList.add(new ScheduleGene(4, 4, allel));
 		}
-		
+
 		chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
 		assertEquals(chromosome.isValid(), true);
-		
-		
+
+
 		// Create second chromosom
 		allelList = new ArrayList<ScheduleGene>();
 		for (int task: chrome2)
@@ -91,20 +92,31 @@ public class ScheduleChromosomeUT {
 			allel = new ScheduleAllele(4, 4, task);
 			allelList.add(new ScheduleGene(4, 4, allel));
 		}
-		
+
+		chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
+		assertEquals(chromosome.isValid(), false);
+
+		// Create second chromosome
+		allelList = new ArrayList<ScheduleGene>();
+		for (int task: chrome3)
+		{
+			allel = new ScheduleAllele(4, 4, task);
+			allelList.add(new ScheduleGene(4, 4, allel));
+		}
+
 		chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
 		assertEquals(chromosome.isValid(), false);
 
 	}
-	
+
 	@Test
 	public void createCheckValid()
 	{
 		double[][] matrix = Util.getDPNDMatrix(numTask);
 		ScheduleChromosome chromosome = new ScheduleChromosome(matrix, 4);
-		
+
 		// This shall be true everytime. If not we are creating invalid solutions
 		assertEquals(chromosome.isValid(), true);
-		
+
 	}
 }
