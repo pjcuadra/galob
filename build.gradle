@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
-//apply plugin: 'checkstyle'
+apply plugin: 'checkstyle'
 
 mainClassName = 'examples.ExecutionTimeExample'
 
@@ -24,7 +24,7 @@ jar {
     version =  '0.1.0'
 }
 
-//checkstyle {
-//    configFile = file("${project.rootDir}/config/checkstyle.xml")
-//    toolVersion = '6.7'
-//}
+checkstyle {
+    configFile = file("${project.rootDir}/config/google_checks.xml")
+    toolVersion = '6.7'
+}
