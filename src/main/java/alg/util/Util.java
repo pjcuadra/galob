@@ -33,10 +33,10 @@ public class Util {
 	 * @return dependency matrix
 	 */
 
-	public static int[][] getDPNDMatrix(int numTasks){
+	public static double[][] getDPNDMatrix(int numTasks){
 		Random randomGen = new Random();
 
-		int[][] depend = new int[numTasks][numTasks];
+		double[][] depend = new double[numTasks][numTasks];
 		// Initialize the upper triangular matrix with ones randomly
 
 		for (int currRow = 0; currRow < numTasks; currRow++)
@@ -54,27 +54,92 @@ public class Util {
 
 		return depend;
 	}
-	
-	
+
+
 
 
 	/**
 	 * Copy contents of matrix1 to matrix2 and return matrix2
-	 * @param Mat1 reference matrix to be copied
-	 * @param Mat2 new matrix copied into
-	 * @return Mat2 cloned matrix from matrix1
+	 * @param matrix reference matrix to be copied
+	 * @return cloned matrix from matrix1
 	 */
 
-	static public double[][] copyMatrix(double[][]Mat1,double[][]Mat2){
+	static public double[][] copyMatrix(double[][]matrix){
 
-		for(int i=0; i<Mat1.length; i++)
+		double[][] copiedMatrix =  new double[matrix.length][matrix[0].length];
+
+		for(int i = 0; i < matrix.length; i++)
 		{
-			for(int j=0; j<Mat1[i].length; j++)
+			for(int j = 0; j < matrix[i].length; j++)
 			{
-				Mat2[i][j]=Mat1[i][j];
+				copiedMatrix[i][j]=matrix[i][j];
 			}
 		}
-		return Mat2;
+		return copiedMatrix;
+
+	}
+
+	/**
+	 * Get sum of values of a given row
+	 * 
+	 * @param matrix values matrix
+	 * @param row given row
+	 * @return sum of values of given row
+	 */
+	static public double getRowSum(double[][] matrix, int row){
+		double rowSum = 0;
+
+		// Iterate over the nodes
+		for (int j = 0; j < matrix[0].length; j++)
+		{
+			// Add all execution times
+			rowSum += matrix[row][j];
+		}
+
+		return rowSum;
+	}
+
+	/**
+	 * Multiply to matrix as follows result(i,j) = A(i,j) * B(i,j)
+	 * 
+	 * @param A matrix A
+	 * @param B matrix B
+	 * @return multiplied matrix
+	 */
+	static public double[][] matrixParallelMultiply(double[][] A, double[][] B){
+		double[][] resMatrix =  new double[A.length][A[0].length];
+
+
+		for (int i = 0; i < resMatrix.length; i++)
+		{
+			for (int j = 0; j < resMatrix[0].length; j++)
+			{
+				resMatrix[i][j] =  A[i][j] * B[i][j];
+			}
+		}
+
+		return resMatrix;
+	}
+
+	/**
+	 * Convert a integer matrix into double matrix
+	 * 
+	 * @param matrix integer matrix
+	 * @return double matrix
+	 */
+	static public double[][] intMatrixtoDouble(int[][] matrix)
+	{
+		double[][] resMatrix =  new double[matrix.length][matrix[0].length];
+
+		for (int i = 0; i < resMatrix.length; i++)
+		{
+			for (int j = 0; j < resMatrix[0].length; j++)
+			{
+				resMatrix[i][j] = (double) matrix[i][j];
+			}
+		}
+
+		return resMatrix;
 
 	}
 }

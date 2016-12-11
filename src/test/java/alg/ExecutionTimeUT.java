@@ -3,7 +3,6 @@
  */
 package alg;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -15,6 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import alg.util.Util;
+import alg.util.genetics.ScheduleChromosome;
+import alg.util.genetics.ScheduleGene;
 
 /**
  * @author Pedro Cuadra
@@ -25,13 +26,14 @@ public class ExecutionTimeUT {
 	private Random randomGen;
 
 	private double[][] ones;
-	private int[] chromosome;
+	private double[][] delta;
+	private ScheduleChromosome chromosome;
 	private ExecutionTime executionTimeGA;
 	private int numTask;
 	private int executors;
 	private int[][] convMatrix;
-	final static int maxNumTask = 16 /* Actual max*/ - 1 /* 0 is not possible so add 1 after*/;
-	final static int maxNumExecutors = 16 /* Actual max*/  - 1 /* 0 is not possible so add 1 after*/;
+	final static int maxNumTask = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
+	final static int maxNumExecutors = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
 
 	/**
 	 * @throws java.lang.Exception
@@ -59,17 +61,13 @@ public class ExecutionTimeUT {
 		executors =  1 + randomGen.nextInt(maxNumExecutors);
 
 		ones = Util.getOnesMatrix(executors, numTask);
-		chromosome = new int[numTask];
+		delta = Util.getDPNDMatrix(numTask);
+		
+		chromosome = new ScheduleChromosome(delta, executors);
+		
+		executionTimeGA =  new ExecutionTime(ones, delta);
 
-		// Randomly initialize the chromosome allocating to a random node
-		for (int currTask = 0; currTask < chromosome.length; currTask++)
-		{
-			chromosome[currTask] =  randomGen.nextInt(executors);
-		}
-
-		executionTimeGA =  new ExecutionTime(ones);
-
-		convMatrix = executionTimeGA.createCONVMatrix(chromosome);
+		convMatrix = executionTimeGA.createOmegaMatrix(chromosome.toSeq());
 
 	}
 
@@ -90,9 +88,9 @@ public class ExecutionTimeUT {
 	{
 		int amount = 0;
 
-		for (int currGen: chromosome)
+		for (ScheduleGene currGen: chromosome.toSeq())
 		{
-			if (currGen == node)
+			if (currGen.getAllele().getExecutorID() == node)
 			{
 				amount++;
 			}
@@ -134,7 +132,7 @@ public class ExecutionTimeUT {
 		 */		
 		for (int currNodeTime = 0; currNodeTime < executors; currNodeTime++)
 		{
-			assertEquals(getTaskAllocateOnNode(currNodeTime), sumTime[currNodeTime], 0.01);
+			assertEquals(getTaskAllocateOnNode(currNodeTime), sumTime[currNodeTime], 0.001);
 		}
 
 	}
@@ -168,39 +166,13 @@ public class ExecutionTimeUT {
 		 * should be 1/number of tasks in one node.
 		 */	
 
-		assertEquals(fitness, ((double)1/getMaxTasksAllocToOneNode()), 0.01);
+		assertEquals(fitness, ((double)getMaxTasksAllocToOneNode()), 0.01);
 		System.out.println(fitness);
 	}
 
-	@Test
-	public void checkDPNDMatrix()
-	{
-		int[][] matrix;
+	
 
-		matrix = Util.getDPNDMatrix(numTask);		
-
-		System.out.println("mat"+ Arrays.deepToString(matrix));
-	}
-
-	@Test
-	public void checkvalidity()
-	{
-		double[][] matrix = new double[4][4];
-		int[] chrome1 = {0,1,2,3};
-		int[] chrome2 = {2,1,3,0};
-
-
-		matrix[0][1] = 1;
-		matrix[0][2] = 1;
-		matrix[1][2] = 1;
-		matrix[1][3] = 1;
-		matrix[2][3] = 1;
-
-		System.out.println("mat"+ Arrays.deepToString(matrix));
-		assertEquals((ExecutionTime.getValidityOfChrm(matrix,chrome1)),true);
-		assertEquals((ExecutionTime.getValidityOfChrm(matrix,chrome2)),false);
-
-	}
+	
 
 	@Test
 	public void loadImbalance(){

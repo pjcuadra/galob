@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
+//apply plugin: 'checkstyle'
 
 mainClassName = 'examples.ExecutionTimeExample'
 
@@ -22,3 +23,8 @@ jar {
     baseName = 'galob-executionTime-gradle'
     version =  '0.1.0'
 }
+
+//checkstyle {
+//    configFile = file("${project.rootDir}/config/checkstyle.xml")
+//    toolVersion = '6.7'
+//}
