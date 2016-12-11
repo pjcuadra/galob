@@ -43,7 +43,7 @@ public class ExecutionTimeExample {
 		final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
 				.builder(
 						etOpt::getFitness,
-						etOpt.ofCONV())
+						etOpt.ofOmega())
 				.populationSize(500)
 				.optimize(Optimize.MINIMUM)
 				.selector(new RouletteWheelSelector<>())
