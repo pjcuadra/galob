@@ -67,7 +67,7 @@ public class ExecutionTimeUT {
 		
 		executionTimeGA =  new ExecutionTime(ones, delta);
 
-		convMatrix = executionTimeGA.createCONVMatrix(chromosome.toSeq());
+		convMatrix = executionTimeGA.createOmegaMatrix(chromosome.toSeq());
 
 	}
 

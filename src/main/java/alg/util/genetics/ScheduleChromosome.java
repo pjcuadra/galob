@@ -100,7 +100,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene>
 			// Add first element to the sequence
 			myList.add(gene.newInstance(allocable.get(0)));
 
-			// Remove from un allocated list
+			// Remove from unallocated list
 			toSchedule.remove(allocable.get(0));
 			
 			// Set dependency for all other task to zero

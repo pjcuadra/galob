@@ -3,7 +3,6 @@ package alg.util.genetics;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import org.jenetics.util.ISeq;

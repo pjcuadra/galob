@@ -18,6 +18,7 @@ import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
 
 import alg.util.Scheduler;
+import alg.util.Util;
 import alg.util.genetics.ScheduleAllele;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
@@ -42,13 +43,13 @@ public class ExecutionTime extends Scheduler{
 
 		return Codec.of(
 				Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
-				gt->createCONVMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq()) /*Decoder*/
+				gt->createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq()) /*Decoder*/
 				);
 	}
 
 
 	/**
-	 * Calculate the CONV matrix from a Chromosome
+	 * Calculate the omega matrix from a Chromosome
 	 * 
 	 * According to "Load Balancing Task Scheduling based on 
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
@@ -58,7 +59,7 @@ public class ExecutionTime extends Scheduler{
 	 * 					  
 	 * @return CONV matrix
 	 */
-	public int[][] createCONVMatrix(ISeq<ScheduleGene> scheduleSeq)
+	public int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq)
 	{
 		int[][] CONV = new int[ETC.length][ETC[0].length];
 		ScheduleAllele currAllel = null;
@@ -72,7 +73,7 @@ public class ExecutionTime extends Scheduler{
 
 		return CONV;
 	}
-	
+
 	/**
 	 * Get the execution time of every node given a chromosome
 	 * 
@@ -80,27 +81,24 @@ public class ExecutionTime extends Scheduler{
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (1)
 	 * 
-	 * @param convMatrix allocation nodes matrix
+	 * @param omega allocation nodes matrix
 	 * 
 	 * @return the sum of execution times per node as an array
 	 *         indexed by node index 
 	 */
-	public double[] getSumTime(int[][] convMatrix)
+	public double[] getSumTime(int[][] omega)
 	{
-		double[] sumTime = new double[convMatrix.length];
-		int i = 0, j = 0;
+		double[][] costsMatrix = null;
+		double[] sumTime = new double[omega.length];
+		int row = 0;
+
+		// Get the execution costs for our allocation
+		costsMatrix = Util.matrixParallelMultiply(Util.intMatrixtoDouble(omega), ETC);
 
 		// Iterate over the tasks
-		for (i = 0; i < convMatrix.length; i++)
+		for (row = 0; row < omega.length; row++)
 		{
-			sumTime[i] = 0;
-
-			// Iterate over the nodes
-			for (j = 0; j < convMatrix[i].length; j++)
-			{
-				// Add all execution times
-				sumTime[i] += convMatrix[i][j]*ETC[i][j];
-			}
+			sumTime[row] = Util.getRowSum(costsMatrix, row);
 		}		
 
 		return sumTime;
@@ -113,13 +111,13 @@ public class ExecutionTime extends Scheduler{
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (2)
 	 * 
-	 * @param convMatrix allocation nodes matrix
+	 * @param omega allocation nodes matrix
 	 * 
 	 * @return total execution time of a given Chromosome
 	 */
-	public double getTotalTime(int[][] convMatrix)
+	public double getTotalTime(int[][] omega)
 	{
-		double[] sumTime = getSumTime(convMatrix);
+		double[] sumTime = getSumTime(omega);
 		double totalTime = 0;
 
 		for (double time : sumTime)
@@ -147,16 +145,16 @@ public class ExecutionTime extends Scheduler{
 	 *          set to 1 as of now.
 	 * @return fitness of a given Chromosome
 	 */
-	public double getFitness(int[][] convMatrix)
+	public double getFitness(int[][] omega)
 	{
-		double TotalTime = getTotalTime(convMatrix);
+		double TotalTime = getTotalTime(omega);
 		double Fitness = 0;
 
 		Fitness = TotalTime;
 
 		return Fitness;
 	}
-	
+
 
 
 	/**
@@ -166,15 +164,15 @@ public class ExecutionTime extends Scheduler{
 	 * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
 	 * LI Jun), equation (4)
 	 * 
-	 * @param convMatrix allocation nodes matrix
+	 * @param omega allocation nodes matrix
 	 * 
 	 * @return load imbalance of a Chromosome
 	 */
-	public double getLoad(int[][] convMatrix)
+	public double getLoad(int[][] omega)
 	{
-		double[] sumTime = getSumTime(convMatrix);
+		double[] sumTime = getSumTime(omega);
 		double load = 0;
-		double avgTime = getTotalTime(convMatrix)/convMatrix.length;
+		double avgTime = getTotalTime(omega)/omega.length;
 
 		// First calculate sum = (sumTime(i) - averageTime)^2
 		for (double time: sumTime)
