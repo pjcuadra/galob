@@ -94,4 +94,12 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
     return new ScheduleGene(numTasks, numExecutors);
   }
 
+  /**
+   * Mutate a gene by setting a new allele.
+   * 
+   * @param value new allele
+   */
+  public void mutate(ScheduleAllele value) {
+    allele = value;
+  }
 }

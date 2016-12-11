@@ -6,8 +6,8 @@ import static org.jenetics.engine.limit.bySteadyFitness;
 import alg.ExecutionTime;
 import alg.util.Util;
 import alg.util.genetics.ScheduleGene;
+import alg.util.genetics.ScheduleMutator;
 
-import org.jenetics.Mutator;
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.RouletteWheelSelector;
@@ -58,7 +58,7 @@ public class ExecutionTimeExample {
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new Mutator<>(0.55),
+            new ScheduleMutator(delta, 0.55),
             new SinglePointCrossover<>(0.06))
         .build();
 
