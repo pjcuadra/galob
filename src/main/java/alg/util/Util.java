@@ -51,6 +51,30 @@ public class Util {
     return depend;
   }
 
+  /**
+   * Get Communication cost matrix of size rows*cols.
+   * @param numExecutors number of processors
+   * @return communication cost matrix
+   */
+
+  public static double[][] getComcostmatrix(int numExecutors) {
+    Random randomGen = new Random();
+
+    double[][] comcost = new double[numExecutors][numExecutors];
+
+
+    for (int currRow = 0; currRow < numExecutors; currRow++) {
+      for (int currCol = currRow + 1; currCol < numExecutors; currCol++) {
+        double rand = randomGen.nextDouble();
+        comcost[currRow][currCol] = Math.floor(rand * 100) / 100;
+      }
+
+      comcost[currRow][currRow] = 0;
+
+    }
+
+    return comcost;
+  }
 
 
 

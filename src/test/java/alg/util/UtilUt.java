@@ -4,6 +4,8 @@
 
 package alg.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,6 +26,7 @@ public class UtilUt {
 
   private Random randomGen;
   private int numTask;
+  private int numExecutors;
   static final int maxNumTask = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
   static final int maxNumExecutors = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
 
@@ -46,7 +49,7 @@ public class UtilUt {
     randomGen = new Random();
 
     numTask =  1 + randomGen.nextInt(maxNumTask);
-
+    numExecutors = 1 + randomGen.nextInt(maxNumExecutors);
   }
 
   @After
@@ -60,5 +63,23 @@ public class UtilUt {
     matrix = Util.getDeltaMatrix(numTask);
 
     System.out.println("mat" + Arrays.deepToString(matrix));
+  }
+  
+  @Test
+  public void checkComcostmatrix() {
+    double[][] matrix;
+    boolean flag = false;
+    
+    matrix = Util.getComcostmatrix(numExecutors); 
+    
+    for (int i = 0; i < numExecutors; i++) {
+      if (matrix[i][i] != 0) {
+        flag = true;
+        break;
+      }
+    }
+    System.out.println("mat" + Arrays.deepToString(matrix));
+    assertEquals(flag, false);
+    
   }
 }

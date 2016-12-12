@@ -180,4 +180,43 @@ public class ExecutionTime extends Scheduler {
     return load;
   }
 
+  /**
+   * Get the communication cost given the chromosome.
+   * According to "Load Balancing Task Scheduling based on 
+   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
+   * LI Jun), equation (2)
+   * 
+   * @param ctmatrix communication cost matrix
+   * @param scheduleSeq genes sequence of a valid chromosome  
+   * 
+   * @return total communication cost of a given Chromosome
+   */
+
+  public double getCommCost(double[][] ctmatrix, ISeq<ScheduleGene> scheduleSeq) {
+    int taskIdold;
+    int taskId;
+    int execIdold;
+    int execId;
+    double totalComCost = 0;
+
+
+    for (int i = 1; i < scheduleSeq.length(); i++) {
+
+      ScheduleGene genecur = scheduleSeq.get(i);
+      ScheduleGene geneold = scheduleSeq.get(i - 1);
+
+      taskId = genecur.getAllele().getTaskId();
+      execId = genecur.getAllele().getExecutorId();
+      taskIdold = geneold.getAllele().getTaskId();
+      execIdold = geneold.getAllele().getExecutorId();
+
+      if (execIdold != execId) {
+        totalComCost += ctmatrix[taskIdold][taskId];
+      }
+
+    }
+
+    return totalComCost;
+
+  }
 }
