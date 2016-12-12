@@ -233,5 +233,20 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   public String toString() {
     return scheduleSeq.toString();
   }
-
+  
+  /**
+   * Create an exact copy of the chromosome.
+   * @return chromosome copy
+   */
+  public ScheduleChromosome clone() {
+    ArrayList<ScheduleGene> genesList = new ArrayList<ScheduleGene>();
+    
+    for  (ScheduleGene gene : scheduleSeq) {
+      genesList.add(gene.newInstance(gene.getAllele()));
+    }
+    
+    return new ScheduleChromosome(delta, numExecutors, ISeq.of(genesList));
+    
+  }
+  
 }

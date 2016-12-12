@@ -124,4 +124,22 @@ public class ScheduleChromosomeUt {
     assertEquals(chromosome.isValid(), true);
 
   }
+  
+  @Test
+  public void cloneChromosome() {
+    double[][] matrix = Util.getDeltaMatrix(numTask);
+    ScheduleChromosome chromosomeOrg = new ScheduleChromosome(matrix, 4);
+    ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
+    ScheduleGene original;
+    ScheduleGene cloned;
+
+    for (int locus = 0; locus < chromosomeOrg.toSeq().size(); locus++) {
+      
+      original =  chromosomeOrg.getGene(locus);
+      cloned =  chromosomeClone.getGene(locus);
+      assertEquals(original, cloned);
+    }
+   
+
+  }
 }
