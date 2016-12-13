@@ -18,6 +18,7 @@ import alg.util.Util;
 import alg.util.genetics.ScheduleAllele;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
+
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
@@ -28,11 +29,13 @@ import org.jenetics.util.ISeq;
  */
 
 public class ExecutionTime extends Scheduler {
-
+  static final double costFact = 0.5;
+  static final double loadFact = 0.5;
   /**
    * Constructor.
    * @param etcmatrix Execution times matrix
    */
+
   public ExecutionTime(double[][] etcmatrix, double[][] delta) {
     super(etcmatrix, delta);
   }
@@ -50,6 +53,19 @@ public class ExecutionTime extends Scheduler {
         );
   }
 
+  /**
+   * Create a Jenetics codec for IntegerChromosome/schedule sequence encoding/decoding.
+   * @return Jenetics codec
+   */
+  public Codec<ISeq<ScheduleGene>, ScheduleGene> ofSeq() {
+    int numExecutors = etc.length;
+
+    return Codec.of(
+        Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
+        gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
+        );
+  }
+
 
   /**
    * Calculate the omega matrix from a Chromosome.
@@ -62,7 +78,7 @@ public class ExecutionTime extends Scheduler {
    * 
    * @return CONV matrix
    */
-  public int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq) {  
+  public int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq) { 
     int[][] omega = new int[etc.length][etc[0].length];
     ScheduleAllele currAllel = null;
 
@@ -127,23 +143,24 @@ public class ExecutionTime extends Scheduler {
   }
 
   /**
-   * The fitness function to calculate fitness of a given Chromosome.
+   * The fitness function to calculate fitness of a given Chromosome
+   * with respect to only computation costs. 
    * 
    * <p>According to "Load Balancing Task Scheduling based on 
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
    * LI Jun), equation (7)
    * 
-   *
-   *        
-   * 
-   * @param  omega the allocation matrix of a chromosome       
+   * @param  scheduleSeq the schedule sequence of the chromosome    
    * @return fitness of a given Chromosome
    */
-  public double getFitness(int[][] omega) {
-    double totaltime = getTotalTime(omega);
+  public double getFitnessCost(ISeq<ScheduleGene> scheduleSeq) {
     double fitness = 0;
+    int[][] omega = createOmegaMatrix(scheduleSeq);
+    double totaltime = getTotalTime(omega);
+    double[][] comCostMat = Util.getComcostmatrix(delta);
+    double totalComCost = getCommCost(comCostMat, scheduleSeq);
 
-    fitness = totaltime;
+    fitness = (costFact * (totaltime + totalComCost));
 
     return fitness;
   }
@@ -193,30 +210,31 @@ public class ExecutionTime extends Scheduler {
    */
 
   public double getCommCost(double[][] ctmatrix, ISeq<ScheduleGene> scheduleSeq) {
-    int taskIdold;
-    int taskId;
-    int execIdold;
-    int execId;
+    int execId2 = 0;
+    int execId1 = 0;
     double totalComCost = 0;
 
 
-    for (int i = 1; i < scheduleSeq.length(); i++) {
-
-      ScheduleGene genecur = scheduleSeq.get(i);
-      ScheduleGene geneold = scheduleSeq.get(i - 1);
-
-      taskId = genecur.getAllele().getTaskId();
-      execId = genecur.getAllele().getExecutorId();
-      taskIdold = geneold.getAllele().getTaskId();
-      execIdold = geneold.getAllele().getExecutorId();
-
-      if (execIdold != execId) {
-        totalComCost += ctmatrix[taskIdold][taskId];
+    for (int i = 0; i < scheduleSeq.length(); i++) {
+      for (int j = (i + 1); j < scheduleSeq.length(); j++) {
+        //iterate only if there is a dependency between the tasks
+        if (ctmatrix[i][j] != 0) {
+          for (ScheduleGene gene : scheduleSeq) {
+            if (gene.getAllele().getTaskId() == i) {
+              execId1 = gene.getAllele().getExecutorId();
+            } else if (gene.getAllele().getTaskId() == j) {
+              execId2 = gene.getAllele().getExecutorId();
+            }
+          }
+          if (execId1 != execId2) {
+            //add the comm cost if the tasks are assigned to diff cores
+            totalComCost += ctmatrix[i][j];
+          }
+        }
       }
 
     }
 
     return totalComCost;
-
   }
 }

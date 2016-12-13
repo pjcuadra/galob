@@ -52,8 +52,8 @@ public class ExecutionTimeExample {
     // Configure and build the evolution engine.
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
-            etOpt::getFitness,
-            etOpt.ofOmega())
+            etOpt::getFitnessCost,
+            etOpt.ofSeq())
         .populationSize(500)
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
