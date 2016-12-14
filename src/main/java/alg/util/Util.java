@@ -51,6 +51,31 @@ public class Util {
     return depend;
   }
 
+  /**
+   * Get Communication cost matrix of size rows*cols.
+   * @param  delta the dependency matrix
+   * @return communication cost matrix
+   */
+
+  public static double[][] getComcostmatrix(double[][] delta) {
+    Random randomGen = new Random();
+
+    double[][] comcost = copyMatrix(delta);
+
+    for (int currRow = 0; currRow < comcost.length; currRow++) {
+      for (int currCol = currRow + 1; currCol < comcost.length; currCol++) {
+        double rand = randomGen.nextDouble();
+        if (comcost[currRow][currCol] != 0) {
+          comcost[currRow][currCol] = Math.floor(rand * 100) / 100;
+        }
+      }
+
+      comcost[currRow][currRow] = 0;
+
+    }
+
+    return comcost;
+  }
 
 
 

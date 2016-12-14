@@ -75,7 +75,7 @@ public class ScheduleChromosomeUt {
 
     // Already known valid solution
     int[] chromosomeSeq1 = {0, 1, 2, 3};
-    
+
     // Create first chromosome
     for (int task: chromosomeSeq1) {
       allel = new ScheduleAllele(4, 4, task);
@@ -89,7 +89,7 @@ public class ScheduleChromosomeUt {
 
     // Already known invalid solution
     int[] chromosomeSeq2 = {0, 2, 1, 3};
-    
+
     // Create second chromosom
     allelList = new ArrayList<ScheduleGene>();
     for (int task: chromosomeSeq2) {
@@ -102,7 +102,7 @@ public class ScheduleChromosomeUt {
 
     // Already known invalid solution (repeat task)
     int[] chromosomeSeq3 = {0,1,2,0};
-    
+
     // Create second chromosome
     allelList = new ArrayList<ScheduleGene>();
     for (int task: chromosomeSeq3) {
