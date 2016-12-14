@@ -102,4 +102,21 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
   public void mutate(ScheduleAllele value) {
     allele = value;
   }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object object) {
+    ScheduleGene gene;
+    
+    if (!(object instanceof ScheduleGene)) {
+      return false;
+    }
+    
+    gene = (ScheduleGene) object;
+    
+    return gene.allele.equals(this.allele);
+    
+  }
 }

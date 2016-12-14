@@ -63,4 +63,29 @@ public class ScheduleAllele {
   public String toString() {
     return "{ " + taskId + " : " + executorId + " }" ;
   }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object object) {
+    ScheduleAllele allele;
+    
+    if (!(object instanceof ScheduleAllele)) {
+      return false;
+    }
+    
+    allele = (ScheduleAllele) object;
+    
+    if (allele.executorId != this.executorId) {
+      return false;
+    }
+    
+    if (allele.taskId != this.taskId) {
+      return false;
+    }
+    
+    return true;
+    
+  }
 }
