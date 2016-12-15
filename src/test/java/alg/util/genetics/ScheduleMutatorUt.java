@@ -126,7 +126,7 @@ public class ScheduleMutatorUt {
     phenoFactory = Phenotype.of(
         Genotype.of(ScheduleChromosome.of(delta, executors)), 
         0, 
-        gt -> myOpt.getFitness(myOpt.ofOmega().decode(gt))
+        gt -> myOpt.getFitnessCost(myOpt.ofSeq().decode(gt))
         );
 
     // Random population size
