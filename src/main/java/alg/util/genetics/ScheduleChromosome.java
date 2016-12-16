@@ -48,7 +48,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     ArrayList<ScheduleAllele> allocable = null;
     ScheduleGene gene =  null;
     boolean clean = false;
-    
+
     gene =  ScheduleGene.of(delta.length, numExecutors);
 
     this.delta = Util.copyMatrix(delta);
@@ -57,7 +57,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     this.numExecutors = numExecutors;
 
     // Create a gene to use it as factory
-    
+
 
     // Initialize the alleles list
     for (int i = 0; i < numTasks; i++) {
@@ -72,12 +72,8 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       for (ScheduleAllele currItem: toSchedule) {
         // If no dependency pending is allocable
         clean = true;
-        for (int j = 0; j < delta.length; j++) {
-          if (this.delta[j][currItem.getTaskId()] != 0) {
-            clean = false;
-            break;
-          }
-
+        if (!(Util.checkColZero(this.delta, currItem.getTaskId()))) {
+          clean = false;
         }
 
         if (!clean) {
@@ -99,10 +95,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       toSchedule.remove(allocable.get(0));
 
       // Set dependency for all other task to zero
-      for (int j = 0; j < delta.length; j++) {
-        this.delta[allocable.get(0).getTaskId()][j] = 0;
-      }
+      Util.clearRow(this.delta, allocable.get(0).getTaskId());
     }
+
 
     // Convert to Sequence
     scheduleSeq = ISeq.of(myList);
@@ -153,7 +148,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
       //to clear the elements of the row
       for (int j = 0; j < numtasks; j++) {
-        
+
         tempmat[gene.getAllele().getTaskId()][j] = 0;
       }
 
@@ -233,20 +228,20 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   public String toString() {
     return scheduleSeq.toString();
   }
-  
+
   /**
    * Create an exact copy of the chromosome.
    * @return chromosome copy
    */
   public ScheduleChromosome clone() {
     ArrayList<ScheduleGene> genesList = new ArrayList<ScheduleGene>();
-    
+
     for  (ScheduleGene gene : scheduleSeq) {
       genesList.add(gene.newInstance(gene.getAllele()));
     }
-    
+
     return new ScheduleChromosome(delta, numExecutors, ISeq.of(genesList));
-    
+
   }
-  
+
 }
