@@ -203,11 +203,20 @@ You can also set your own IP and port by running;
 You might want to create two different webservers; one for documentation and one for test reports. For doing so just use different ports, for example 8080 for documentation and 8081 for test reports.
 
 
-# Execute the code
+# Run examples
 
 Thanks to ```gradle``` executing the code is really easy. Just run;
 
 ```
 $ cd <project-root-dir>
-$ gradle run
+$ gradle runLoadBalancingExample
 ```
+
+For *Load Balancing Optimization* example, or;
+
+```
+$ cd <project-root-dir>
+$ gradle runExecutionTimeExample
+```
+
+For *Execution Time Optimization* example.
