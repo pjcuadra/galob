@@ -47,7 +47,6 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
     ArrayList<ScheduleAllele> allocable = null;
     ScheduleGene gene =  null;
-    boolean clean = false;
 
     gene =  ScheduleGene.of(delta.length, numExecutors);
 
@@ -71,12 +70,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
       for (ScheduleAllele currItem: toSchedule) {
         // If no dependency pending is allocable
-        clean = true;
-        if (!(Util.checkColZero(this.delta, currItem.getTaskId()))) {
-          clean = false;
-        }
 
-        if (!clean) {
+
+        if (!(Util.checkColZero(this.delta, currItem.getTaskId()))) {
           continue;
         }
 
@@ -147,10 +143,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       }
 
       //to clear the elements of the row
-      for (int j = 0; j < numtasks; j++) {
-
-        tempmat[gene.getAllele().getTaskId()][j] = 0;
-      }
+      Util.clearRow(tempmat, gene.getAllele().getTaskId());
 
       tempmat[gene.getAllele().getTaskId()][gene.getAllele().getTaskId()] = 1;
     }
