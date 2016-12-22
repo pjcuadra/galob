@@ -3,7 +3,9 @@ apply plugin: 'application'
 apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
 
-mainClassName = 'examples.ExecutionTimeExample'
+version = '1.0'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     // Use 'jcenter' for resolving your dependencies.
@@ -11,19 +13,28 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 dependencies {
     compile 'org.bitbucket.fwilhelm:org.jenetics:3.6.0'
     testCompile 'junit:junit:4.12'
+
 }
 
-jar {
-    baseName = 'galob-executionTime-gradle'
-    version =  '0.1.0'
+// Run default example
+mainClassName = 'examples.ExecutionTimeExample'
+
+// Run only execution time optimization example
+task runExecutionTimeExample(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'examples.ExecutionTimeExample'
 }
 
+// Run only load balancing optimization example
+task runLoadBalancingExample(type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'examples.LoadBalancingExample'
+}
+
+// Check the style of Java code
 checkstyle {
     configFile = file("${project.rootDir}/config/google_checks.xml")
     toolVersion = '6.7'
