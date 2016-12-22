@@ -62,7 +62,6 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
   private void getDependenciesLevels(double[][] delta) {
     double[][] myDelta = Util.copyMatrix(delta);
     ArrayList<Integer> toDet = new ArrayList<Integer>();
-    int numOfOnes = 0;
     ArrayList<Integer> thisLevel;
 
     for (int i = 0; i < numTasks ;i++) {
@@ -78,15 +77,13 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
           continue;
         }
 
-        for (int i = 0; i < numTasks ;i++) {
-          /*
-           * check if there is a dependency with a successive task
-           * check for ones in the column
-           */
-          numOfOnes += myDelta[i][task];
-        }
 
-        if (numOfOnes != 0) {
+        /*
+         * check if there is a dependency with a successive task
+         * check for ones in the column
+         */
+
+        if (!(Util.checkColZero(myDelta, task))) {
           continue;
         }
 
@@ -96,10 +93,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
 
         //to clear the elements of the row
-        for (int j = 0; j < numTasks; j++) {
-
-          myDelta[task][j] = 0;
-        }
+        Util.clearRow(myDelta, task);
 
       }
 

@@ -64,6 +64,16 @@ public class UtilUt {
   }
 
   @Test
+  public void checkcol() {
+    double[][] ones = Util.getOnesMatrix(3, 5);
+    assertEquals(Util.checkColZero(ones, 4), false);
+    for (int i = 0; i < 3; i++) {
+      ones[i][2] = 0;
+    } 
+    assertEquals(Util.checkColZero(ones, 2), true);
+  }
+
+  @Test
   public void checkComcostmatrix() {
     double[][] matrix;
     boolean flag = false;

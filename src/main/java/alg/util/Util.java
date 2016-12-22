@@ -119,6 +119,42 @@ public class Util {
   }
 
   /**
+   * Check if the given column has all zeroes.
+   * 
+   * @param matrix values matrix
+   * @param col given column
+   * @return true if the col has all zeroes; else false
+   */
+  public static boolean checkColZero(double[][] matrix, int col) {
+
+    // Iterate over the rows
+    for (int i = 0; i < matrix.length; i++) {
+      // Add all elements in the col
+      if (matrix[i][col] != 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Clear a row; fill the row elements with zero.
+   * 
+   * @param matrix values matrix
+   * @param row row to be cleared
+   */
+  public static void clearRow(double[][] matrix, int row) {
+
+    // Iterate over the rows
+    for (int i = 0; i < matrix.length; i++) {
+      // Add all elements in the col
+      matrix[row][i] = 0; 
+    }
+  }
+
+  
+  /**
    * Multiply to matrix as follows result(i,j) = A(i,j) * B(i,j).
    * 
    * @param matrixA matrix A
