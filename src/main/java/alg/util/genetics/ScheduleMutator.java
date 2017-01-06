@@ -91,13 +91,14 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
         thisLevel.add(task);
 
-
+      }
+      for (Integer iterator:thisLevel) {
         //to clear the elements of the row
-        Util.clearRow(myDelta, task);
-
+        Util.clearRow(myDelta, iterator);
       }
 
       levels.add(thisLevel);
+      System.out.println(levels);
 
     }
 
