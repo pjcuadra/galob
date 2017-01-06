@@ -18,3 +18,4 @@ program **Embedded Systems for Mechatronics**.
    :maxdepth: 2
 
    terms/index
+   arch/index

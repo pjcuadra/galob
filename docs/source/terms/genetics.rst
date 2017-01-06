@@ -8,13 +8,7 @@ important biological genetics terms. The figure was based on [#]_.
   :scale: 50 %
   :align: center
 
-  skinparam classBackgroundColor #C9C9C9
-  skinparam classArrowColor #2980B9
-  skinparam classBorderColor #2980B9
-  skinparam classFontColor #404040
-  skinparam classFontSize 14
-  skinparam classFontName proxima-nova
-  skinparam classFontStyle bold
+  skinparam monochrome true
 
   class DNA
   class Genome
