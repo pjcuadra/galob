@@ -10,7 +10,6 @@ import org.jenetics.Population;
 import org.jenetics.util.MSeq;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
@@ -22,7 +21,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
    */
   private int numTasks;
   /**
-   * Mutation probability.
+   * Crossover probability.
    */
   private double probCrossover;
   /**
@@ -30,14 +29,18 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
    */
   private ArrayList<ArrayList<Integer>> levels;
   private double[][] delta;
+  /**
+   * Number of altered genes after crossover.
+   */
+  public int crosssedOvrGenes;
 
   /**
    * Constructor.
    * 
    * @param delta dependency matrix
-   * @param probMutator mutating probability
+   * @param probCrossover crossing over probability
    */
-  public ScheduleCrossover(double[][] delta, double probMutator) {
+  public ScheduleCrossover(double[][] delta, double probCrossover) {
     this.numTasks = delta.length;
     this.delta = delta;
     
@@ -153,7 +156,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
         final MSeq<ScheduleGene> secondSeq = secondParent.toSeq().copy();
 
         firstSeq.swap(firstGeneLocus, firstSeq.length(), secondSeq, firstGeneLocus);
-
+        crosssedOvrGenes = firstParent.length() - firstGeneLocus;
         return firstParent.newInstance(firstSeq.toISeq());
 
       }
@@ -176,7 +179,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
     int phenoTypeIndex = 0;
 
     for (phenoTypeIndex = 0; phenoTypeIndex < population.size(); phenoTypeIndex++) {
-    	
+    
       phenoType = population.get(phenoTypeIndex);
       
       // Randomly decide if the crossover will occur with this individual as firstparent
@@ -217,12 +220,11 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
 
       // Replace the chromosome with the mutated chromosome
       parentSeq1.set(chromosomeIdxToCross1, childchromosome);
-
+     
       // Replace the phenotype with the mutated phenotype
       population.add(phenoType.newInstance(Genotype.of(parentSeq1.toISeq())));
     }
 
-    System.out.println(childChromosomes);
     return childChromosomes;
   }
 

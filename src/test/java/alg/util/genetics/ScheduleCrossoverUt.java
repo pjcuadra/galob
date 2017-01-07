@@ -100,9 +100,9 @@ public class ScheduleCrossoverUt {
     // Crossover the chromosome
     childChromosome = (ScheduleChromosome)crossover
         .crossoverChromosome(parentChromosome1, parentChromosome2);
-
+    
     if (childChromosome !=  null) {
-      alterations = 2;
+      alterations = crossover.crosssedOvrGenes;
 
 
       alterationsCount = countAltersOfChromosome(parentChromosome1, childChromosome);
@@ -110,6 +110,7 @@ public class ScheduleCrossoverUt {
 
     assertEquals(alterationsCount, alterations);
     System.out.println(alterationsCount);
+    System.out.println(alterations);
     
   }
 
