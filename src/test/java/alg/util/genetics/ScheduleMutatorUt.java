@@ -112,7 +112,7 @@ public class ScheduleMutatorUt {
     }
 
     assertEquals(alterationsCount, alterations);
-    System.out.println(alterationsCount);
+    
   }
 
   @Test

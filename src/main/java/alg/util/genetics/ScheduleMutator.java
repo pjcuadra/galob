@@ -98,7 +98,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
       }
 
       levels.add(thisLevel);
-      System.out.println(levels);
+      
 
     }
 
