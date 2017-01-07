@@ -106,11 +106,13 @@ public class ScheduleMutatorUt {
 
     if (mutatedChromosome !=  null) {
       alterations = 2;
+
+
+      alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
     }
 
-    alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
-
     assertEquals(alterationsCount, alterations);
+    
   }
 
   @Test
