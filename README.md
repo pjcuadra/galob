@@ -70,6 +70,8 @@ The commit messages should have
 
 # Documentation
 
+The presentation slides are available in the Wiki of this repository.
+
 The documentation was developed using [Sphinx](http://www.sphinx-doc.org/en/1.4.9/). To build the documentation follow the steps bellow.
 
 ## Virtual environment
@@ -140,25 +142,6 @@ After activating the *Virtual Environment* and installing all requirements, buil
 ```
 
 Now you can open the ```PDF``` file located at ``` <project-root-dir>/docs/build/latex/galob.pdf```.
-
-## Slides for presentation
-
-Slides are created using [Hieroglyph](https://github.com/nyergler/hieroglyph/blob/master/docs/index.rst). First install it running;
-
-```
-(docs-virt)$ pip install hieroglyph
-```
-
-To build the slides run;
-
-```
-(docs-virt)$ cd <project-root-dir>/presentation
-(docs-virt)$ make slides
-(docs-virt)$ cd <project-root-dir>/presentation/build/slides/
-(docs-virt)$ webdev 0.0.0.0:8080
-```
-
-Now open a web browser and type [0.0.0.0:8080](0.0.0.0:8080).
 
 # Install dependencies
 
