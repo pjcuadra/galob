@@ -103,7 +103,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
    * @param tasknum taskId 
    * @return tasklevel dependency level of the taskId
    */
-  public int getLevel( int tasknum) {
+  public int getLevel(int tasknum) {
     int tasklevel = 0;
     for (int i = 0; i < delta.length; i++) {
       tasklevel += delta[i][tasknum]; 
@@ -172,8 +172,13 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
     int childChromosomes = 0;
     Chromosome<ScheduleGene> firstChromosome;
     Chromosome<ScheduleGene> secondChromosome;
+    Phenotype<ScheduleGene, Double> phenoType;
+    int phenoTypeIndex = 0;
 
-    for (Phenotype<ScheduleGene, Double> phenoType: population) {
+    for (phenoTypeIndex = 0; phenoTypeIndex < population.size(); phenoTypeIndex++) {
+    	
+      phenoType = population.get(phenoTypeIndex);
+      
       // Randomly decide if the crossover will occur with this individual as firstparent
       if (randomGen.nextInt(100) <= probCrossover * 100) {
         continue;
