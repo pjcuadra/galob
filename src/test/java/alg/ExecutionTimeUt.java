@@ -163,14 +163,4 @@ public class ExecutionTimeUt {
     System.out.println(fitness);
   }
 
-
-
-
-
-  @Test
-  public void loadImbalance() {
-
-    executionTimeGa.getLoad(convMatrix);
-  }
-
 }

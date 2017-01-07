@@ -15,7 +15,6 @@ package alg;
 
 import alg.util.Scheduler;
 import alg.util.Util;
-import alg.util.genetics.ScheduleAllele;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
 
@@ -65,83 +64,7 @@ public class ExecutionTime extends Scheduler {
         gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
         );
   }
-
-
-  /**
-   * Calculate the omega matrix from a Chromosome.
-   * 
-   * <p>According to "Load Balancing Task Scheduling based on 
-   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
-   * LI Jun) 
-   * 
-   * @param scheduleSeq genes sequence of a valid chromosome
-   * 
-   * @return CONV matrix
-   */
-  public int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq) { 
-    int[][] omega = new int[etc.length][etc[0].length];
-    ScheduleAllele currAllel = null;
-
-    // Just set to one where it is allocated
-    for (ScheduleGene gene: scheduleSeq) {
-      currAllel = gene.getAllele();
-      omega[currAllel.getExecutorId()][currAllel.getTaskId()] = 1;
-    }
-
-    return omega;
-  }
-
-  /**
-   * Get the execution time of every node given a chromosome.
-   * 
-   * <p>According to "Load Balancing Task Scheduling based on 
-   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
-   * LI Jun), equation (1)
-   * 
-   * @param omega allocation nodes matrix
-   * 
-   * @return the sum of execution times per node as an array
-   *         indexed by node index 
-   */
-  public double[] getSumTime(int[][] omega) {
-    double[][] costsMatrix = null;
-    double[] sumTime = new double[omega.length];
-    int row = 0;
-
-    // Get the execution costs for our allocation
-    costsMatrix = Util.matrixParallelMultiply(Util.intMatrixtoDouble(omega), etc);
-
-    // Iterate over the tasks
-    for (row = 0; row < omega.length; row++) {
-      sumTime[row] = Util.getRowSum(costsMatrix, row);
-    }
-
-    return sumTime;
-  }
-
-  /**
-   * Get total execution time given a Chromosome.
-   * According to "Load Balancing Task Scheduling based on 
-   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
-   * LI Jun), equation (2)
-   * 
-   * @param omega allocation nodes matrix
-   * 
-   * @return total execution time of a given Chromosome
-   */
-  public double getTotalTime(int[][] omega) {
-    double[] sumTime = getSumTime(omega);
-    double totalTime = 0;
-
-    for (double time : sumTime) {
-      if (time > totalTime) {
-        totalTime = time;
-      }
-    }
-
-    return totalTime;
-  }
-
+  
   /**
    * The fitness function to calculate fitness of a given Chromosome
    * with respect to only computation costs. 
@@ -164,39 +87,7 @@ public class ExecutionTime extends Scheduler {
 
     return fitness;
   }
-
-
-
-  /**
-   * Get the load imbalance of given Chromosome.
-   * 
-   * <p>According to "Load Balancing Task Scheduling based on 
-   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
-   * LI Jun), equation (4)
-   * 
-   * @param omega allocation nodes matrix
-   * 
-   * @return load imbalance of a Chromosome
-   */
-  public double getLoad(int[][] omega) {
-    double[] sumTime = getSumTime(omega);
-    double load = 0;
-    double avgTime = getTotalTime(omega) / omega.length;
-
-    // First calculate sum = (sumTime(i) - averageTime)^2
-    for (double time: sumTime) {
-      load += Math.pow(time - avgTime, 2);
-    }
-
-    // Now multiply the sum with 1/(M - 1)
-    load = load / ((double)(sumTime.length - 1));
-
-    // And finally take the square root
-    load = Math.sqrt(load);
-
-    return load;
-  }
-
+  
   /**
    * Get the communication cost given the chromosome.
    * According to "Load Balancing Task Scheduling based on 

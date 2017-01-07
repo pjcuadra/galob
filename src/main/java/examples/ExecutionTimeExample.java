@@ -5,13 +5,13 @@ import static org.jenetics.engine.limit.bySteadyFitness;
 
 import alg.ExecutionTime;
 import alg.util.Util;
+import alg.util.genetics.ScheduleCrossover;
 import alg.util.genetics.ScheduleGene;
 import alg.util.genetics.ScheduleMutator;
 
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.RouletteWheelSelector;
-import org.jenetics.SinglePointCrossover;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionStatistics;
 
@@ -59,7 +59,7 @@ public class ExecutionTimeExample {
         .selector(new RouletteWheelSelector<>())
         .alterers(
             new ScheduleMutator(delta, 0.55),
-            new SinglePointCrossover<>(0.06))
+            new ScheduleCrossover(delta, 0.55))
         .build();
 
     // Create evolution statistics consumer.
