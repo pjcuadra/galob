@@ -18,7 +18,7 @@ import org.junit.Test;
 import java.util.Random;
 
 /**
- * Schedule Mutator unit testing.
+ * Schedule Crossover unit testing.
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
@@ -109,8 +109,6 @@ public class ScheduleCrossoverUt {
     }
 
     assertEquals(alterationsCount, alterations);
-    System.out.println(alterationsCount);
-    System.out.println(alterations);
     
   }
 

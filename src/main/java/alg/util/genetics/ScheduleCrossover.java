@@ -28,6 +28,9 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
    * Levels partitioning of dependencies.
    */
   private ArrayList<ArrayList<Integer>> levels;
+  /**
+   * The dependency matrix copy.
+   */
   private double[][] delta;
   /**
    * Number of altered genes after crossover.
@@ -106,7 +109,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
    * @param tasknum taskId 
    * @return tasklevel dependency level of the taskId
    */
-  public int getLevel(int tasknum) {
+  private int getLevel(int tasknum) {
     int tasklevel = 0;
     for (int i = 0; i < delta.length; i++) {
       tasklevel += delta[i][tasknum]; 
@@ -210,7 +213,7 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
       Chromosome<ScheduleGene> childchromosome 
            = crossoverChromosome(firstChromosome,secondChromosome);
 
-      // If no mutation was performed then continue
+      // If no crossover was performed then continue
       if (childchromosome == null) {
         continue;
       }
@@ -218,10 +221,10 @@ public class ScheduleCrossover implements Alterer<ScheduleGene, Double> {
       // Child chromosome is added
       childChromosomes += 1;
 
-      // Replace the chromosome with the mutated chromosome
+      // Replace the chromosome with the child chromosome
       parentSeq1.set(chromosomeIdxToCross1, childchromosome);
      
-      // Replace the phenotype with the mutated phenotype
+      // Replace the phenotype with the crossed over phenotype
       population.add(phenoType.newInstance(Genotype.of(parentSeq1.toISeq())));
     }
 
