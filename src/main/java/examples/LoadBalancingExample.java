@@ -66,7 +66,31 @@ public class LoadBalancingExample {
     delta[6][9] = 1;
     delta[7][9] = 1;
     delta[8][9] = 1;
+    
+    
+    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
+    comCost[0][1] = 18;
+    comCost[0][2] = 12;
+    comCost[0][3] = 9;
+    comCost[0][4] = 11;
+    comCost[0][5] = 14;
 
+    comCost[1][7] = 19;
+    comCost[1][8] = 16;
+
+    comCost[2][6] = 23;
+
+    comCost[3][7] = 27;
+    comCost[3][8] = 23;
+
+    comCost[4][8] = 13;
+
+    comCost[5][7] = 15;
+
+    comCost[6][9] = 17;
+    comCost[7][9] = 11;
+    comCost[8][9] = 13;
+    
     loadBal = new LoadBalancing(etc, delta, comCost);
 
 
@@ -82,8 +106,8 @@ public class LoadBalancingExample {
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.10), // TODO: Implement Individual adaptability
-            new ScheduleCrossover(delta,0.45)) // TODO: Implement Individual adaptability
+            new ScheduleMutator(delta, 0.05), // TODO: Implement Individual adaptability
+            new ScheduleCrossover(delta, 0.45)) // TODO: Implement Individual adaptability
         .build();
 
     // Create evolution statistics consumer.
@@ -92,7 +116,7 @@ public class LoadBalancingExample {
     final Phenotype<ScheduleGene, Double> best = engine.stream()
         // The evolution will stop after maximal 100
         // generations.
-        .limit(100)
+        .limit(1000)
         // Update the evaluation statistics after
         // each generation
         .peek(statistics)

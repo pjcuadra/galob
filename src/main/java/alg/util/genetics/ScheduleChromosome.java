@@ -47,10 +47,13 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
     ArrayList<ScheduleAllele> allocable = null;
     ScheduleGene gene =  null;
+    double[][] deltaTemp = null; 
 
     gene =  ScheduleGene.of(delta.length, numExecutors);
 
     this.delta = Util.copyMatrix(delta);
+    
+    deltaTemp = Util.copyMatrix(this.delta);
 
     this.numTasks = delta.length;
     this.numExecutors = numExecutors;
@@ -72,7 +75,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
         // If no dependency pending is allocable
 
 
-        if (!(Util.checkColZero(this.delta, currItem.getTaskId()))) {
+        if (!(Util.checkColZero(deltaTemp, currItem.getTaskId()))) {
           continue;
         }
 
@@ -91,7 +94,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       toSchedule.remove(allocable.get(0));
 
       // Set dependency for all other task to zero
-      Util.clearRow(this.delta, allocable.get(0).getTaskId());
+      Util.clearRow(deltaTemp, allocable.get(0).getTaskId());
     }
 
 
@@ -109,11 +112,12 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    */
   public ScheduleChromosome(double[][] delta, int numExecutors, ISeq<ScheduleGene> genes) {
 
-    this.delta = delta;
+    this.delta = Util.copyMatrix(delta);
     this.numTasks = delta.length;
     this.numExecutors = numExecutors;
 
     scheduleSeq = genes;
+    
   }
 
   /* (non-Javadoc)
