@@ -1,7 +1,6 @@
 package examples;
 
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
-import static org.jenetics.engine.limit.bySteadyFitness;
 
 import alg.LoadBalancing;
 import alg.util.Util;

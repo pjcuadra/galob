@@ -1,11 +1,11 @@
 package alg.util.genetics;
 
+import static java.lang.Math.min;
+
 import alg.util.Util;
 
 import org.jenetics.SinglePointCrossover;
 import org.jenetics.util.MSeq;
-
-import static java.lang.Math.min;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,7 +53,8 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
   }
 
   /* (non-Javadoc)
-   * @see org.jenetics.SinglePointCrossover#crossover(org.jenetics.util.MSeq, org.jenetics.util.MSeq)
+   * @see org.jenetics.SinglePointCrossover#crossover(org.jenetics.util.MSeq,
+   * org.jenetics.util.MSeq)
    */
   @Override  
   protected int crossover(MSeq<ScheduleGene> that, MSeq<ScheduleGene> other) {
