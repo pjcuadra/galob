@@ -24,7 +24,7 @@ public class LoadBalancing extends Scheduler {
   public LoadBalancing(double[][] etcmatrix, double[][] delta) {
     super(etcmatrix, delta);
   }
-  
+
   /**
    * Get the load imbalance of given Chromosome.
    * 
@@ -71,6 +71,25 @@ public class LoadBalancing extends Scheduler {
     double fitness = 0;
     int[][] omega = createOmegaMatrix(scheduleSeq);
     fitness = getLoad(omega);
+
+    return fitness;
+  }
+  
+  /**
+   * The fitness function to calculate fitness of a given Chromosome
+   * with respect to the work load and communication costs.
+   * 
+   * <p>According to "Load Balancing Task Scheduling based on 
+   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
+   * LI Jun), equation (7)
+   * 
+   * @param  scheduleSeq the schedule sequence of the chromosome    
+   * @return fitness of a given Chromosome
+   */
+  public double getFitnessLoadCommCt(ISeq<ScheduleGene> scheduleSeq) {
+    double fitness = 0;
+    int[][] omega = createOmegaMatrix(scheduleSeq);
+    fitness = (getLoad(omega)) + getCommCost(scheduleSeq);
 
     return fitness;
   }

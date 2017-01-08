@@ -54,7 +54,7 @@ public class LoadBalancingExample {
     // Configure and build the evolution engine.
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
-            loadBal::getFitnessLoad,
+            loadBal::getFitnessLoadCommCt,
             loadBal.ofSeq())
         .populationSize(500)
         .optimize(Optimize.MINIMUM)
@@ -82,7 +82,6 @@ public class LoadBalancingExample {
     System.out.println(statistics);
     System.out.println("Loadbalanced solution:");
     System.out.println(best);
-
   }
 
 }

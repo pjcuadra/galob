@@ -14,7 +14,6 @@
 package alg;
 
 import alg.util.Scheduler;
-import alg.util.Util;
 import alg.util.genetics.ScheduleGene;
 
 import org.jenetics.util.ISeq;
@@ -36,8 +35,8 @@ public class ExecutionTime extends Scheduler {
     super(etcmatrix, delta);
   }
 
- 
-  
+
+
   /**
    * The fitness function to calculate fitness of a given Chromosome
    * with respect to only computation costs. 
@@ -53,52 +52,12 @@ public class ExecutionTime extends Scheduler {
     double fitness = 0;
     int[][] omega = createOmegaMatrix(scheduleSeq);
     double totaltime = getTotalTime(omega);
-    double[][] comCostMat = Util.getComcostmatrix(delta);
-    double totalComCost = getCommCost(comCostMat, scheduleSeq);
+    double totalComCost = getCommCost(scheduleSeq);
 
     fitness = (costFact * (totaltime + totalComCost));
 
     return fitness;
   }
-  
-  /**
-   * Get the communication cost given the chromosome.
-   * According to "Load Balancing Task Scheduling based on 
-   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
-   * LI Jun), equation (2)
-   * 
-   * @param ctmatrix communication cost matrix
-   * @param scheduleSeq genes sequence of a valid chromosome  
-   * 
-   * @return total communication cost of a given Chromosome
-   */
-
-  public double getCommCost(double[][] ctmatrix, ISeq<ScheduleGene> scheduleSeq) {
-    int execId2 = 0;
-    int execId1 = 0;
-    double totalComCost = 0;
 
 
-    for (int i = 0; i < scheduleSeq.length(); i++) {
-      for (int j = (i + 1); j < scheduleSeq.length(); j++) {
-        //iterate only if there is a dependency between the tasks
-        if (ctmatrix[i][j] != 0) {
-          for (ScheduleGene gene : scheduleSeq) {
-            if (gene.getAllele().getTaskId() == i) {
-              execId1 = gene.getAllele().getExecutorId();
-            } else if (gene.getAllele().getTaskId() == j) {
-              execId2 = gene.getAllele().getExecutorId();
-            }
-          }
-          if (execId1 != execId2) {
-            //add the comm cost if the tasks are assigned to diff cores
-            totalComCost += ctmatrix[i][j];
-          }
-        }
-      }
-
-    }
-
-    return totalComCost;
-  }
 }
