@@ -28,10 +28,6 @@ import java.util.Random;
 public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
   /**
-   * Number of tasks.
-   */
-  private int numTasks;
-  /**
    * Mutation probability.
    */
   private double probMutator;
@@ -47,61 +43,10 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @param probMutator mutating probability
    */
   public ScheduleMutator(double[][] delta, double probMutator) {
-    this.numTasks = delta.length;
+    this.probMutator = probMutator;
 
-    levels =  new ArrayList<ArrayList<Integer>>(); 
-
-    getDependenciesLevels(delta);
-  }
-
-  /**
-   * Create the levels representation of the dependencies.
-   * 
-   * @param delta dependencies matrix
-   */
-  private void getDependenciesLevels(double[][] delta) {
-    double[][] myDelta = Util.copyMatrix(delta);
-    ArrayList<Integer> toDet = new ArrayList<Integer>();
-    ArrayList<Integer> thisLevel;
-
-    for (int i = 0; i < numTasks ;i++) {
-      toDet.add(new Integer(i));
-    }
-
-    while (!toDet.isEmpty()) {
-      thisLevel =  new ArrayList<Integer>();
-
-      for (Integer task = 0; task < numTasks; task++) {
-
-        if (!toDet.contains(task)) {
-          continue;
-        }
-
-
-        /*
-         * check if there is a dependency with a successive task
-         * check for ones in the column
-         */
-
-        if (!(Util.checkColZero(myDelta, task))) {
-          continue;
-        }
-
-        toDet.remove(task);
-
-        thisLevel.add(task);
-
-      }
-      for (Integer iterator:thisLevel) {
-        //to clear the elements of the row
-        Util.clearRow(myDelta, iterator);
-      }
-
-      levels.add(thisLevel);
-      
-
-    }
-
+    levels =  Util.getDependenciesLevels(delta); 
+    
   }
 
   /**
@@ -166,7 +111,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
     for (Phenotype<ScheduleGene, Double> phenoType: population) {
       // Randomly decide if this individual is going to mutate
-      if (randomGen.nextInt(100) <= probMutator * 100) {
+      if (randomGen.nextInt(100) > probMutator * 100) {
         continue;
       }
 

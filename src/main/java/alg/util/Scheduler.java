@@ -5,8 +5,11 @@
 package alg.util;
 
 import alg.util.genetics.ScheduleAllele;
+import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleGene;
 
+import org.jenetics.Genotype;
+import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
 
 /**
@@ -113,6 +116,32 @@ public class Scheduler {
     }
 
     return totalTime;
+  }
+  
+  /**
+   * Create a Jenetics codec for IntegerChromosome/Conv matrix encoding/decoding.
+   * @return Jenetics codec
+   */
+  public Codec<int[][], ScheduleGene> ofOmega() {
+    int numExecutors = etc.length;
+
+    return Codec.of(
+        Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
+        gt -> createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq()) /*Decoder*/
+        );
+  }
+
+  /**
+   * Create a Jenetics codec for IntegerChromosome/schedule sequence encoding/decoding.
+   * @return Jenetics codec
+   */
+  public Codec<ISeq<ScheduleGene>, ScheduleGene> ofSeq() {
+    int numExecutors = etc.length;
+
+    return Codec.of(
+        Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
+        gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
+        );
   }
 
 

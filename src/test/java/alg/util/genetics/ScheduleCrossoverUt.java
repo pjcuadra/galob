@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import alg.util.Util;
 
-import org.jenetics.Chromosome;
+import org.jenetics.util.MSeq;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -69,45 +69,28 @@ public class ScheduleCrossoverUt {
   public void tearDown() throws Exception {
   }
 
-  private int countAltersOfChromosome(Chromosome<ScheduleGene> originalChromosome, 
-      Chromosome<ScheduleGene> childChromosome) {
-    int alterationsCount = 0;
-    ScheduleGene expected;
-    ScheduleGene actual;
-    // Count number of alterations
-    for (int locus = 0; locus < originalChromosome.toSeq().size(); locus++) {
-
-      expected =  originalChromosome.getGene(locus);
-      actual =  childChromosome.getGene(locus);
-
-      if (!expected.equals(actual)) {
-        alterationsCount++;
-      }
-
-    }
-
-    return alterationsCount;
-  }
-
   @Test
   public void singleCrossover() {
-    ScheduleChromosome parentChromosome1 = new ScheduleChromosome(delta, executors);
-    ScheduleChromosome parentChromosome2 = new ScheduleChromosome(delta, executors);
-    ScheduleChromosome childChromosome = parentChromosome1.clone();
+    ScheduleChromosome p1Chromosome = new ScheduleChromosome(delta, executors);
+    ScheduleChromosome p2Chromosome = new ScheduleChromosome(delta, executors);
+    MSeq<ScheduleGene> p1Seq = p1Chromosome.toSeq().copy();
+    MSeq<ScheduleGene> p2Seq = p2Chromosome.toSeq().copy();
     int alterations = 0;
     int alterationsCount = 0;
 
     // Crossover the chromosome
-    childChromosome = (ScheduleChromosome)crossover
-        .crossoverChromosome(parentChromosome1, parentChromosome2);
+    alterations = crossover.crossover(p1Seq, p2Seq);
     
-    if (childChromosome !=  null) {
-      alterations = crossover.crosssedOvrGenes;
-
-
-      alterationsCount = countAltersOfChromosome(parentChromosome1, childChromosome);
+    // Check that the Gene sequence changed
+    if (!p1Seq.equals(p1Chromosome.toSeq().copy())) {
+      alterationsCount++;
     }
-
+    
+    // Check that the Gene sequence changed
+    if (!p2Seq.equals(p2Chromosome.toSeq().copy())) {
+      alterationsCount++;
+    }
+    
     assertEquals(alterationsCount, alterations);
     
   }
