@@ -1,5 +1,6 @@
 package alg.util;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Util {
@@ -190,6 +191,58 @@ public class Util {
     }
 
     return resMatrix;
+
+  }
+  
+  /**
+   * Create the levels representation of the dependencies.
+   * 
+   * @param delta dependencies matrix
+   */
+  public static ArrayList<ArrayList<Integer>> getDependenciesLevels(double[][] delta) {
+    ArrayList<ArrayList<Integer>> levels = new ArrayList<ArrayList<Integer>>();
+    ArrayList<Integer> toDet = new ArrayList<Integer>();
+    ArrayList<Integer> thisLevel;
+    double[][] myDelta = Util.copyMatrix(delta);
+    for (int i = 0; i < delta.length ;i++) {
+      toDet.add(new Integer(i));
+    }
+
+    while (!toDet.isEmpty()) {
+      thisLevel =  new ArrayList<Integer>();
+
+      for (Integer task = 0; task < delta.length; task++) {
+
+        if (!toDet.contains(task)) {
+          continue;
+        }
+
+
+        /*
+         * check if there is a dependency with a successive task
+         * check for ones in the column
+         */
+
+        if (!(Util.checkColZero(myDelta, task))) {
+          continue;
+        }
+
+        toDet.remove(task);
+
+        thisLevel.add(task);
+
+      }
+      for (Integer iterator:thisLevel) {
+        //to clear the elements of the row
+        Util.clearRow(myDelta, iterator);
+      }
+
+      levels.add(thisLevel);
+
+
+    }
+    
+    return levels;
 
   }
 }
