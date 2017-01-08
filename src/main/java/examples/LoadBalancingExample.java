@@ -49,6 +49,9 @@ public class LoadBalancingExample {
     loadBal = new LoadBalancing(myetc, delta);
 
 
+    /* The values in this examples are taken form "A fast hybrid genetic 
+     * algorithm in heterogeneous computing environment" (Zhiyang Jiang, 
+     * Shengzhong Feng) */
     // Configure and build the evolution engine.
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
@@ -58,17 +61,14 @@ public class LoadBalancingExample {
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.45),
-            new ScheduleCrossover(delta,0.06))
+            new ScheduleMutator(delta, 0.10), // TODO: Implement Individual adaptability
+            new ScheduleCrossover(delta,0.45)) // TODO: Implement Individual adaptability
         .build();
 
     // Create evolution statistics consumer.
     final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
 
     final Phenotype<ScheduleGene, Double> best = engine.stream()
-        // Truncate the evolution stream after 7 "steady"
-        // generations.
-        .limit(bySteadyFitness(3))
         // The evolution will stop after maximal 100
         // generations.
         .limit(100)
