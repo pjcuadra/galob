@@ -98,16 +98,11 @@ public class ScheduleCrossoverUt {
     int alterationsCount = 0;
 
     // Crossover the chromosome
-    childChromosome = (ScheduleChromosome)crossover
-        .crossoverChromosome(parentChromosome1, parentChromosome2);
+    alterations = crossover.crossover(parentChromosome1.toSeq().copy(), 
+        parentChromosome2.toSeq().copy());
+
+    alterationsCount = countAltersOfChromosome(parentChromosome1, childChromosome);
     
-    if (childChromosome !=  null) {
-      alterations = crossover.crosssedOvrGenes;
-
-
-      alterationsCount = countAltersOfChromosome(parentChromosome1, childChromosome);
-    }
-
     assertEquals(alterationsCount, alterations);
     
   }
