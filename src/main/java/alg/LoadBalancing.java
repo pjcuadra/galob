@@ -11,7 +11,7 @@
 
 package alg;
 
-import alg.ExecutionTime;
+import alg.util.Scheduler;
 import alg.util.genetics.ScheduleGene;
 import org.jenetics.util.ISeq;
 
@@ -19,7 +19,7 @@ import org.jenetics.util.ISeq;
 // For now this class is just a placeholder. Remove this comment once
 // class is implemented.
 
-public class LoadBalancing extends ExecutionTime {
+public class LoadBalancing extends Scheduler {
 
   public LoadBalancing(double[][] etcmatrix, double[][] delta) {
     super(etcmatrix, delta);
