@@ -118,7 +118,7 @@ public class ExecutionTimeUt {
   public void getSumTime() {
     double[] sumTime;
 
-    sumTime = executionTimeGa.getSumTime(convMatrix);
+    sumTime = executionTimeGa.getNodesExecutionTime(convMatrix);
 
     /* 
      * Since our ETC matrix has only ones the execution time per node

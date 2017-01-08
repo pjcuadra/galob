@@ -99,7 +99,7 @@ public class Scheduler {
    * @return the sum of execution times per node as an array
    *         indexed by node index 
    */
-  public double[] getSumTime(int[][] omega) {
+  public double[] getNodesExecutionTime(int[][] omega) {
     double[][] costsMatrix = null;
     double[] sumTime = new double[omega.length];
     int row = 0;
@@ -126,9 +126,8 @@ public class Scheduler {
    * @return total execution time of a given Chromosome
    */
   public double getTotalTime(int[][] omega) {
-    double[] sumTime = getSumTime(omega);
+    double[] sumTime = getNodesExecutionTime(omega);
     double totalTime = 0;
-    double[][] costsMatrix = null;
     
     for (double time : sumTime) {
       if (time > totalTime) {

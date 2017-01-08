@@ -91,7 +91,7 @@ public class LoadBalancingExample {
     comCost[7][9] = 11;
     comCost[8][9] = 13;
     
-    loadBal = new LoadBalancing(etc, delta, comCost);
+    loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
 
 
     /* The values in this examples are taken form "A fast hybrid genetic 
@@ -103,7 +103,7 @@ public class LoadBalancingExample {
             loadBal::getFitnessLoadCommCt,
             loadBal.ofSeq())
         .populationSize(500)
-        .optimize(Optimize.MINIMUM)
+        .optimize(Optimize.MAXIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
             new ScheduleMutator(delta, 0.05), // TODO: Implement Individual adaptability

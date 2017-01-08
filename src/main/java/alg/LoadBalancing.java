@@ -20,7 +20,13 @@ import org.jenetics.util.ISeq;
 // class is implemented.
 
 public class LoadBalancing extends Scheduler {
-
+  
+  /**
+   * Alpha value to mix fitness functions
+   */
+  private double alpha;
+  
+  
   /**
    * Constructor
    * 
@@ -29,8 +35,35 @@ public class LoadBalancing extends Scheduler {
    */
   public LoadBalancing(double[][] etcmatrix, double[][] delta) {
     super(etcmatrix, delta);
+    
+    this.alpha = 0.5;
   }
 
+  /**
+   * Constructor
+   * 
+   * @param etcmatrix execution time matrix
+   * @param delta dependencies matrix
+   * @param alpha fitness function mixing coefficient
+   */
+  public LoadBalancing(double[][] etcmatrix, double[][] delta, double alpha) {
+    super(etcmatrix, delta);
+    
+    this.alpha = alpha;
+  }
+
+  /**
+   * @param etc execution time matrix
+   * @param delta dependencies matrix
+   * @param alpha fitness function mixing coefficient
+   * @param comCost communication costs matrix
+   */
+  public LoadBalancing(double[][] etc, double[][] delta, double alpha, double[][] comCost) {
+    super(etc, delta, comCost);
+    
+    this.alpha = alpha;
+  }
+  
   /**
    * @param etc execution time matrix
    * @param delta dependencies matrix
@@ -38,6 +71,8 @@ public class LoadBalancing extends Scheduler {
    */
   public LoadBalancing(double[][] etc, double[][] delta, double[][] comCost) {
     super(etc, delta, comCost);
+    
+    this.alpha = 0.5;
   }
 
   /**
@@ -52,17 +87,17 @@ public class LoadBalancing extends Scheduler {
    * @return load imbalance of a Chromosome
    */
   public double getLoad(int[][] omega) {
-    double[] sumTime = getSumTime(omega);
+    double[] nodesExecutionTime = getNodesExecutionTime(omega);
     double load = 0;
     double avgTime = getTotalTime(omega) / omega.length;
 
     // First calculate sum = (sumTime(i) - averageTime)^2
-    for (double time: sumTime) {
+    for (double time: nodesExecutionTime) {
       load += Math.pow(time - avgTime, 2);
     }
 
     // Now multiply the sum with 1/(M - 1)
-    load = load / ((double)(sumTime.length - 1));
+    load = load / ((double)(nodesExecutionTime.length - 1));
 
     // And finally take the square root
     load = Math.sqrt(load);
@@ -87,7 +122,7 @@ public class LoadBalancing extends Scheduler {
   public double getFitnessLoad(ISeq<ScheduleGene> scheduleSeq) {
     double fitness = 0;
     int[][] omega = createOmegaMatrix(scheduleSeq);
-    fitness = getLoad(omega);
+    fitness = 1/getLoad(omega);
 
     return fitness;
   }
@@ -106,7 +141,7 @@ public class LoadBalancing extends Scheduler {
   public double getFitnessLoadCommCt(ISeq<ScheduleGene> scheduleSeq) {
     double fitness = 0;
     int[][] omega = createOmegaMatrix(scheduleSeq);
-    fitness = (getLoad(omega)) + getCommCost(scheduleSeq);
+    fitness = alpha*getFitnessLoad(scheduleSeq) + (1 - alpha)*(1/getTotalTime(omega));
 
     return fitness;
   }
