@@ -23,6 +23,25 @@ public class Util {
 
     return ones;
   }
+  
+  /**
+   * Create empty matrix of size rows*cols.
+   * 
+   * @param rows rows of the matrix
+   * @param cols columns of the matrix
+   * @return empty matrix
+   */
+  public static double[][] createEmptyMatrix(int rows, int cols) {
+    double[][] ones = new double[rows][cols];
+    // Initialize ones matrix with ones}
+    for (int currRow = 0; currRow < rows; currRow++) {
+      for (int currCol = 0; currCol < cols; currCol++) {
+        ones[currRow][currCol] = 0;
+      }
+    }
+
+    return ones;
+  }
 
 
   /**

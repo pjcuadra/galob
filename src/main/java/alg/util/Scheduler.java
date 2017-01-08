@@ -31,7 +31,26 @@ public class Scheduler {
    */
 
   protected double[][] delta;
+  
+  /**
+   * Communication costs matrix 
+   */
 
+  protected double[][] comCost;
+
+  /**
+   * Constructor.
+   * 
+   * @param etc execution time matrix
+   * @param delta dependency matrix
+   * @param comCost communication cost matrix
+   */
+  public Scheduler(double[][] etc, double[][] delta, double[][] comCost) {
+    this.etc = etc;
+    this.delta = delta;
+    this.comCost = comCost;
+  }
+  
   /**
    * Constructor.
    * 
@@ -41,6 +60,7 @@ public class Scheduler {
   public Scheduler(double[][] etc, double[][] delta) {
     this.etc = etc;
     this.delta = delta;
+    this.comCost = null;
   }
 
   /**
@@ -108,7 +128,8 @@ public class Scheduler {
   public double getTotalTime(int[][] omega) {
     double[] sumTime = getSumTime(omega);
     double totalTime = 0;
-
+    double[][] costsMatrix = null;
+    
     for (double time : sumTime) {
       if (time > totalTime) {
         totalTime = time;
@@ -133,12 +154,15 @@ public class Scheduler {
     int execId2 = 0;
     int execId1 = 0;
     double totalComCost = 0;
-    double[][] ctmatrix = Util.getComcostmatrix(delta);
+    
+    if (comCost == null) {
+      return 0;
+    }
 
     for (int i = 0; i < scheduleSeq.length(); i++) {
       for (int j = (i + 1); j < scheduleSeq.length(); j++) {
         //iterate only if there is a dependency between the tasks
-        if (ctmatrix[i][j] != 0) {
+        if (comCost[i][j] != 0) {
           for (ScheduleGene gene : scheduleSeq) {
             if (gene.getAllele().getTaskId() == i) {
               execId1 = gene.getAllele().getExecutorId();
@@ -148,7 +172,7 @@ public class Scheduler {
           }
           if (execId1 != execId2) {
             //add the comm cost if the tasks are assigned to diff cores
-            totalComCost += ctmatrix[i][j];
+            totalComCost += comCost[i][j];
           }
         }
       }

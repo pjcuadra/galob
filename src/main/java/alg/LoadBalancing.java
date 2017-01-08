@@ -21,8 +21,23 @@ import org.jenetics.util.ISeq;
 
 public class LoadBalancing extends Scheduler {
 
+  /**
+   * Constructor
+   * 
+   * @param etcmatrix execution time matrix
+   * @param delta dependencies matrix
+   */
   public LoadBalancing(double[][] etcmatrix, double[][] delta) {
     super(etcmatrix, delta);
+  }
+
+  /**
+   * @param etc execution time matrix
+   * @param delta dependencies matrix
+   * @param comCost communication costs matrix
+   */
+  public LoadBalancing(double[][] etc, double[][] delta, double[][] comCost) {
+    super(etc, delta, comCost);
   }
 
   /**
@@ -51,6 +66,8 @@ public class LoadBalancing extends Scheduler {
 
     // And finally take the square root
     load = Math.sqrt(load);
+    
+    System.out.println("Current Load: " + load);
 
     return load;
   }

@@ -25,27 +25,49 @@ import org.jenetics.engine.EvolutionStatistics;
  */
 public class LoadBalancingExample {
 
-  static final int numOfTasks = 16;
-  static final int numOfExecutors = 4;
-  static LoadBalancing loadBal;
+  static final int numOfTasks = 10;
+  static final int numOfExecutors = 3;
+  
+  /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
+  static final double[][] etc = {{14, 13, 11, 13, 12, 13, 7, 5, 18, 21},
+                                 {16, 19, 13, 8, 13, 16, 15, 11, 12, 7},
+                                 {9, 18, 19, 17, 10, 9, 11, 14, 20, 16}};
+    
   /**
    * Main function.
    * @param args command line parameters
    */
   
   public static void main(String[] args) {
-    double[][] myetc = Util.getOnesMatrix(numOfExecutors, numOfTasks);
-    double[][] delta = Util.getDeltaMatrix(numOfTasks);
+    double[][] delta = Util.createEmptyMatrix(numOfTasks, numOfTasks);
+    double[][] comCost = Util.createEmptyMatrix(numOfTasks, numOfTasks);
     LoadBalancing loadBal = null;
+    
+    
+    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
+    delta[0][1] = 1;
+    delta[0][2] = 1;
+    delta[0][3] = 1;
+    delta[0][4] = 1;
+    delta[0][5] = 1;
+    
+    delta[1][7] = 1;
+    delta[1][8] = 1;
+    
+    delta[2][6] = 1;
+    
+    delta[3][7] = 1;
+    delta[3][8] = 1;
+    
+    delta[4][8] = 1;
+    
+    delta[5][7] = 1;
+    
+    delta[6][9] = 1;
+    delta[7][9] = 1;
+    delta[8][9] = 1;
 
-
-    for (int o = 0; o < myetc[0].length; o++) {
-      myetc[0][o] = 2;
-      myetc[1][o] = 3;
-      myetc[2][o] = 5;
-    }
-
-    loadBal = new LoadBalancing(myetc, delta);
+    loadBal = new LoadBalancing(etc, delta, comCost);
 
 
     /* The values in this examples are taken form "A fast hybrid genetic 
