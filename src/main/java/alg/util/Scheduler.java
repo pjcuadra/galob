@@ -66,7 +66,7 @@ public class Scheduler {
 
     return omega;
   }
-  
+
   /**
    * Get the execution time of every node given a chromosome.
    * 
@@ -117,7 +117,47 @@ public class Scheduler {
 
     return totalTime;
   }
-  
+
+  /**
+   * Get the communication cost given the chromosome.
+   * According to "Load Balancing Task Scheduling based on 
+   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
+   * LI Jun), equation (2)
+   * 
+   * @param scheduleSeq genes sequence of a valid chromosome  
+   * 
+   * @return total communication cost of a given Chromosome
+   */
+
+  public double getCommCost(ISeq<ScheduleGene> scheduleSeq) {
+    int execId2 = 0;
+    int execId1 = 0;
+    double totalComCost = 0;
+    double[][] ctmatrix = Util.getComcostmatrix(delta);
+
+    for (int i = 0; i < scheduleSeq.length(); i++) {
+      for (int j = (i + 1); j < scheduleSeq.length(); j++) {
+        //iterate only if there is a dependency between the tasks
+        if (ctmatrix[i][j] != 0) {
+          for (ScheduleGene gene : scheduleSeq) {
+            if (gene.getAllele().getTaskId() == i) {
+              execId1 = gene.getAllele().getExecutorId();
+            } else if (gene.getAllele().getTaskId() == j) {
+              execId2 = gene.getAllele().getExecutorId();
+            }
+          }
+          if (execId1 != execId2) {
+            //add the comm cost if the tasks are assigned to diff cores
+            totalComCost += ctmatrix[i][j];
+          }
+        }
+      }
+
+    }
+
+    return totalComCost;
+  }
+
   /**
    * Create a Jenetics codec for IntegerChromosome/Conv matrix encoding/decoding.
    * @return Jenetics codec
