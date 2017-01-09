@@ -22,13 +22,13 @@ import org.jenetics.util.ISeq;
 public class LoadBalancing extends Scheduler {
   
   /**
-   * Alpha value to mix fitness functions
+   * Alpha value to mix fitness functions.
    */
   private double alpha;
   
   
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param etcmatrix execution time matrix
    * @param delta dependencies matrix
@@ -40,7 +40,7 @@ public class LoadBalancing extends Scheduler {
   }
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param etcmatrix execution time matrix
    * @param delta dependencies matrix
@@ -53,6 +53,7 @@ public class LoadBalancing extends Scheduler {
   }
 
   /**
+   * Constructor.
    * @param etc execution time matrix
    * @param delta dependencies matrix
    * @param alpha fitness function mixing coefficient
@@ -65,6 +66,7 @@ public class LoadBalancing extends Scheduler {
   }
   
   /**
+   * Constructor.
    * @param etc execution time matrix
    * @param delta dependencies matrix
    * @param comCost communication costs matrix
@@ -82,14 +84,14 @@ public class LoadBalancing extends Scheduler {
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
    * LI Jun), equation (4)
    * 
-   * @param omega allocation nodes matrix
+   * @param scheduleSeq scheduling sequence
    * 
    * @return load imbalance of a Chromosome
    */
-  public double getLoad(int[][] omega) {
-    double[] nodesExecutionTime = getNodesExecutionTime(omega);
+  public double getLoad(ISeq<ScheduleGene> scheduleSeq) {
+    double[] nodesExecutionTime = getNodesExecutionTime(scheduleSeq);
     double load = 0;
-    double avgTime = getTotalTime(omega) / omega.length;
+    double avgTime = getTotalTime(scheduleSeq) / scheduleSeq.size();
 
     // First calculate sum = (sumTime(i) - averageTime)^2
     for (double time: nodesExecutionTime) {
@@ -102,8 +104,6 @@ public class LoadBalancing extends Scheduler {
     // And finally take the square root
     load = Math.sqrt(load);
     
-    System.out.println("Current Load: " + load);
-
     return load;
   }
 
@@ -120,11 +120,7 @@ public class LoadBalancing extends Scheduler {
    * @return fitness of a given Chromosome
    */
   public double getFitnessLoad(ISeq<ScheduleGene> scheduleSeq) {
-    double fitness = 0;
-    int[][] omega = createOmegaMatrix(scheduleSeq);
-    fitness = 1/getLoad(omega);
-
-    return fitness;
+    return 1 / getLoad(scheduleSeq);
   }
   
   /**
@@ -139,10 +135,6 @@ public class LoadBalancing extends Scheduler {
    * @return fitness of a given Chromosome
    */
   public double getFitnessLoadCommCt(ISeq<ScheduleGene> scheduleSeq) {
-    double fitness = 0;
-    int[][] omega = createOmegaMatrix(scheduleSeq);
-    fitness = alpha*getFitnessLoad(scheduleSeq) + (1 - alpha)*(1/getTotalTime(omega));
-
-    return fitness;
+    return alpha * getFitnessLoad(scheduleSeq) + (1 - alpha) * (1 / getTotalTime(scheduleSeq));
   }
 }

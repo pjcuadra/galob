@@ -146,7 +146,7 @@ public class ScheduleChromosomeUt {
   @Test
   public void knowChromosome() {
     double[][] matrix = Util.createEmptyMatrix(5, 5);
-    ScheduleChromosome chromosome = null;
+    
     
     /* (1) -> (2) -> (3) -> (4) -> (5) */
     matrix[0][1] = 1;
@@ -154,7 +154,7 @@ public class ScheduleChromosomeUt {
     matrix[2][3] = 1;
     matrix[3][4] = 1;
     
-    chromosome = new ScheduleChromosome(matrix, 4);
+    ScheduleChromosome chromosome = new ScheduleChromosome(matrix, 4);
 
     for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene ++) {
       assertEquals(chromosome.toSeq().get(currGene).getAllele().getTaskId(), currGene);

@@ -40,8 +40,6 @@ public class LoadBalancingExample {
   
   public static void main(String[] args) {
     double[][] delta = Util.createEmptyMatrix(numOfTasks, numOfTasks);
-    double[][] comCost = Util.createEmptyMatrix(numOfTasks, numOfTasks);
-    LoadBalancing loadBal = null;
     
     
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
@@ -68,6 +66,8 @@ public class LoadBalancingExample {
     delta[8][9] = 1;
     
     
+    double[][] comCost = Util.createEmptyMatrix(numOfTasks, numOfTasks);
+    
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
     comCost[0][1] = 18;
     comCost[0][2] = 12;
@@ -91,7 +91,7 @@ public class LoadBalancingExample {
     comCost[7][9] = 11;
     comCost[8][9] = 13;
     
-    loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
 
 
     /* The values in this examples are taken form "A fast hybrid genetic 
@@ -106,7 +106,7 @@ public class LoadBalancingExample {
         .optimize(Optimize.MAXIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.05), // TODO: Implement Individual adaptability
+            new ScheduleMutator(delta, 0.1), // TODO: Implement Individual adaptability
             new ScheduleCrossover(delta, 0.45)) // TODO: Implement Individual adaptability
         .build();
 
@@ -116,7 +116,7 @@ public class LoadBalancingExample {
     final Phenotype<ScheduleGene, Double> best = engine.stream()
         // The evolution will stop after maximal 100
         // generations.
-        .limit(1000)
+        .limit(100)
         // Update the evaluation statistics after
         // each generation
         .peek(statistics)

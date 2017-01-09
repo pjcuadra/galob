@@ -11,6 +11,9 @@ import alg.util.genetics.ScheduleGene;
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
+import org.jenetics.util.MSeq;
+
+import java.util.ArrayList;
 
 /**
  * Scheduler class abstraction.
@@ -33,7 +36,7 @@ public class Scheduler {
   protected double[][] delta;
   
   /**
-   * Communication costs matrix 
+   * Communication costs matrix.
    */
 
   protected double[][] comCost;
@@ -60,7 +63,7 @@ public class Scheduler {
   public Scheduler(double[][] etc, double[][] delta) {
     this.etc = etc;
     this.delta = delta;
-    this.comCost = null;
+    this.comCost = Util.createEmptyMatrix(delta.length, delta.length);
   }
 
   /**
@@ -94,24 +97,100 @@ public class Scheduler {
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
    * LI Jun), equation (1)
    * 
-   * @param omega allocation nodes matrix
+   * @param scheduleSeq scheduling sequence
    * 
    * @return the sum of execution times per node as an array
    *         indexed by node index 
    */
-  public double[] getNodesExecutionTime(int[][] omega) {
-    double[][] costsMatrix = null;
-    double[] sumTime = new double[omega.length];
-    int row = 0;
-
-    // Get the execution costs for our allocation
-    costsMatrix = Util.matrixParallelMultiply(Util.intMatrixtoDouble(omega), etc);
-
-    // Iterate over the tasks
-    for (row = 0; row < omega.length; row++) {
-      sumTime[row] = Util.getRowSum(costsMatrix, row);
+  public double[] getNodesExecutionTime(ISeq<ScheduleGene> scheduleSeq) {
+    double[] sumTime = new double[etc.length];
+    double currTime = 0;
+    MSeq<ScheduleGene> toRun = scheduleSeq.copy();
+    double[][] deltaTemp = Util.copyMatrix(delta);
+    double[][] comCostTemp = Util.copyMatrix(comCost);
+    int currGeneIndx = 0;
+    ArrayList<ScheduleGene> doneTasks = new ArrayList<ScheduleGene>(); 
+    ArrayList<ScheduleGene> executed = new ArrayList<ScheduleGene>();
+    ArrayList<Double> finishTime = new ArrayList<Double>();
+    ScheduleChromosome test =  new ScheduleChromosome(delta, etc.length, scheduleSeq);
+    ScheduleGene currGene = null;
+    
+    // Check if the sequence is correct
+    if (!test.isValid()) {
+      for (int idx = 0; idx < sumTime.length; idx ++) {
+        sumTime[idx] = Integer.MAX_VALUE;      
+      }
+      return sumTime;
     }
-
+    
+    
+    // Set to zero communication costs because of same node allocation
+    Util.allocComCost(comCostTemp, createOmegaMatrix(scheduleSeq));
+    
+    
+    //
+    while (currGeneIndx < toRun.length()) {
+      
+      while (currGeneIndx < toRun.length()) {
+        
+        currGene = toRun.get(currGeneIndx);
+        
+        // If dependencies aren't met time must pass
+        if (!(Util.checkColZero(deltaTemp, currGene.getAllele().getTaskId()))) {
+          break;
+        }
+        
+        // If communication isn't finished time must pass
+        if (!(Util.checkColZero(comCostTemp, currGene.getAllele().getTaskId()))) {
+          break;
+        }
+        
+        // Execute task on node
+        if (currTime >= sumTime[currGene.getAllele().getExecutorId()]) {
+          
+          sumTime[currGene.getAllele().getExecutorId()] = currTime;
+          sumTime[currGene.getAllele().getExecutorId()] += etc[currGene.getAllele().getExecutorId()]
+              [currGene.getAllele().getTaskId()];
+          
+          currGeneIndx++;
+          
+          // Add to both list
+          executed.add(currGene);
+          finishTime.add(new Double(sumTime[currGene.getAllele().getExecutorId()]));
+          
+          continue;
+        
+        }
+        
+        break;
+        
+      }
+      
+      
+      // Check if any executing task is done
+      for (int idx = 0; idx < finishTime.size(); idx++) {
+        
+        if (currTime >= finishTime.get(idx)) {
+          Util.clearRow(deltaTemp, executed.get(idx).getAllele().getTaskId());
+          
+          doneTasks.add(executed.get(idx));
+          
+          // Remove from both lists
+          executed.remove(idx);
+          finishTime.remove(idx);
+          
+        }
+      }
+      
+      // Increase communication time
+      for (ScheduleGene gene: doneTasks) {
+        Util.decrementRow(comCostTemp, gene.getAllele().getTaskId());
+      }
+      
+      currTime++;
+      
+    }
+    
     return sumTime;
   }
 
@@ -121,12 +200,12 @@ public class Scheduler {
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
    * LI Jun), equation (2)
    * 
-   * @param omega allocation nodes matrix
+   * @param scheduleSeq scheduling sequence
    * 
    * @return total execution time of a given Chromosome
    */
-  public double getTotalTime(int[][] omega) {
-    double[] sumTime = getNodesExecutionTime(omega);
+  public double getTotalTime(ISeq<ScheduleGene> scheduleSeq) {
+    double[] sumTime = getNodesExecutionTime(scheduleSeq);
     double totalTime = 0;
     
     for (double time : sumTime) {

@@ -59,6 +59,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
   @Override  
   protected int crossover(MSeq<ScheduleGene> that, MSeq<ScheduleGene> other) {
     Random randomGen = new Random();
+    MSeq<ScheduleGene> temp = that.copy();
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
     
     
@@ -68,7 +69,9 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
       
       that.swap(crossoverSiteLocus, min(that.length(), other.length()), other, crossoverSiteLocus);
       
-      return 2;
+      if ((!that.equals(temp)) && (!that.equals(other))) {
+        return 2;
+      }
     
     }
     
