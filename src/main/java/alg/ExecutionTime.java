@@ -50,8 +50,7 @@ public class ExecutionTime extends Scheduler {
    */
   public double getFitnessCost(ISeq<ScheduleGene> scheduleSeq) {
     double fitness = 0;
-    int[][] omega = createOmegaMatrix(scheduleSeq);
-    double totaltime = getTotalTime(omega);
+    double totaltime = getTotalTime(scheduleSeq);
     double totalComCost = getCommCost(scheduleSeq);
 
     fitness = (costFact * (totaltime + totalComCost));

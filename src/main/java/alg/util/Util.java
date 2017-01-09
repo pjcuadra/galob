@@ -23,6 +23,25 @@ public class Util {
 
     return ones;
   }
+  
+  /**
+   * Create empty matrix of size rows*cols.
+   * 
+   * @param rows rows of the matrix
+   * @param cols columns of the matrix
+   * @return empty matrix
+   */
+  public static double[][] createEmptyMatrix(int rows, int cols) {
+    double[][] ones = new double[rows][cols];
+    // Initialize ones matrix with ones}
+    for (int currRow = 0; currRow < rows; currRow++) {
+      for (int currCol = 0; currCol < cols; currCol++) {
+        ones[currRow][currCol] = 0;
+      }
+    }
+
+    return ones;
+  }
 
 
   /**
@@ -244,5 +263,39 @@ public class Util {
     
     return levels;
 
+  }
+  
+  /**
+   * Decrement all the values in a row by one until it's zero.
+   * @param commCost communication cost matrix
+   * @param row row
+   */
+  public static void decrementRow(double[][] commCost, int row) {
+    for (int i = 0; i < commCost[0].length; i++) {
+      if (--commCost[row][i] < 0) {
+        commCost[row][i] = 0;
+      }
+    }
+  }
+  
+  /**
+   * Clear communication costs that are zero because of same
+   * node allocation.
+   * @param commCost Communication cost matrix
+   * @param omega allocation matrix
+   */
+  public static void allocComCost(double[][] commCost, int[][] omega) {
+    for (int i = 0; i < commCost.length; i++) {
+      for (int j = 0; j < commCost[0].length; j ++) {
+        if (commCost[i][j] != 0) {
+          for (int excId = 0; excId < omega.length; excId++) {
+            if ((omega[excId][i] == omega[excId][j]) && (omega[excId][i] == 1)) {
+              commCost[i][j] = 0;
+            }
+          }
+        }
+      }
+    }
+  
   }
 }

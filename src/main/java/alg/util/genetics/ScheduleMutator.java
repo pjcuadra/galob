@@ -111,7 +111,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
     for (Phenotype<ScheduleGene, Double> phenoType: population) {
       // Randomly decide if this individual is going to mutate
-      if (randomGen.nextInt(100) > probMutator * 100) {
+      if (randomGen.nextInt(100) + 0.001 > probMutator * 100) {
         continue;
       }
 
