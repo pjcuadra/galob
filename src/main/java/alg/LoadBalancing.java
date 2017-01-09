@@ -91,7 +91,7 @@ public class LoadBalancing extends Scheduler {
   public double getLoad(ISeq<ScheduleGene> scheduleSeq) {
     double[] nodesExecutionTime = getNodesExecutionTime(scheduleSeq);
     double load = 0;
-    double avgTime = getTotalTime(scheduleSeq) / scheduleSeq.size();
+    double avgTime = getTotalTime(scheduleSeq) / etc.length;
 
     // First calculate sum = (sumTime(i) - averageTime)^2
     for (double time: nodesExecutionTime) {

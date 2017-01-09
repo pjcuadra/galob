@@ -91,7 +91,8 @@ public class Scheduler {
   }
 
   /**
-   * Get the execution time of every node given a chromosome.
+   * Get the execution time of every node given a chromosome
+   * by simulating the execution of the schedule sequence.
    * 
    * <p>According to "Load Balancing Task Scheduling based on 
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
@@ -128,9 +129,10 @@ public class Scheduler {
     Util.allocComCost(comCostTemp, createOmegaMatrix(scheduleSeq));
     
     
-    //
+    // Time passing loop
     while (currGeneIndx < toRun.length()) {
       
+      // Allocating loop
       while (currGeneIndx < toRun.length()) {
         
         currGene = toRun.get(currGeneIndx);
