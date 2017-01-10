@@ -58,7 +58,7 @@ public class ExecutionTimeExample {
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.55),
+            new ScheduleMutator(delta, 0.55, null, etOpt),
             new ScheduleCrossover(delta, 0.55))
         .build();
 

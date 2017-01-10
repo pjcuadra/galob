@@ -4,6 +4,8 @@
 
 package alg.util.genetics;
 
+import alg.ExecutionTime;
+import alg.LoadBalancing;
 import alg.util.Util;
 
 import org.jenetics.Alterer;
@@ -35,18 +37,29 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * Levels partitioning of dependencies.
    */
   private ArrayList<ArrayList<Integer>> levels;
-
+  /**
+   * dependency matrix.
+   */
+  private double[][] delta;
+  private LoadBalancing loadbal;
+  private ExecutionTime exectime;
   /**
    * Constructor.
    * 
    * @param delta dependency matrix
    * @param probMutator mutating probability
+   * @param loadbal the instance of loadbalancing
+   * @param exectime instance of executiontime
    */
-  public ScheduleMutator(double[][] delta, double probMutator) {
-    this.probMutator = probMutator;
 
+  public ScheduleMutator(double[][] delta, double probMutator, 
+      LoadBalancing loadbal, ExecutionTime exectime) {
+    this.probMutator = probMutator;
+    this.delta = delta;
+    this.loadbal = loadbal;
+    this.exectime = exectime;
     levels =  Util.getDependenciesLevels(delta); 
-    
+
   }
 
   /**
@@ -56,6 +69,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @return mutated chromosome
    */
   public Chromosome<ScheduleGene> mutateChromosome(Chromosome<ScheduleGene> chromosome) {
+    ScheduleChromosome childChromosome;
     Random randomGen = new Random();
     int randLevel = randomGen.nextInt(levels.size());
     int firstGeneLocus = 0;
@@ -91,8 +105,22 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
       Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
 
-      return chromosome.newInstance(cSeq.toISeq());
-
+      childChromosome = new ScheduleChromosome(this.delta, cSeq.size() / 2, cSeq.toISeq());
+      // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
+      if (loadbal != null) {
+        if (childChromosome.is_Validsa_load(loadbal, 
+            loadbal.getFitnessLoadCommCt(chromosome.toSeq()), 
+            loadbal.getFitnessLoadCommCt(childChromosome.toSeq()))) {
+          return chromosome.newInstance(cSeq.toISeq());
+        }
+        // use the fitness functions for executiontime if the mutation is on executiontime 
+      } else if (exectime != null) {
+        if (childChromosome.is_Validsa_exectime(exectime, 
+            exectime.getFitnessCost(chromosome.toSeq()), 
+            exectime.getFitnessCost(childChromosome.toSeq()))) {
+          return childChromosome;
+        }
+      }
     }
 
     return null;

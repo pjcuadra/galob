@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -57,10 +56,18 @@ public class UtilUt {
   @Test
   public void checkDeltaMatrix() {
     double[][] matrix;
-
+    int count = 0;
     matrix = Util.getDeltaMatrix(numTask);
+    for (int i = numTask; i < numTask; i++) {
+      for (int j = i; j < numTask; j--) {
+        if (matrix[i][j] != 0) {
 
-    System.out.println("mat" + Arrays.deepToString(matrix));
+          count++;
+        }
+      }
+    }
+
+    assertEquals(count, 0);
   }
 
   @Test
@@ -86,7 +93,6 @@ public class UtilUt {
         break;
       }
     }
-    System.out.println("mat" + Arrays.deepToString(matrix));
     assertEquals(flag, false);
 
   }

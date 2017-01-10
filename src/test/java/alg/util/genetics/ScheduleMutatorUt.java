@@ -7,6 +7,7 @@ package alg.util.genetics;
 import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
+import alg.LoadBalancing;
 import alg.util.Util;
 
 import org.jenetics.Chromosome;
@@ -40,6 +41,7 @@ public class ScheduleMutatorUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
   private double[][] delta;
+  private LoadBalancing loadball;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -61,12 +63,15 @@ public class ScheduleMutatorUt {
 
     numTask =  1 + randomGen.nextInt(maxNumTask);
     executors =  1 + randomGen.nextInt(maxNumExecutors);
-
+    double[][] etc = Util.getOnesMatrix(executors, numTask);
+   
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
-
+    double[][] comCost = Util.getComcostmatrix(delta);
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost, 0.9);
+    loadBal.setTemp(800);
     // Always mutate probability 1
-    mutator = new ScheduleMutator(delta, 1);
+    mutator = new ScheduleMutator(delta, 0.6, loadball, null);
 
   }
 
@@ -110,7 +115,6 @@ public class ScheduleMutatorUt {
 
       alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
     }
-
     assertEquals(alterationsCount, alterations);
     
   }
@@ -162,8 +166,6 @@ public class ScheduleMutatorUt {
             );
       }
     }
-
-    System.out.println(populationSize + " " + alterationsCount + " " + alterations);
 
     // Verify the alterations match
     assertEquals(alterationsCount, alterations);
