@@ -64,6 +64,21 @@ public class LoadBalancing extends Scheduler {
     
     this.alpha = alpha;
   }
+  /**
+   * Constructor.
+   * @param etc execution time matrix
+   * @param delta dependencies matrix
+   * @param alpha fitness function mixing coefficient
+   * @param comCost communication costs matrix
+   * @param gamma cooling factor for the temperature of the alg
+   */
+  
+  public LoadBalancing(double[][] etc, double[][] delta, double alpha, 
+      double[][] comCost, double gamma) {
+    super(etc, delta, comCost, gamma);
+    
+    this.alpha = alpha;
+  }
   
   /**
    * Constructor.
@@ -91,7 +106,7 @@ public class LoadBalancing extends Scheduler {
   public double getLoad(ISeq<ScheduleGene> scheduleSeq) {
     double[] nodesExecutionTime = getNodesExecutionTime(scheduleSeq);
     double load = 0;
-    double avgTime = getTotalTime(scheduleSeq) / scheduleSeq.size();
+    double avgTime = getAverageTime(scheduleSeq);
 
     // First calculate sum = (sumTime(i) - averageTime)^2
     for (double time: nodesExecutionTime) {

@@ -34,7 +34,7 @@ public class Scheduler {
    */
 
   protected double[][] delta;
-  
+
   /**
    * Communication costs matrix.
    */
@@ -42,18 +42,45 @@ public class Scheduler {
   protected double[][] comCost;
 
   /**
+   * The cooling factor used in simulated anealing.
+   */
+
+  private double gamma;
+  /**
+   * The initial temperature used in simulated anealing.
+   */
+
+  private double temp;
+  /**
    * Constructor.
    * 
    * @param etc execution time matrix
    * @param delta dependency matrix
    * @param comCost communication cost matrix
    */
+  
   public Scheduler(double[][] etc, double[][] delta, double[][] comCost) {
     this.etc = etc;
     this.delta = delta;
     this.comCost = comCost;
+    this.setGamma(0.9);
   }
-  
+
+  /**
+   * Constructor.
+   * 
+   * @param etc execution time matrix
+   * @param delta dependency matrix
+   * @param comCost communication cost matrix\
+   * @param gamma the cooling factor for the temperature of alg
+   */
+  public Scheduler(double[][] etc, double[][] delta, double[][] comCost, double gamma) {
+    this.etc = etc;
+    this.delta = delta;
+    this.comCost = comCost;
+    this.setGamma(gamma);
+  }
+
   /**
    * Constructor.
    * 
@@ -64,6 +91,7 @@ public class Scheduler {
     this.etc = etc;
     this.delta = delta;
     this.comCost = Util.createEmptyMatrix(delta.length, delta.length);
+    this.setGamma(0.9);
   }
 
   /**
@@ -114,7 +142,7 @@ public class Scheduler {
     ArrayList<Double> finishTime = new ArrayList<Double>();
     ScheduleChromosome test =  new ScheduleChromosome(delta, etc.length, scheduleSeq);
     ScheduleGene currGene = null;
-    
+
     // Check if the sequence is correct
     if (!test.isValid()) {
       for (int idx = 0; idx < sumTime.length; idx ++) {
@@ -122,75 +150,75 @@ public class Scheduler {
       }
       return sumTime;
     }
-    
-    
+
+
     // Set to zero communication costs because of same node allocation
     Util.allocComCost(comCostTemp, createOmegaMatrix(scheduleSeq));
-    
-    
+
+
     //
     while (currGeneIndx < toRun.length()) {
-      
+
       while (currGeneIndx < toRun.length()) {
-        
+
         currGene = toRun.get(currGeneIndx);
-        
+
         // If dependencies aren't met time must pass
         if (!(Util.checkColZero(deltaTemp, currGene.getAllele().getTaskId()))) {
           break;
         }
-        
+
         // If communication isn't finished time must pass
         if (!(Util.checkColZero(comCostTemp, currGene.getAllele().getTaskId()))) {
           break;
         }
-        
+
         // Execute task on node
         if (currTime >= sumTime[currGene.getAllele().getExecutorId()]) {
-          
+
           sumTime[currGene.getAllele().getExecutorId()] = currTime;
           sumTime[currGene.getAllele().getExecutorId()] += etc[currGene.getAllele().getExecutorId()]
               [currGene.getAllele().getTaskId()];
-          
+
           currGeneIndx++;
-          
+
           // Add to both list
           executed.add(currGene);
           finishTime.add(new Double(sumTime[currGene.getAllele().getExecutorId()]));
-          
+
           continue;
-        
+
         }
-        
+
         break;
-        
+
       }
-      
-      
+
+
       // Check if any executing task is done
       for (int idx = 0; idx < finishTime.size(); idx++) {
-        
+
         if (currTime >= finishTime.get(idx)) {
           Util.clearRow(deltaTemp, executed.get(idx).getAllele().getTaskId());
-          
+
           doneTasks.add(executed.get(idx));
-          
+
           // Remove from both lists
           executed.remove(idx);
           finishTime.remove(idx);
-          
+
         }
       }
-      
+
       // Increase communication time
       for (ScheduleGene gene: doneTasks) {
         Util.decrementRow(comCostTemp, gene.getAllele().getTaskId());
       }
-      
+
       currTime++;
-      
+
     }
-    
+
     return sumTime;
   }
 
@@ -207,7 +235,7 @@ public class Scheduler {
   public double getTotalTime(ISeq<ScheduleGene> scheduleSeq) {
     double[] sumTime = getNodesExecutionTime(scheduleSeq);
     double totalTime = 0;
-    
+
     for (double time : sumTime) {
       if (time > totalTime) {
         totalTime = time;
@@ -215,6 +243,29 @@ public class Scheduler {
     }
 
     return totalTime;
+  }
+
+  /**
+   * Get average execution time given a Chromosome.
+   * According to "Load Balancing Task Scheduling based on 
+   * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
+   * LI Jun), equation (2)
+   * 
+   * @param scheduleSeq scheduling sequence
+   * 
+   * @return average execution time of a given Chromosome
+   */
+  public double getAverageTime(ISeq<ScheduleGene> scheduleSeq) {
+    double[] sumTime = getNodesExecutionTime(scheduleSeq);
+    double totalTime = 0;
+
+    for (double time : sumTime) {
+
+      totalTime += time;
+
+    }
+
+    return totalTime / sumTime.length;
   }
 
   /**
@@ -232,7 +283,7 @@ public class Scheduler {
     int execId2 = 0;
     int execId1 = 0;
     double totalComCost = 0;
-    
+
     if (comCost == null) {
       return 0;
     }
@@ -284,6 +335,22 @@ public class Scheduler {
         Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
         gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
         );
+  }
+
+  public double getGamma() {
+    return gamma;
+  }
+
+  public void setGamma(double gamma) {
+    this.gamma = gamma;
+  }
+
+  public double getTemp() {
+    return temp;
+  }
+
+  public void setTemp(double temp) {
+    this.temp = temp;
   }
 
 
