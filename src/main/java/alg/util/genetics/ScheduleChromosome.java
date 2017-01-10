@@ -1,7 +1,5 @@
 package alg.util.genetics;
 
-import alg.ExecutionTime;
-import alg.LoadBalancing;
 import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
 
@@ -11,7 +9,6 @@ import org.jenetics.util.ISeq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Random;
 
 /**
  * Genetic algorithm's chromosome.
@@ -157,65 +154,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
     return true;
   }
-  /**
-   * Method to check the validity of the chromosome according to simulated anealing for loadbal.
-   * @param loadBal the instance of loadbalancing
-   * @param fitParent fitness of the parent chromosome
-   * @param fitChild  fitness of the child chromosome
-   * @return returns a boolean value true if the chromosome is valid
-   */
   
-  public boolean is_Validsa_load(LoadBalancing loadBal, double fitParent, double fitChild) {
-    double probFactor;
-    Random randomGen = new Random();
-    // randome probability factor
-    probFactor = randomGen.nextDouble();
-
-    if (fitChild > fitParent) {
-      return true;
-
-    } else {
-      // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-(fitParent - fitChild) / loadBal.getTemp())))) > probFactor) {   
-        double currTemp = loadBal.getGamma() * loadBal.getTemp();
-        loadBal.setTemp(currTemp);
-        return true;
-      }
-
-      return false;
-    }
-
-  }
-  /**
-   * Method to check the validity of the chromosome according to simulated anealing for exectime.
-   * @param exectime the instance of ExecutionTime
-   * @param fitParent fitness of the parent chromosome
-   * @param fitChild  fitness of the child chromosome
-   * @return returns a boolean value true if the chromosome is valid
-   */
-  
-  public boolean is_Validsa_exectime(ExecutionTime exectime, double fitParent, double fitChild) {
-    double probFactor;
-    Random randomGen = new Random();
-    // randome probability factor
-    probFactor = randomGen.nextDouble();
-
-    if (fitChild > fitParent) {
-      return true;
-
-    } else {
-      // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-(fitParent - fitChild) / exectime.getTemp())))) > probFactor) {   
-        double currTemp = exectime.getGamma() * exectime.getTemp();
-        exectime.setTemp(currTemp);
-        return true;
-      }
-
-      return false;
-    }
-
-  }
-
   /* (non-Javadoc)
    * @see java.lang.Iterable#iterator()
    */

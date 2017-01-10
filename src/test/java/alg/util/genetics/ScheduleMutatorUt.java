@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
 import alg.LoadBalancing;
+import alg.util.SimulatedAnneling;
 import alg.util.Util;
 
 import org.jenetics.Chromosome;
@@ -41,8 +42,7 @@ public class ScheduleMutatorUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
   private double[][] delta;
-  private LoadBalancing loadball;
-
+  
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
   }
@@ -68,10 +68,11 @@ public class ScheduleMutatorUt {
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
     double[][] comCost = Util.getComcostmatrix(delta);
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost, 0.9);
-    loadBal.setTemp(800);
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
+    SimulatedAnneling simAnne = new SimulatedAnneling(0.8, 900, loadBal);
+   
     // Always mutate probability 1
-    mutator = new ScheduleMutator(delta, 0.6, loadball, null);
+    mutator = new ScheduleMutator(delta, 0.6, simAnne);
 
   }
 
@@ -132,7 +133,7 @@ public class ScheduleMutatorUt {
     phenoFactory = Phenotype.of(
         Genotype.of(ScheduleChromosome.of(delta, executors)), 
         0, 
-        gt -> myOpt.getFitnessCost(myOpt.ofSeq().decode(gt))
+        gt -> myOpt.getFitness(myOpt.ofSeq().decode(gt))
         );
 
     // Random population size

@@ -2,6 +2,7 @@ package alg.util.genetics;
 
 import static java.lang.Math.min;
 
+import alg.util.SimulatedAnneling;
 import alg.util.Util;
 
 import org.jenetics.SinglePointCrossover;
@@ -21,6 +22,14 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    * Number of altered genes after crossover.
    */
   public int crosssedOvrGenes;
+  /**
+   * Object of simulated anneling.
+   */
+  private SimulatedAnneling simAnne;
+  /**
+   * Flag to indicate if simulated anealing is required.
+   */
+  private boolean isSimulated;
 
   /**
    * Constructor.
@@ -30,11 +39,27 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    */
   public ScheduleCrossover(double[][] delta, double probCrossover) {
     super(probCrossover);
+    this.simAnne = null;
+    isSimulated = false;
 
     levels =  Util.getDependenciesLevels(delta); 
   }
 
-  
+  /**
+   * Constructor.
+   * 
+   * @param delta dependency matrix
+   * @param probCrossover crossing over probability
+   * @param simAnne Simulated anealing object
+   */
+  public ScheduleCrossover(double[][] delta, double probCrossover, SimulatedAnneling simAnne) {
+    super(probCrossover);
+    this.simAnne = simAnne;
+    isSimulated = true;
+    levels =  Util.getDependenciesLevels(delta); 
+  }
+
+
 
   /**
    * Return the dependency level of a particular taskId.
@@ -48,7 +73,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
         return currLevel;
       }
     }
-    
+
     return -1;
   }
 
@@ -61,20 +86,24 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
     Random randomGen = new Random();
     MSeq<ScheduleGene> temp = that.copy();
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
-    
-    
+
+
     //cond1: the tasks immediately before the crossover point must be of same level
     if (getLevel(that.get(crossoverSiteLocus).getAllele().getTaskId()) 
         == getLevel(other.get(crossoverSiteLocus).getAllele().getTaskId())) {
-      
+
       that.swap(crossoverSiteLocus, min(that.length(), other.length()), other, crossoverSiteLocus);
-      
+
       if ((!that.equals(temp)) && (!that.equals(other))) {
-        return 2;
+        if (isSimulated) {
+          // temp: parent sequence, that : child sequemce
+          if (simAnne.checkCriteria(temp.toISeq(), that.toISeq())) {
+            return 2;
+          }
+        }
       }
-    
+      return 2;
     }
-    
     return 0;    
   }
 

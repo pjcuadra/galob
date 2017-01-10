@@ -3,6 +3,7 @@ package examples;
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
 import alg.LoadBalancing;
+import alg.util.SimulatedAnneling;
 import alg.util.Util;
 import alg.util.genetics.ScheduleCrossover;
 import alg.util.genetics.ScheduleGene;
@@ -92,8 +93,8 @@ public class LoadBalancingExample {
     comCost[7][9] = 11;
     comCost[8][9] = 13;
 
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost, gamma);
-    loadBal.setTemp(800);
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
+    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, loadBal);
 
     /* The values in this examples are taken form "A fast hybrid genetic 
      * algorithm in heterogeneous computing environment" (Zhiyang Jiang, 
@@ -101,15 +102,15 @@ public class LoadBalancingExample {
     // Configure and build the evolution engine.
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
-            loadBal::getFitnessLoadCommCt,
+            loadBal::getFitness,
             loadBal.ofSeq())
         .populationSize(500)
         .optimize(Optimize.MAXIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            // to use the fitness function of loadbalancing
-            new ScheduleMutator(delta, 0.1, loadBal, null),
-            new ScheduleCrossover(delta, 0.45)) // to use the fitness function of loadbalancing
+            // use simulated aneeling technique
+            new ScheduleMutator(delta, 0.1, simAnn),
+            new ScheduleCrossover(delta, 0.45, simAnn))
         .build();
 
     // Create evolution statistics consumer.

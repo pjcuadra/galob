@@ -73,7 +73,7 @@ public class ExecutionTimeUt {
   public void calculateFitness() {
     double fitness;
 
-    fitness = executionTimeGa.getFitnessCost(chromosome.toSeq());
+    fitness = executionTimeGa.getFitness(chromosome.toSeq());
 
     /* 
      * Since our ETC matrix has only ones the fitness value

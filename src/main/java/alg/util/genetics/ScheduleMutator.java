@@ -4,8 +4,7 @@
 
 package alg.util.genetics;
 
-import alg.ExecutionTime;
-import alg.LoadBalancing;
+import alg.util.SimulatedAnneling;
 import alg.util.Util;
 
 import org.jenetics.Alterer;
@@ -41,23 +40,43 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * dependency matrix.
    */
   private double[][] delta;
-  private LoadBalancing loadbal;
-  private ExecutionTime exectime;
+  /**
+   * Object of simulated anneling.
+   */
+  private SimulatedAnneling simAnne;
+  /**
+   * Flag to indicate if simulated anealing is required.
+   */
+  private boolean isSimulated;
+
   /**
    * Constructor.
    * 
    * @param delta dependency matrix
    * @param probMutator mutating probability
-   * @param loadbal the instance of loadbalancing
-   * @param exectime instance of executiontime
    */
 
-  public ScheduleMutator(double[][] delta, double probMutator, 
-      LoadBalancing loadbal, ExecutionTime exectime) {
+  public ScheduleMutator(double[][] delta, double probMutator) {
     this.probMutator = probMutator;
     this.delta = delta;
-    this.loadbal = loadbal;
-    this.exectime = exectime;
+    this.simAnne = null;
+    isSimulated = false;
+    levels =  Util.getDependenciesLevels(delta); 
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param delta dependency matrix
+   * @param probMutator mutating probability
+   * @param simAnne Simulated Anealing object
+   */
+
+  public ScheduleMutator(double[][] delta, double probMutator, SimulatedAnneling simAnne) {
+    this.probMutator = probMutator;
+    this.delta = delta;
+    this.simAnne = simAnne;
+    isSimulated = true;
     levels =  Util.getDependenciesLevels(delta); 
 
   }
@@ -106,24 +125,19 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
       Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
 
       childChromosome = new ScheduleChromosome(this.delta, cSeq.size() / 2, cSeq.toISeq());
-      // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
-      if (loadbal != null) {
-        if (childChromosome.is_Validsa_load(loadbal, 
-            loadbal.getFitnessLoadCommCt(chromosome.toSeq()), 
-            loadbal.getFitnessLoadCommCt(childChromosome.toSeq()))) {
-          return chromosome.newInstance(cSeq.toISeq());
-        }
-        // use the fitness functions for executiontime if the mutation is on executiontime 
-      } else if (exectime != null) {
-        if (childChromosome.is_Validsa_exectime(exectime, 
-            exectime.getFitnessCost(chromosome.toSeq()), 
-            exectime.getFitnessCost(childChromosome.toSeq()))) {
+      //check if simulated anealing is required
+      if (isSimulated) {
+        // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
+        if (simAnne.checkCriteria(chromosome.toSeq(), childChromosome.toSeq())) {
+
           return childChromosome;
         }
       }
-    }
+      return childChromosome;
 
+    }
     return null;
+
 
   }
 

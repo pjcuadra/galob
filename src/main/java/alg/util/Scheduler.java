@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * @author Sudheera Bandi
  *
  */
-public class Scheduler {
+public abstract class Scheduler {
   /**
    * Execution Time matrix with ETC[i][j] where i is the
    * node and j is the task index. 
@@ -42,43 +42,17 @@ public class Scheduler {
   protected double[][] comCost;
 
   /**
-   * The cooling factor used in simulated anealing.
-   */
-
-  private double gamma;
-  /**
-   * The initial temperature used in simulated anealing.
-   */
-
-  private double temp;
-  /**
    * Constructor.
    * 
    * @param etc execution time matrix
    * @param delta dependency matrix
    * @param comCost communication cost matrix
    */
-  
+
   public Scheduler(double[][] etc, double[][] delta, double[][] comCost) {
     this.etc = etc;
     this.delta = delta;
     this.comCost = comCost;
-    this.setGamma(0.9);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param etc execution time matrix
-   * @param delta dependency matrix
-   * @param comCost communication cost matrix\
-   * @param gamma the cooling factor for the temperature of alg
-   */
-  public Scheduler(double[][] etc, double[][] delta, double[][] comCost, double gamma) {
-    this.etc = etc;
-    this.delta = delta;
-    this.comCost = comCost;
-    this.setGamma(gamma);
   }
 
   /**
@@ -91,7 +65,6 @@ public class Scheduler {
     this.etc = etc;
     this.delta = delta;
     this.comCost = Util.createEmptyMatrix(delta.length, delta.length);
-    this.setGamma(0.9);
   }
 
   /**
@@ -117,6 +90,12 @@ public class Scheduler {
 
     return omega;
   }
+
+  /**
+   * abstract method for the fitness functions.
+   * @param scheduleSeq schedule sequence of the chromosome.
+   */
+  public abstract double getFitness(ISeq<ScheduleGene> scheduleSeq);
 
   /**
    * Get the execution time of every node given a chromosome.
@@ -335,22 +314,6 @@ public class Scheduler {
         Genotype.of(ScheduleChromosome.of(delta, numExecutors)), /*Encoder*/ 
         gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
         );
-  }
-
-  public double getGamma() {
-    return gamma;
-  }
-
-  public void setGamma(double gamma) {
-    this.gamma = gamma;
-  }
-
-  public double getTemp() {
-    return temp;
-  }
-
-  public void setTemp(double temp) {
-    this.temp = temp;
   }
 
 

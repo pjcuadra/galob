@@ -64,21 +64,6 @@ public class LoadBalancing extends Scheduler {
     
     this.alpha = alpha;
   }
-  /**
-   * Constructor.
-   * @param etc execution time matrix
-   * @param delta dependencies matrix
-   * @param alpha fitness function mixing coefficient
-   * @param comCost communication costs matrix
-   * @param gamma cooling factor for the temperature of the alg
-   */
-  
-  public LoadBalancing(double[][] etc, double[][] delta, double alpha, 
-      double[][] comCost, double gamma) {
-    super(etc, delta, comCost, gamma);
-    
-    this.alpha = alpha;
-  }
   
   /**
    * Constructor.
@@ -149,7 +134,8 @@ public class LoadBalancing extends Scheduler {
    * @param  scheduleSeq the schedule sequence of the chromosome    
    * @return fitness of a given Chromosome
    */
-  public double getFitnessLoadCommCt(ISeq<ScheduleGene> scheduleSeq) {
+  @Override
+  public double getFitness(ISeq<ScheduleGene> scheduleSeq) {
     return alpha * getFitnessLoad(scheduleSeq) + (1 - alpha) * (1 / getTotalTime(scheduleSeq));
   }
 }
