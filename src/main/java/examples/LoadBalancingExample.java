@@ -92,7 +92,7 @@ public class LoadBalancingExample {
     comCost[6][9] = 17;
     comCost[7][9] = 11;
     comCost[8][9] = 13;
-
+    
     LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
     SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, loadBal);
 
@@ -119,7 +119,7 @@ public class LoadBalancingExample {
     final Phenotype<ScheduleGene, Double> best = engine.stream()
         // The evolution will stop after maximal 100
         // generations.
-        .limit(100)
+        .limit(10000)
         // Update the evaluation statistics after
         // each generation
         .peek(statistics)

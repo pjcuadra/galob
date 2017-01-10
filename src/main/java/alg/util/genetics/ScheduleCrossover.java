@@ -101,8 +101,9 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
             return 2;
           }
         }
+        return 2;
       }
-      return 2;
+      
     }
     return 0;    
   }

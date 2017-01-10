@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+
 /**
  * Genetic algorithm's chromosome.
  * 
@@ -154,7 +155,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
     return true;
   }
+
   
+
   /* (non-Javadoc)
    * @see java.lang.Iterable#iterator()
    */

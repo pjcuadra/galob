@@ -48,7 +48,6 @@ public abstract class Scheduler {
    * @param delta dependency matrix
    * @param comCost communication cost matrix
    */
-
   public Scheduler(double[][] etc, double[][] delta, double[][] comCost) {
     this.etc = etc;
     this.delta = delta;
@@ -99,6 +98,8 @@ public abstract class Scheduler {
 
   /**
    * Get the execution time of every node given a chromosome.
+   * Get the execution time of every node given a chromosome
+   * by simulating the execution of the schedule sequence.
    * 
    * <p>According to "Load Balancing Task Scheduling based on 
    * Multi-Population Genetic in Cloud Computing" (Wang Bei, 
@@ -135,9 +136,10 @@ public abstract class Scheduler {
     Util.allocComCost(comCostTemp, createOmegaMatrix(scheduleSeq));
 
 
-    //
+    // Time passing loop
     while (currGeneIndx < toRun.length()) {
 
+      // Allocating loop
       while (currGeneIndx < toRun.length()) {
 
         currGene = toRun.get(currGeneIndx);
@@ -200,6 +202,7 @@ public abstract class Scheduler {
 
     return sumTime;
   }
+
 
   /**
    * Get total execution time given a Chromosome.

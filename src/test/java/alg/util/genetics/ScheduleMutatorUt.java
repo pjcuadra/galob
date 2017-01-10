@@ -8,7 +8,9 @@ import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
 import alg.LoadBalancing;
+
 import alg.util.SimulatedAnneling;
+
 import alg.util.Util;
 
 import org.jenetics.Chromosome;
@@ -42,7 +44,7 @@ public class ScheduleMutatorUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
   private double[][] delta;
-  
+
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
   }
@@ -68,6 +70,7 @@ public class ScheduleMutatorUt {
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
     double[][] comCost = Util.getComcostmatrix(delta);
+
     LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
     SimulatedAnneling simAnne = new SimulatedAnneling(0.8, 900, loadBal);
    

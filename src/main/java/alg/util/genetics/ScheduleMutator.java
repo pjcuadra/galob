@@ -5,6 +5,7 @@
 package alg.util.genetics;
 
 import alg.util.SimulatedAnneling;
+
 import alg.util.Util;
 
 import org.jenetics.Alterer;
@@ -53,7 +54,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * Constructor.
    * 
    * @param delta dependency matrix
-   * @param probMutator mutating probability
+   * @param probMutator mutating probability 
    */
 
   public ScheduleMutator(double[][] delta, double probMutator) {
@@ -77,6 +78,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
     this.delta = delta;
     this.simAnne = simAnne;
     isSimulated = true;
+
     levels =  Util.getDependenciesLevels(delta); 
 
   }
@@ -125,6 +127,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
       Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
 
       childChromosome = new ScheduleChromosome(this.delta, cSeq.size() / 2, cSeq.toISeq());
+
       //check if simulated anealing is required
       if (isSimulated) {
         // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
