@@ -134,6 +134,8 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
         if (simAnne.checkCriteria(chromosome.toSeq(), childChromosome.toSeq())) {
 
           return childChromosome;
+        } else {
+          return null;
         }
       }
       return childChromosome;

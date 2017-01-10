@@ -99,7 +99,12 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
           // temp: parent sequence, that : child sequemce
           if (simAnne.checkCriteria(temp.toISeq(), that.toISeq())) {
             return 2;
+          } else {
+            // unswap: return the original chromosome as the criteria failed.
+            that = temp.copy();
+            return 0;
           }
+          
         }
         return 2;
       }
