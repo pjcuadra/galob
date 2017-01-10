@@ -118,7 +118,7 @@ public class LoadBalancingExample {
     final Phenotype<ScheduleGene, Double> best = engine.stream()
         // The evolution will stop after maximal 100
         // generations.
-        .limit(100)
+        .limit(10000)
         // Update the evaluation statistics after
         // each generation
         .peek(statistics)
