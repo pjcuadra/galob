@@ -94,7 +94,7 @@ public class LoadBalancingExample {
     comCost[8][9] = 13;
     
     LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
-    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, loadBal);
+    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.9, 900, loadBal);
 
     /* The values in this examples are taken form "A fast hybrid genetic 
      * algorithm in heterogeneous computing environment" (Zhiyang Jiang, 
