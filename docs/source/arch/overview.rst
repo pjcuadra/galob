@@ -257,9 +257,63 @@ Deployment View
 Process View
 ------------
 
-* Threads
-* Active classes
-* Processes
+.. uml::
+  :scale: 50 %
+  :align: center
+
+  skinparam monochrome true
+  skinparam backgroundColor #d9d9d9
+
+  Actor User
+
+  UserCode -> UserCode : Create ETC Matrix, ETC
+  UserCode -> UserCode : Create Dependencies Matrix, delta
+  UserCode -> UserCode : Create Communication costs Matrix, comCost
+
+  UserCode -> UserCode : Assign fitness filtering factor, alpha
+
+  UserCode --> LoadBalancing : <<create>> (ETC, delta, comCost, alpha)
+  activate LoadBalancing
+
+  UserCode -> UserCode : Assign crossover probability, cpro
+  UserCode -> UserCode : Assign mutation probability, mpro
+
+  alt with simulated annealing
+    UserCode -> UserCode : Assign cooling factor, theta
+    UserCode --> UserCode : Assign initial temperature, K
+
+    UserCode --> SimulatedAnneling : <<create>> (theta, K)
+    activate SimulatedAnneling
+
+    UserCode --> ScheduleMutator : <<create>> (delta, mprob, simAnne)
+    activate ScheduleMutator
+
+    UserCode --> ScheduleCrossover : <<create>> (delta, mprob, simAnne)
+    activate ScheduleCrossover
+
+  else without simulated annealing
+
+    UserCode --> ScheduleMutator : <<create>> (delta, mprob)
+    activate ScheduleMutator
+
+    UserCode --> ScheduleCrossover : <<create>> (delta, mprob)
+    activate ScheduleCrossover
+
+  end
+
+  UserCode --> "jenetics.Engine" : <create>
+  activate "jenetics.Engine"
+  UserCode -> "jenetics.Engine" : Set fitness function
+  UserCode -> "jenetics.Engine" : Set Mutator
+  UserCode -> "jenetics.Engine" : Set Crossover
+
+
+  UserCode -> "jenetics.Engine" : evolve
+  UserCode <- "jenetics.Engine" : results
+  deactivate "jenetics.Engine"
+
+
+
 
 Use Case View
 -------------
