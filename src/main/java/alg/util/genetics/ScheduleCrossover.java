@@ -84,7 +84,8 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
   @Override  
   protected int crossover(MSeq<ScheduleGene> that, MSeq<ScheduleGene> other) {
     Random randomGen = new Random();
-    MSeq<ScheduleGene> temp = that.copy();
+    MSeq<ScheduleGene> temp_other = other.copy();
+    MSeq<ScheduleGene> temp_that = that.copy();
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
 
 
@@ -94,14 +95,15 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
 
       that.swap(crossoverSiteLocus, min(that.length(), other.length()), other, crossoverSiteLocus);
 
-      if ((!that.equals(temp)) && (!that.equals(other))) {
+      if ((!that.equals(temp_that)) && (!that.equals(other)) && (!other.equals(temp_other))) {
         if (isSimulated) {
           // temp: parent sequence, that : child sequemce
-          if (simAnne.checkCriteria(temp.toISeq(), that.toISeq())) {
+          if (simAnne.checkCriteria(temp_that.toISeq(), that.toISeq())) {
             return 2;
           } else {
             // unswap: return the original chromosome as the criteria failed.
-            that = temp.copy();
+            that = temp_that.copy();
+            other = temp_other.copy();
             return 0;
           }
           
