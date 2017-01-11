@@ -17,15 +17,33 @@ Schedulers
   skinparam backgroundColor #d9d9d9
 
   package alg {
-    class ExecutionTime
-    class LoadBalancing
+    class ExecutionTime {
+      + ExecutionTime(etcmatrix: double[][], delta: double[][])
+      + getFitness(scheduleSeq: ISeq<ScheduleGene>): double
+    }
+    class LoadBalancing {
+      + LoadBalancing(etcmatrix: double[][], delta: double[][])
+      + LoadBalancing(etcmatrix: double[][], delta: double[][], alpha: double)
+      + LoadBalancing(etc: double[][], delta: double[][], alpha: double, comCost: double[][])
+      + LoadBalancing(etc: double[][], delta: double[][], comCost: double[][])
+      + getFitness(scheduleSeq: ISeq<ScheduleGene>): double
+      --
+      - alpha: double
+    }
 
     package util {
       class Scheduler {
-        + Scheduler(ETC: double[][] , delta: double[][])
+        + Scheduler(ETC: double[][], delta: double[][])
+        + Scheduler(ETC: double[][], delta: double[][], comCost: double[][])
+        + createOmegaMatrix(scheduleSeq: ISeq<ScheduleGene>): int[][]
+        + getNodesExecutionTime(scheduleSeq: ISeq<ScheduleGene>): double[]
+        + getTotalTime(scheduleSeq: ISeq<ScheduleGene>): double
+        + getAverageTime(scheduleSeq: ISeq<ScheduleGene>): double
+        + {abstract} getFitness(scheduleSeq: ISeq<ScheduleGene>): double
         --
         # ETC: double[][]
         # delta: double[][]
+        # comCost: double[][]
       }
 
       ExecutionTime -up-|> Scheduler
@@ -37,6 +55,9 @@ Schedulers
 
 Genetics
 ++++++++
+
+Structure
+~~~~~~~~~
 
 .. uml::
   :scale: 50 %
@@ -82,20 +103,8 @@ Genetics
       - numExecutors: int
     }
 
-    class ScheduleMutator {
-      + ScheduleMutator(delta: double[][], probMutator: double)
-      + mutateChromosome(chromosome: ScheduleChromosome): ScheduleChromosome
-      + alter(population: Population<ScheduleGene, Double>, generation: long): int
-      - getDependenciesLevels(delta: double[][])
-      --
-      - numTasks: int
-      - probMutator: double
-      - levels: ArrayList<ArrayList<Integer>>
-    }
-
     ScheduleChromosome "1"*--"*" ScheduleGene
-    ScheduleGene "1"*-down-"1" ScheduleAllele
-    ScheduleMutator .up.> ScheduleChromosome
+    ScheduleGene "1"*-left-"1" ScheduleAllele
 
   }
 
@@ -117,11 +126,60 @@ Genetics
       + isValid(): boolean
     }
 
-
   }
 
   Chromosome <|.. ScheduleChromosome
   Gene <|.. ScheduleGene
+
+Alterers
+~~~~~~~~
+
+.. uml::
+  :scale: 50 %
+  :align: center
+
+  skinparam monochrome true
+  skinparam backgroundColor #d9d9d9
+
+  package alg.util.genetics {
+    class ScheduleChromosome
+    class ScheduleGene
+
+    class ScheduleMutator {
+      + ScheduleMutator(delta: double[][], probMutator: double)
+      + mutateChromosome(chromosome: ScheduleChromosome): ScheduleChromosome
+      + alter(population: Population<ScheduleGene, Double>, generation: long): int
+      --
+      - numTasks: int
+      - probMutator: double
+      - levels: ArrayList<ArrayList<Integer>>
+    }
+
+    class ScheduleCrossover {
+      + ScheduleCrossover(delta: double[][], probCrossover: double)
+      + ScheduleCrossover(delta: double[][], probCrossover: double, simAnne: SimulatedAnneling)
+      # crossover(that: MSeq<ScheduleGene>, other: MSeq<ScheduleGene> ): int
+      - getLevel(tasknum: int): int
+      --
+      - isSimulated: boolean
+      - simAnne: SimulatedAnneling
+      - levels: ArrayList<ArrayList<Integer>>
+    }
+
+    ScheduleMutator ..> ScheduleChromosome
+    ScheduleMutator ..> ScheduleGene
+    ScheduleCrossover ..> ScheduleGene
+
+  }
+
+  package org.jenetics {
+    class SinglePointCrossover
+    Interface Alterer
+  }
+
+  ScheduleCrossover -up-|> SinglePointCrossover
+  Alterer .down.|> ScheduleMutator
+
 
 Util
 ++++
@@ -133,32 +191,26 @@ Util
   skinparam monochrome true
   skinparam backgroundColor #d9d9d9
 
-  package alg {
-    class ExecutionTime
-    class LoadBalancing
-
-    package util {
-      class Util {
-        + getOnesMatrix(rows: int, int cols: int): double[][]
-        + getDeltaMatrix(numTasks: int): double[][]
-        + getComcostmatrix(delta: double[][]): double[][]
-        + copyMatrix(matrix: double[][]): double[][]
-        + getRowSum(matrix: double[][], int row: int): double
-        + checkColZero(matrix: double[][], col: int): boolean
-        + clearRow(matrix: double[][], row: int)
-        + matrixParallelMultiply(matrixA: double[][], matrixB: double[][]): double[][]
-        + intMatrixtoDouble(matrix: int[][]): double[][]
-      }
-
+  package alg.util {
+    class Util {
+      + {static} getOnesMatrix(rows: int, int cols: int): double[][]
+      + {static} getDeltaMatrix(numTasks: int): double[][]
+      + {static} getComcostmatrix(delta: double[][]): double[][]
+      + {static} copyMatrix(matrix: double[][]): double[][]
+      + {static} getRowSum(matrix: double[][], int row: int): double
+      + {static} checkColZero(matrix: double[][], col: int): boolean
+      + {static} clearRow(matrix: double[][], row: int)
+      + {static} matrixParallelMultiply(matrixA: double[][], matrixB: double[][]): double[][]
+      + {static} intMatrixtoDouble(matrix: int[][]): double[][]
+      + {static} getDependenciesLevels(delta: double[][])
+      + {static} decrementRow(commCost: double[][], row: int)
+      + {static} allocComCost(commCost: double[][], omega: int[][])
     }
-
-    ExecutionTime ..> Util
-    LoadBalancing ..> Util
 
   }
 
-Examples
-++++++++
+Implementation View
+-------------------
 
 .. uml::
   :scale: 50 %
@@ -167,50 +219,40 @@ Examples
   skinparam monochrome true
   skinparam backgroundColor #d9d9d9
 
-  package alg {
-    class ExecutionTime
-    class LoadBalancing
+  [UserCode] ..> [galob]
+  [LoadBalancingExample] ..> [galob]
+  [UserCode] ..> [jenetics]
+  [LoadBalancingExample] ..> [jenetics]
+  [galob] ..> [jenetics] : use
 
-    package util {
-      class Util
-
-      package genetics {
-
-      }
-    }
-  }
-
-  package examples {
-    class ExecutionTimeExample
-    class LoadBalancingExample
-
-    ExecutionTimeExample ..> ExecutionTime
-    ExecutionTimeExample ..> util
-
-    LoadBalancingExample ..> LoadBalancing
-    LoadBalancingExample ..> util
-
-
-
-  }
-
-Implementation View
--------------------
-
-* Component diagrams
-
-* Sequence diagrams
-* Statechart
-* Activity diagram
 
 Deployment View
 ---------------
 
-* Deployment diagrams
+.. uml::
+  :scale: 50 %
+  :align: center
 
-* Sequence diagrams
-* Statechart
-* Activity diagram
+  skinparam monochrome true
+  skinparam backgroundColor #d9d9d9
+
+  component galob
+  component UserCode
+  component jenetics
+
+  node system {
+    artifact UserCode.jar
+
+    node java_libray_path {
+      artifact galob.jar
+      artifact jenetics.jar
+    }
+  }
+
+  UserCode.jar ..> UserCode : <<manifest>>
+  galob.jar ..> galob : <<manifest>>
+  jenetics.jar ..> jenetics : <<manifest>>
+
 
 Process View
 ------------
@@ -225,6 +267,9 @@ Use Case View
 .. uml::
   :scale: 50 %
   :align: center
+
+  skinparam monochrome true
+  skinparam backgroundColor #d9d9d9
 
   Actor User
   Actor "Jenetic's Engine"
