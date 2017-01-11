@@ -7,6 +7,10 @@ package alg.util.genetics;
 import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
+import alg.LoadBalancing;
+
+import alg.util.SimulatedAnneling;
+
 import alg.util.Util;
 
 import org.jenetics.Chromosome;
@@ -61,12 +65,17 @@ public class ScheduleMutatorUt {
 
     numTask =  1 + randomGen.nextInt(maxNumTask);
     executors =  1 + randomGen.nextInt(maxNumExecutors);
-
+    double[][] etc = Util.getOnesMatrix(executors, numTask);
+   
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
+    double[][] comCost = Util.getComcostmatrix(delta);
 
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
+    SimulatedAnneling simAnne = new SimulatedAnneling(0.8, 900, loadBal);
+   
     // Always mutate probability 1
-    mutator = new ScheduleMutator(delta, 1);
+    mutator = new ScheduleMutator(delta, 0.6, simAnne);
 
   }
 
@@ -110,7 +119,6 @@ public class ScheduleMutatorUt {
 
       alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
     }
-
     assertEquals(alterationsCount, alterations);
     
   }
@@ -128,7 +136,7 @@ public class ScheduleMutatorUt {
     phenoFactory = Phenotype.of(
         Genotype.of(ScheduleChromosome.of(delta, executors)), 
         0, 
-        gt -> myOpt.getFitnessCost(myOpt.ofSeq().decode(gt))
+        gt -> myOpt.getFitness(myOpt.ofSeq().decode(gt))
         );
 
     // Random population size
@@ -162,8 +170,6 @@ public class ScheduleMutatorUt {
             );
       }
     }
-
-    System.out.println(populationSize + " " + alterationsCount + " " + alterations);
 
     // Verify the alterations match
     assertEquals(alterationsCount, alterations);

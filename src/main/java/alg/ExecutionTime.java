@@ -48,7 +48,8 @@ public class ExecutionTime extends Scheduler {
    * @param  scheduleSeq the schedule sequence of the chromosome    
    * @return fitness of a given Chromosome
    */
-  public double getFitnessCost(ISeq<ScheduleGene> scheduleSeq) {
+  @Override
+  public double getFitness(ISeq<ScheduleGene> scheduleSeq) {
     double fitness = 0;
     double totaltime = getTotalTime(scheduleSeq);
     double totalComCost = getCommCost(scheduleSeq);
@@ -57,6 +58,5 @@ public class ExecutionTime extends Scheduler {
 
     return fitness;
   }
-
 
 }

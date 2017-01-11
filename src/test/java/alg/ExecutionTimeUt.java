@@ -73,15 +73,16 @@ public class ExecutionTimeUt {
   public void calculateFitness() {
     double fitness;
 
-    fitness = executionTimeGa.getFitnessCost(chromosome.toSeq());
+    fitness = executionTimeGa.getFitness(chromosome.toSeq());
 
     /* 
      * Since our ETC matrix has only ones the fitness value
      * should be 1/number of tasks in one node.
      */
 
-    // assertEquals(fitness, ((double)getMaxTasksAllocToOneNode()), 0.01);
+    //assertEquals(fitness, ((double)getMaxTasksAllocToOneNode()), 0.01);
     System.out.println(fitness);
+
   }
 
 }

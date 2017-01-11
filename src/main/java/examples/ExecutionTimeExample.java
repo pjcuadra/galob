@@ -4,6 +4,7 @@ import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 import static org.jenetics.engine.limit.bySteadyFitness;
 
 import alg.ExecutionTime;
+import alg.util.SimulatedAnneling;
 import alg.util.Util;
 import alg.util.genetics.ScheduleCrossover;
 import alg.util.genetics.ScheduleGene;
@@ -47,19 +48,19 @@ public class ExecutionTimeExample {
     }
 
     etOpt = new ExecutionTime(myetc, delta);
-
+    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, etOpt);
 
     // Configure and build the evolution engine.
     final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
         .builder(
-            etOpt::getFitnessCost,
+            etOpt::getFitness,
             etOpt.ofSeq())
         .populationSize(500)
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.55),
-            new ScheduleCrossover(delta, 0.55))
+            new ScheduleMutator(delta, 0.55, simAnn),
+            new ScheduleCrossover(delta, 0.55, simAnn))
         .build();
 
     // Create evolution statistics consumer.

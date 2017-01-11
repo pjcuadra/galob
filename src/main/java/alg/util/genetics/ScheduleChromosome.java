@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+
 /**
  * Genetic algorithm's chromosome.
  * 
@@ -52,7 +53,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     gene =  ScheduleGene.of(delta.length, numExecutors);
 
     this.delta = Util.copyMatrix(delta);
-    
+
     deltaTemp = Util.copyMatrix(this.delta);
 
     this.numTasks = delta.length;
@@ -117,7 +118,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     this.numExecutors = numExecutors;
 
     scheduleSeq = genes;
-    
+
   }
 
   /* (non-Javadoc)
@@ -155,6 +156,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return true;
   }
 
+  
 
   /* (non-Javadoc)
    * @see java.lang.Iterable#iterator()

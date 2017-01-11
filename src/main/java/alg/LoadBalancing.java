@@ -91,7 +91,7 @@ public class LoadBalancing extends Scheduler {
   public double getLoad(ISeq<ScheduleGene> scheduleSeq) {
     double[] nodesExecutionTime = getNodesExecutionTime(scheduleSeq);
     double load = 0;
-    double avgTime = getTotalTime(scheduleSeq) / etc.length;
+    double avgTime = getAverageTime(scheduleSeq);
 
     // First calculate sum = (sumTime(i) - averageTime)^2
     for (double time: nodesExecutionTime) {
@@ -134,7 +134,8 @@ public class LoadBalancing extends Scheduler {
    * @param  scheduleSeq the schedule sequence of the chromosome    
    * @return fitness of a given Chromosome
    */
-  public double getFitnessLoadCommCt(ISeq<ScheduleGene> scheduleSeq) {
+  @Override
+  public double getFitness(ISeq<ScheduleGene> scheduleSeq) {
     return alpha * getFitnessLoad(scheduleSeq) + (1 - alpha) * (1 / getTotalTime(scheduleSeq));
   }
 }

@@ -4,6 +4,8 @@
 
 package alg.util.genetics;
 
+import alg.util.SimulatedAnneling;
+
 import alg.util.Util;
 
 import org.jenetics.Alterer;
@@ -35,18 +37,50 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * Levels partitioning of dependencies.
    */
   private ArrayList<ArrayList<Integer>> levels;
+  /**
+   * dependency matrix.
+   */
+  private double[][] delta;
+  /**
+   * Object of simulated anneling.
+   */
+  private SimulatedAnneling simAnne;
+  /**
+   * Flag to indicate if simulated anealing is required.
+   */
+  private boolean isSimulated;
+
+  /**
+   * Constructor.
+   * 
+   * @param delta dependency matrix
+   * @param probMutator mutating probability 
+   */
+
+  public ScheduleMutator(double[][] delta, double probMutator) {
+    this.probMutator = probMutator;
+    this.delta = delta;
+    this.simAnne = null;
+    isSimulated = false;
+    levels =  Util.getDependenciesLevels(delta); 
+  }
 
   /**
    * Constructor.
    * 
    * @param delta dependency matrix
    * @param probMutator mutating probability
+   * @param simAnne Simulated Anealing object
    */
-  public ScheduleMutator(double[][] delta, double probMutator) {
+
+  public ScheduleMutator(double[][] delta, double probMutator, SimulatedAnneling simAnne) {
     this.probMutator = probMutator;
+    this.delta = delta;
+    this.simAnne = simAnne;
+    isSimulated = true;
 
     levels =  Util.getDependenciesLevels(delta); 
-    
+
   }
 
   /**
@@ -56,6 +90,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @return mutated chromosome
    */
   public Chromosome<ScheduleGene> mutateChromosome(Chromosome<ScheduleGene> chromosome) {
+    ScheduleChromosome childChromosome;
     Random randomGen = new Random();
     int randLevel = randomGen.nextInt(levels.size());
     int firstGeneLocus = 0;
@@ -91,11 +126,23 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
       Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
 
-      return chromosome.newInstance(cSeq.toISeq());
+      childChromosome = new ScheduleChromosome(this.delta, cSeq.size() / 2, cSeq.toISeq());
+
+      //check if simulated anealing is required
+      if (isSimulated) {
+        // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
+        if (simAnne.checkCriteria(chromosome.toSeq(), childChromosome.toSeq())) {
+
+          return childChromosome;
+        } else {
+          return null;
+        }
+      }
+      return childChromosome;
 
     }
-
     return null;
+
 
   }
 

@@ -80,21 +80,21 @@ public class ScheduleCrossoverUt {
 
     // Crossover the chromosome
     alterations = crossover.crossover(p1Seq, p2Seq);
-    
+
     // Check that the Gene sequence changed
     if (!p1Seq.equals(p1Chromosome.toSeq().copy())) {
       alterationsCount++;
     }
-    
+
     // Check that the Gene sequence changed
     if (!p2Seq.equals(p2Chromosome.toSeq().copy())) {
       alterationsCount++;
     }
-    
+
     assertEquals(alterationsCount, alterations);
-    
+
   }
 
- 
-     
+
+
 }
