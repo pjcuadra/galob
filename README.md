@@ -68,7 +68,7 @@ $ git push -f
 The commit messages should have
 [gitchangelog](https://pypi.python.org/pypi/gitchangelog)'s tool format.
 
-# presentation Slides
+# Presentation Slides
 
 The presentation slides are tracked as part of the git repository, but since ```.pptx```
 contains binary information ```git lfs``` was used to commit the presentation.
