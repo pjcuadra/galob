@@ -19,15 +19,11 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    */
   private ArrayList<ArrayList<Integer>> levels;
   /**
-   * Number of altered genes after crossover.
-   */
-  public int crosssedOvrGenes;
-  /**
-   * Object of simulated anneling.
+   * Object of simulated annealing.
    */
   private SimulatedAnneling simAnne;
   /**
-   * Flag to indicate if simulated anealing is required.
+   * Flag to indicate if simulated annealing is required.
    */
   private boolean isSimulated;
 

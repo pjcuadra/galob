@@ -93,8 +93,8 @@ public class LoadBalancingExample {
     comCost[7][9] = 11;
     comCost[8][9] = 13;
     
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
-    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, loadBal);
+    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.8, comCost);
+    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.9, 900, loadBal);
 
     /* The values in this examples are taken form "A fast hybrid genetic 
      * algorithm in heterogeneous computing environment" (Zhiyang Jiang, 
@@ -104,20 +104,20 @@ public class LoadBalancingExample {
         .builder(
             loadBal::getFitness,
             loadBal.ofSeq())
-        .populationSize(500)
+        .populationSize(100)
         .optimize(Optimize.MAXIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            // use simulated aneeling technique
-            new ScheduleMutator(delta, 0.1, simAnn),
-            new ScheduleCrossover(delta, 0.45, simAnn))
+            // use simulated annealing technique
+            new ScheduleMutator(delta, 0.01, simAnn),
+            new ScheduleCrossover(delta, 0.8, simAnn))
         .build();
 
     // Create evolution statistics consumer.
     final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
 
     final Phenotype<ScheduleGene, Double> best = engine.stream()
-        // The evolution will stop after maximal 100
+        // The evolution will stop after maximal 10000
         // generations.
         .limit(10000)
         // Update the evaluation statistics after

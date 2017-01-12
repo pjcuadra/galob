@@ -68,9 +68,16 @@ $ git push -f
 The commit messages should have
 [gitchangelog](https://pypi.python.org/pypi/gitchangelog)'s tool format.
 
-# Documentation
+# Presentation Slides
 
-The presentation slides are available in the Wiki of this repository.
+The presentation slides are tracked as part of the git repository, but since ```.pptx```
+contains binary information ```git lfs``` was used to commit the presentation.
+
+To pull the presentation install ```git lfs``` as shown [here](https://packagecloud.io/github/git-lfs/install).
+
+The presentation slides are also uploaded to the wiki of this project.
+
+# Documentation
 
 The documentation was developed using [Sphinx](http://www.sphinx-doc.org/en/1.4.9/). To build the documentation follow the steps bellow.
 

@@ -45,7 +45,7 @@ public class SimulatedAnneling {
   public boolean checkCriteria(ISeq<ScheduleGene> parent, ISeq<ScheduleGene> child) {
     double probFactor;
     Random randomGen = new Random();
-    // randome probability factor
+    // Random probability factor
     probFactor = randomGen.nextDouble();
 
     double fitChild = sched.getFitness(child);
@@ -53,16 +53,15 @@ public class SimulatedAnneling {
 
     if (fitChild > fitParent) {
       return true;
-
     } else {
       // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-(fitParent - fitChild) / this.temp)))) > probFactor) {   
+      if ((Math.min(1, (Math.exp(-(fitParent - fitChild) / this.temp)))) < probFactor) {   
         this.temp = this.gamma * this.temp;
         return true;
       }
-
-      return false;
     }
+    
+    return false;
   }    
 
   public double getTemp() {
