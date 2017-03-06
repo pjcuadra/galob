@@ -2,7 +2,7 @@ package alg.util.genetics;
 
 import static java.lang.Math.min;
 
-import alg.util.SimulatedAnneling;
+import alg.util.HCE;
 import alg.util.Util;
 
 import org.jenetics.SinglePointCrossover;
@@ -12,6 +12,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
+/**
+ * Schedule crossover operation class
+ * 
+ * @author Pedro Cuadra
+ *
+ */
 public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double> {
 
   /**
@@ -19,42 +25,22 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    */
   private ArrayList<ArrayList<Integer>> levels;
   /**
-   * Object of simulated annealing.
+   * Heterogeneous computing environment
    */
-  private SimulatedAnneling simAnne;
-  /**
-   * Flag to indicate if simulated annealing is required.
-   */
-  private boolean isSimulated;
+  private HCE env;
 
   /**
    * Constructor.
    * 
-   * @param delta dependency matrix
+   * @param env heterogeneous computing environment
    * @param probCrossover crossing over probability
    */
-  public ScheduleCrossover(double[][] delta, double probCrossover) {
+  public ScheduleCrossover(HCE env, double probCrossover) {
     super(probCrossover);
-    this.simAnne = null;
-    isSimulated = false;
+    this.env = env;
 
-    levels =  Util.getDependenciesLevels(delta); 
+    levels =  Util.getDependenciesLevels(env.getDependencyMatrix()); 
   }
-
-  /**
-   * Constructor.
-   * 
-   * @param delta dependency matrix
-   * @param probCrossover crossing over probability
-   * @param simAnne Simulated anealing object
-   */
-  public ScheduleCrossover(double[][] delta, double probCrossover, SimulatedAnneling simAnne) {
-    super(probCrossover);
-    this.simAnne = simAnne;
-    isSimulated = true;
-    levels =  Util.getDependenciesLevels(delta); 
-  }
-
 
 
   /**
@@ -83,6 +69,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
     MSeq<ScheduleGene> tempother = other.copy();
     MSeq<ScheduleGene> tempthat = that.copy();
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
+    ScheduleChromosome chrFac = new ScheduleChromosome(env);
 
 
     //cond1: the tasks immediately before the crossover point must be of same level
@@ -92,9 +79,10 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
       that.swap(crossoverSiteLocus, min(that.length(), other.length()), other, crossoverSiteLocus);
 
       if ((!that.equals(tempthat)) && (!that.equals(other)) && (!other.equals(tempother))) {
-        if (isSimulated) {
+        if (env.getSimulatedAnnealingEnabled()) {
           // temp: parent sequence, that : child sequemce
-          if (simAnne.checkCriteria(tempthat.toISeq(), that.toISeq())) {
+          if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempthat.toISeq()), 
+              chrFac.newInstance(that.toISeq()))) {
             return 2;
           } else {
             // unswap: return the original chromosome as the criteria failed.

@@ -4,8 +4,10 @@
 
 package alg;
 
+import alg.util.HCE;
 import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
+import alg.util.graph.Graph;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -56,12 +58,15 @@ public class ExecutionTimeUt {
     numTask =  1 + randomGen.nextInt(maxNumTask);
     executors =  1 + randomGen.nextInt(maxNumExecutors);
 
-    ones = Util.getOnesMatrix(executors, numTask);
+    ones = Util.getOnesMatrix(numTask, executors);
     delta = Util.getDeltaMatrix(numTask);
+    
+    HCE env = new HCE(delta, ones);
 
-    chromosome = new ScheduleChromosome(delta, executors);
+    chromosome = new ScheduleChromosome(env);
+    Graph graph = Graph.buildGraph(env);
 
-    executionTimeGa =  new ExecutionTime(ones, delta);
+    executionTimeGa =  new ExecutionTime(graph);
 
   }
 
@@ -73,7 +78,7 @@ public class ExecutionTimeUt {
   public void calculateFitness() {
     double fitness;
 
-    fitness = executionTimeGa.getFitness(chromosome.toSeq());
+    fitness = executionTimeGa.getFitness(chromosome);
 
     /* 
      * Since our ETC matrix has only ones the fitness value

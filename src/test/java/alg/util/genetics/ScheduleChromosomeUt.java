@@ -6,6 +6,7 @@ package alg.util.genetics;
 
 import static org.junit.Assert.assertEquals;
 
+import alg.util.HCE;
 import alg.util.Util;
 
 import org.jenetics.util.ISeq;
@@ -71,6 +72,8 @@ public class ScheduleChromosomeUt {
     matrix[1][2] = 1;
     matrix[1][3] = 1;
     matrix[2][3] = 1;
+    
+    HCE env = new HCE(matrix, matrix);
 
 
     // Already known valid solution
@@ -83,7 +86,7 @@ public class ScheduleChromosomeUt {
     }
 
     ScheduleChromosome chromosome;
-    chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
     assertEquals(chromosome.isValid(), true);
 
 
@@ -97,7 +100,7 @@ public class ScheduleChromosomeUt {
       allelList.add(new ScheduleGene(4, 4, allel));
     }
 
-    chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
     assertEquals(chromosome.isValid(), false);
 
     // Already known invalid solution (repeat task)
@@ -110,7 +113,7 @@ public class ScheduleChromosomeUt {
       allelList.add(new ScheduleGene(4, 4, allel));
     }
 
-    chromosome = new ScheduleChromosome(matrix, 4, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
     assertEquals(chromosome.isValid(), false);
 
   }
@@ -118,7 +121,8 @@ public class ScheduleChromosomeUt {
   @Test
   public void createCheckValid() {
     double[][] matrix = Util.getDeltaMatrix(numTask);
-    ScheduleChromosome chromosome = new ScheduleChromosome(matrix, 4);
+    HCE env = new HCE(matrix, matrix);
+    ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     // This shall be true everytime. If not we are creating invalid solutions
     assertEquals(chromosome.isValid(), true);
@@ -128,7 +132,8 @@ public class ScheduleChromosomeUt {
   @Test
   public void cloneChromosome() {
     double[][] matrix = Util.getDeltaMatrix(numTask);
-    ScheduleChromosome chromosomeOrg = new ScheduleChromosome(matrix, 4);
+    HCE env = new HCE(matrix, matrix);
+    ScheduleChromosome chromosomeOrg = new ScheduleChromosome(env);
     ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
     ScheduleGene original;
     ScheduleGene cloned;
@@ -147,6 +152,8 @@ public class ScheduleChromosomeUt {
   public void knowChromosome() {
     double[][] matrix = Util.createEmptyMatrix(5, 5);
     
+    HCE env = new HCE(matrix, matrix);
+    
     
     /* (1) -> (2) -> (3) -> (4) -> (5) */
     matrix[0][1] = 1;
@@ -154,7 +161,7 @@ public class ScheduleChromosomeUt {
     matrix[2][3] = 1;
     matrix[3][4] = 1;
     
-    ScheduleChromosome chromosome = new ScheduleChromosome(matrix, 4);
+    ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene ++) {
       assertEquals(chromosome.toSeq().get(currGene).getAllele().getTaskId(), currGene);

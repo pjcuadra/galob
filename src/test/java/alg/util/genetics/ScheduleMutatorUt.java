@@ -7,11 +7,12 @@ package alg.util.genetics;
 import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
-import alg.LoadBalancing;
-
-import alg.util.SimulatedAnneling;
+import alg.LoadBalancingStats;
+import alg.util.HCE;
+import alg.util.SimulatedAnnealing;
 
 import alg.util.Util;
+import alg.util.graph.Graph;
 
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
@@ -24,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -44,6 +46,7 @@ public class ScheduleMutatorUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
   private double[][] delta;
+  HCE env;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -65,17 +68,26 @@ public class ScheduleMutatorUt {
 
     numTask =  1 + randomGen.nextInt(maxNumTask);
     executors =  1 + randomGen.nextInt(maxNumExecutors);
-    double[][] etc = Util.getOnesMatrix(executors, numTask);
+    double[][] etc = Util.getOnesMatrix(numTask, executors);
    
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
     double[][] comCost = Util.getComcostmatrix(delta);
+    
+    System.out.println(Arrays.deepToString(delta));
+    System.out.println(Arrays.deepToString(comCost));
+    
+    env = new HCE(delta, etc, comCost);
+    
+    Graph graph = Graph.buildGraph(env);
 
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
-    SimulatedAnneling simAnne = new SimulatedAnneling(0.8, 900, loadBal);
+    LoadBalancingStats loadBal = new LoadBalancingStats(graph, 0.6);
+    SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal);
+    
+    env.setSimulatedAnnealing(simAnne);
    
     // Always mutate probability 1
-    mutator = new ScheduleMutator(delta, 0.6, simAnne);
+    mutator = new ScheduleMutator(env, 0.6);
 
   }
 
@@ -105,7 +117,7 @@ public class ScheduleMutatorUt {
 
   @Test
   public void singleMutation() {
-    ScheduleChromosome originalChromosome = new ScheduleChromosome(delta, executors);
+    ScheduleChromosome originalChromosome = new ScheduleChromosome(env);
     ScheduleChromosome mutatedChromosome = originalChromosome.clone();
     int alterations = 0;
     int alterationsCount = 0;
@@ -125,18 +137,22 @@ public class ScheduleMutatorUt {
 
   @Test
   public void populationMutattion() {
-    double[][] myetc = Util.getOnesMatrix(executors, numTask);
+    double[][] myetc = Util.getOnesMatrix(numTask, executors);
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
-    ExecutionTime myOpt = new ExecutionTime(myetc, delta);
+    
+    HCE env = new HCE(delta, myetc);
+    Graph graph = Graph.buildGraph(env);
+    ExecutionTime myOpt = new ExecutionTime(graph);
+    ScheduleCodec codec = new ScheduleCodec(env);
     Phenotype<ScheduleGene, Double> phenoFactory;
     int populationSize;  
     int alterationsCount = 0;
 
     // Create a phenotype to be used as factory for others
     phenoFactory = Phenotype.of(
-        Genotype.of(ScheduleChromosome.of(delta, executors)), 
+        Genotype.of(ScheduleChromosome.of(env)), 
         0, 
-        gt -> myOpt.getFitness(myOpt.ofSeq().decode(gt))
+        gt -> myOpt.getFitness(codec.ofChromosome().decode(gt))
         );
 
     // Random population size
@@ -146,7 +162,7 @@ public class ScheduleMutatorUt {
     phenoList = new ArrayList<Phenotype<ScheduleGene, Double>>();
     for (int individualIdx = 0; individualIdx < populationSize; individualIdx++) {
       phenoList.add(
-          phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(delta, executors))));
+          phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(env))));
     }
 
     Population<ScheduleGene, Double> originalPopulation = Population.empty();

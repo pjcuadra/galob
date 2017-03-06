@@ -1,7 +1,9 @@
 package alg.util.genetics;
 
+import alg.util.HCE;
 import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
+import alg.util.graph.GraphStats;
 
 import org.jenetics.Chromosome;
 import org.jenetics.util.ISeq;
@@ -24,18 +26,13 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    */
   public ISeq<ScheduleGene> scheduleSeq;
   /**
-   * Number of tasks.
+   * Heterogeneous computing environment
    */
-  private int numTasks;
+  private HCE env;
   /**
-   * Number of executing units.
+   * The statistics of the chromosome
    */
-  private int numExecutors;
-  /**
-   * Dependencies matrix, delta.
-   */
-  private double[][] delta;
-
+  private GraphStats stats;
 
   /**
    * Constructor.
@@ -43,28 +40,20 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * @param delta dependency matrix, delta
    * @param numExecutors number of executing units
    */
-  public ScheduleChromosome(double[][] delta, int numExecutors) {
+  public ScheduleChromosome(HCE env) {
     ArrayList<ScheduleAllele> toSchedule = new ArrayList<ScheduleAllele>();
     ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
     ArrayList<ScheduleAllele> allocable = null;
     ScheduleGene gene =  null;
-    double[][] deltaTemp = null; 
-
-    gene =  ScheduleGene.of(delta.length, numExecutors);
-
-    this.delta = Util.copyMatrix(delta);
-
-    deltaTemp = Util.copyMatrix(this.delta);
-
-    this.numTasks = delta.length;
-    this.numExecutors = numExecutors;
-
+    this.env = env;
+    double[][] deltaTemp =  env.getDependencyMatrix();
+    
     // Create a gene to use it as factory
-
+    gene =  ScheduleGene.of(env.getNumberOfTasks(), env.getNumberOfExecutors());
 
     // Initialize the alleles list
-    for (int i = 0; i < numTasks; i++) {
-      toSchedule.add(new ScheduleAllele(numTasks, numExecutors, i));
+    for (int i = 0; i < env.getNumberOfTasks(); i++) {
+      toSchedule.add(new ScheduleAllele(env.getNumberOfTasks(), env.getNumberOfExecutors(), i));
     }
 
     // Finish until everything is allocated (assuming no cycles)
@@ -74,8 +63,6 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
       for (ScheduleAllele currItem: toSchedule) {
         // If no dependency pending is allocable
-
-
         if (!(Util.checkColZero(deltaTemp, currItem.getTaskId()))) {
           continue;
         }
@@ -107,31 +94,41 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Constructor.
    * 
-   * @param delta dependency matrix, delta
-   * @param numExecutors number of executing units
+   * @param env heterogeneous computing environment
    * @param genes sequence of already created genes
    */
-  public ScheduleChromosome(double[][] delta, int numExecutors, ISeq<ScheduleGene> genes) {
+  public ScheduleChromosome(HCE env, ISeq<ScheduleGene> genes) {
 
-    this.delta = Util.copyMatrix(delta);
-    this.numTasks = delta.length;
-    this.numExecutors = numExecutors;
+    this.env = env;
 
     scheduleSeq = genes;
 
   }
+  
+  /**
+   * Constructor
+   * 
+   * @param chromosome already existing chromosome
+   */
+  public ScheduleChromosome(ScheduleChromosome chromosome) {
 
+    this.env = chromosome.env;
+
+    scheduleSeq = chromosome.toSeq().copy().toISeq();
+
+  }
+  
   /* (non-Javadoc)
    * @see org.jenetics.util.Verifiable#isValid()
    */
   @Override
   public boolean isValid() {
 
-    int numtasks = delta.length; //square matrix with rows=cols=num of tasks
+    int numtasks = env.getNumberOfTasks();
     double[][]tempmat = new double[numtasks][numtasks];
     int numofones = 0;
 
-    tempmat = Util.copyMatrix(delta);
+    tempmat = Util.copyMatrix(env.getDependencyMatrix());
 
     //only execute as long as order is valid
     for (ScheduleGene gene: scheduleSeq) {
@@ -172,8 +169,8 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * @see org.jenetics.util.Factory#newInstance()
    */
   @Override
-  public Chromosome<ScheduleGene> newInstance() {
-    return new ScheduleChromosome(delta, numExecutors);
+  public ScheduleChromosome newInstance() {
+    return new ScheduleChromosome(env);
 
   }
 
@@ -181,8 +178,8 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * @see org.jenetics.Chromosome#newInstance(org.jenetics.util.ISeq)
    */
   @Override
-  public Chromosome<ScheduleGene> newInstance(ISeq<ScheduleGene> genes) {
-    return new ScheduleChromosome(delta, numExecutors, genes);
+  public ScheduleChromosome newInstance(ISeq<ScheduleGene> genes) {
+    return new ScheduleChromosome(env, genes);
   }
 
   /* (non-Javadoc)
@@ -212,12 +209,11 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Static constructor.
    * 
-   * @param delta dependency matrix, delta
-   * @param numExecutors number of executing units
+   * @param env heterogeneous computing environment
    * @return newly created chromosome
    */
-  public static Chromosome<ScheduleGene> of(double[][] delta, int numExecutors) {
-    return new ScheduleChromosome(delta, numExecutors);
+  public static ScheduleChromosome of(HCE env) {
+    return new ScheduleChromosome(env);
   }
 
   /* (non-Javadoc)
@@ -230,6 +226,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
   /**
    * Create an exact copy of the chromosome.
+   * 
    * @return chromosome copy
    */
   public ScheduleChromosome clone() {
@@ -239,8 +236,35 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       genesList.add(gene.newInstance(gene.getAllele()));
     }
 
-    return new ScheduleChromosome(delta, numExecutors, ISeq.of(genesList));
+    return new ScheduleChromosome(env, ISeq.of(genesList));
 
+  }
+  
+  /**
+   * Set statistics object
+   * 
+   * @param stats statistics object
+   */
+  public void setStats(GraphStats stats) {
+    this.stats = stats;
+  }
+  
+  /**
+   * Get statistics object
+   * 
+   * @return return statistics object
+   */
+  public GraphStats getStats() {
+    return this.stats;
+  }
+  
+  /**
+   * Check if the chromosome has statistics set
+   *  
+   * @return true if the chromosome has statistics set false otherwise
+   */
+  public boolean hasStats() {
+    return (this.stats != null);
   }
 
 }

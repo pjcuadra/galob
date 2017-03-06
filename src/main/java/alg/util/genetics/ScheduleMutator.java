@@ -4,7 +4,8 @@
 
 package alg.util.genetics;
 
-import alg.util.SimulatedAnneling;
+import alg.util.HCE;
+import alg.util.SimulatedAnnealing;
 
 import alg.util.Util;
 
@@ -22,13 +23,13 @@ import java.util.Random;
 
 
 /**
- * Genetic Mutator of ScheduleChromosomes.
+ * Genetic Mutator of ScheduleChromosomes
+ * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
  */
 public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
-
   /**
    * Mutation probability.
    */
@@ -38,49 +39,29 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    */
   private ArrayList<ArrayList<Integer>> levels;
   /**
-   * dependency matrix.
-   */
-  private double[][] delta;
-  /**
    * Object of simulated anneling.
    */
-  private SimulatedAnneling simAnne;
+  private SimulatedAnnealing simAnne;
   /**
    * Flag to indicate if simulated anealing is required.
    */
   private boolean isSimulated;
+//  /**
+//   * Heterogeneous computing environment
+//   */
+//  private HCE env;
 
   /**
    * Constructor.
    * 
-   * @param delta dependency matrix
+   * @param env heterogeneous computing environment
    * @param probMutator mutating probability 
    */
-
-  public ScheduleMutator(double[][] delta, double probMutator) {
+  public ScheduleMutator(HCE env, double probMutator) {
     this.probMutator = probMutator;
-    this.delta = delta;
-    this.simAnne = null;
+//    this.env = env;
     isSimulated = false;
-    levels =  Util.getDependenciesLevels(delta); 
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param delta dependency matrix
-   * @param probMutator mutating probability
-   * @param simAnne Simulated Anealing object
-   */
-
-  public ScheduleMutator(double[][] delta, double probMutator, SimulatedAnneling simAnne) {
-    this.probMutator = probMutator;
-    this.delta = delta;
-    this.simAnne = simAnne;
-    isSimulated = true;
-
-    levels =  Util.getDependenciesLevels(delta); 
-
+    levels =  Util.getDependenciesLevels(env.getDependencyMatrix()); 
   }
 
   /**
@@ -89,7 +70,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @param chromosome chromosome to be mutated
    * @return mutated chromosome
    */
-  public Chromosome<ScheduleGene> mutateChromosome(Chromosome<ScheduleGene> chromosome) {
+  public ScheduleChromosome mutateChromosome(ScheduleChromosome chromosome) {
     ScheduleChromosome childChromosome;
     Random randomGen = new Random();
     int randLevel = randomGen.nextInt(levels.size());
@@ -126,12 +107,12 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
 
       Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
 
-      childChromosome = new ScheduleChromosome(this.delta, cSeq.size() / 2, cSeq.toISeq());
+      childChromosome = chromosome.newInstance(cSeq.toISeq());
 
       //check if simulated anealing is required
       if (isSimulated) {
         // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
-        if (simAnne.checkCriteria(chromosome.toSeq(), childChromosome.toSeq())) {
+        if (simAnne.checkCriteria(chromosome, childChromosome)) {
 
           return childChromosome;
         } else {
@@ -154,7 +135,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
     Random randomGen = new Random();
     Genotype<ScheduleGene> genotype;
     int alteredGenes = 0;
-    Chromosome<ScheduleGene> chromosome;
+    ScheduleChromosome chromosome;
 
     for (Phenotype<ScheduleGene, Double> phenoType: population) {
       // Randomly decide if this individual is going to mutate
@@ -171,7 +152,7 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
       final int chromosomeIdxToMutate = randomGen.nextInt(genotype.length());
 
       // Mutate the chromosome
-      chromosome = genotype.getChromosome(chromosomeIdxToMutate);
+      chromosome = (ScheduleChromosome) genotype.getChromosome(chromosomeIdxToMutate);
       chromosome = mutateChromosome(chromosome);
 
       // If no mutation was performed then continue

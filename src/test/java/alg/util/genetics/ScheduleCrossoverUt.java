@@ -6,6 +6,7 @@ package alg.util.genetics;
 
 import static org.junit.Assert.assertEquals;
 
+import alg.util.HCE;
 import alg.util.Util;
 
 import org.jenetics.util.MSeq;
@@ -35,6 +36,7 @@ public class ScheduleCrossoverUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleCrossover crossover;
   private double[][] delta;
+  HCE env;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -59,9 +61,11 @@ public class ScheduleCrossoverUt {
 
     // Create new dependencies randomly
     delta = Util.getDeltaMatrix(numTask);
+    
+    env = new HCE(delta, Util.createEmptyMatrix(numTask, executors));
 
     // Always crossover
-    crossover = new ScheduleCrossover(delta, 1);
+    crossover = new ScheduleCrossover(env, 1);
 
   }
 
@@ -71,8 +75,8 @@ public class ScheduleCrossoverUt {
 
   @Test
   public void singleCrossover() {
-    ScheduleChromosome p1Chromosome = new ScheduleChromosome(delta, executors);
-    ScheduleChromosome p2Chromosome = new ScheduleChromosome(delta, executors);
+    ScheduleChromosome p1Chromosome = new ScheduleChromosome(env);
+    ScheduleChromosome p2Chromosome = new ScheduleChromosome(env);
     MSeq<ScheduleGene> p1Seq = p1Chromosome.toSeq().copy();
     MSeq<ScheduleGene> p2Seq = p2Chromosome.toSeq().copy();
     int alterations = 0;

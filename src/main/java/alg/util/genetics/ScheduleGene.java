@@ -2,6 +2,12 @@ package alg.util.genetics;
 
 import org.jenetics.Gene;
 
+/**
+ * Schedule gene
+ * 
+ * @author Pedro Cuadra
+ *
+ */
 public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
   /**
    * Allele of the gene.
