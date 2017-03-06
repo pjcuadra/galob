@@ -3,7 +3,7 @@ package examples;
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
 import alg.ExecutionTime;
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
 import alg.util.Util;
 import alg.util.genetics.ScheduleCodec;
@@ -29,39 +29,39 @@ import org.jenetics.engine.EvolutionStatistics;
  */
 public class ExecutionTimeExample {
   /**
-   * Number of tasks
+   * Number of tasks.
    */
   static final int NUM_TASKS = 10;
   /**
-   * Number of executors
+   * Number of executors.
    */
   static final int NUM_EXECUTORS = 3;
   /**
-   * Gamma value of simulated annealing
+   * Gamma value of simulated annealing.
    */
   static final double SA_GAMMA_COOLING_FACTOR = 0.85;
   /**
-   * Initial temperature of simulated annealing
+   * Initial temperature of simulated annealing.
    */
   static final double SA_INITIAL_TEMPERATURE = 900;
   /**
-   * Mutation probability
+   * Mutation probability.
    */
   static final double MUTATION_PROBABILITY = 0.01;
   /**
-   * Crossover probability
+   * Crossover probability.
    */
   static final double CROSSOVER_PROBABILITY = 0.80;
   /**
-   * Fitness function filtering factor
+   * Fitness function filtering factor.
    */
   static final double ALPHA_FILTERING_FACTOR = 0.8;
   /**
-   * Generations limit
+   * Generations limit.
    */
   static final int GEN_LIMIT = 10000;
   /**
-   * Initial population size
+   * Initial population size.
    */
   static final int POPULATION_SIZE = 500;
 
@@ -71,7 +71,7 @@ public class ExecutionTimeExample {
    */
   public static void main(String[] args) {
     double[][] myetc = Util.getOnesMatrix(NUM_EXECUTORS, NUM_TASKS);
-    double[][] delta = Util.getDeltaMatrix(NUM_TASKS);
+    double[][] delta = Util.getRandomDeltaMatrix(NUM_TASKS);
     
     // Initialize expected time to compute matrix
     for (int o = 0; o < myetc[0].length; o++) {
@@ -81,7 +81,7 @@ public class ExecutionTimeExample {
     }
     
     // Create the HCE
-    HCE env = new HCE(delta, myetc);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, myetc);
     // Build a graph from the HCE
     Graph graph = Graph.buildGraph(env);
 

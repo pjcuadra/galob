@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import alg.ExecutionTime;
 import alg.LoadBalancingStats;
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
 
 import alg.util.Util;
@@ -25,7 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -46,7 +45,7 @@ public class ScheduleMutatorUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
   private double[][] delta;
-  HCE env;
+  HeterogeneousComputingEnv env;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -68,16 +67,13 @@ public class ScheduleMutatorUt {
 
     numTask =  1 + randomGen.nextInt(maxNumTask);
     executors =  1 + randomGen.nextInt(maxNumExecutors);
-    double[][] etc = Util.getOnesMatrix(numTask, executors);
-   
+    
     // Create new dependencies randomly
-    delta = Util.getDeltaMatrix(numTask);
-    double[][] comCost = Util.getComcostmatrix(delta);
+    delta = Util.getRandomDeltaMatrix(numTask);
+    double[][] comCost = Util.getRandomComcostmatrix(delta);
+    double[][] etc = Util.getOnesMatrix(numTask, executors);
     
-    System.out.println(Arrays.deepToString(delta));
-    System.out.println(Arrays.deepToString(comCost));
-    
-    env = new HCE(delta, etc, comCost);
+    env = new HeterogeneousComputingEnv(delta, etc, comCost);
     
     Graph graph = Graph.buildGraph(env);
 
@@ -140,7 +136,7 @@ public class ScheduleMutatorUt {
     double[][] myetc = Util.getOnesMatrix(numTask, executors);
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
     
-    HCE env = new HCE(delta, myetc);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, myetc);
     Graph graph = Graph.buildGraph(env);
     ExecutionTime myOpt = new ExecutionTime(graph);
     ScheduleCodec codec = new ScheduleCodec(env);

@@ -5,8 +5,6 @@ import alg.util.graph.Graph;
 import alg.util.graph.GraphStatsFactory;
 
 /**
- * Scheduler representation.
- * 
  * This class should implement all the necessary methods to implement
  * Load Balancing Task Scheduling based on Multi-Population Genetic in
  * Cloud Computing (Wang Bei, LI Jun). Note that this is not actually

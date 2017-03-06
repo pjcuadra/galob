@@ -57,7 +57,7 @@ public class UtilUt {
   public void checkDeltaMatrix() {
     double[][] matrix;
     int count = 0;
-    matrix = Util.getDeltaMatrix(numTask);
+    matrix = Util.getRandomDeltaMatrix(numTask);
     for (int i = numTask; i < numTask; i++) {
       for (int j = i; j < numTask; j--) {
         if (matrix[i][j] != 0) {
@@ -85,7 +85,7 @@ public class UtilUt {
     double[][] matrix;
     boolean flag = false;
 
-    matrix = Util.getComcostmatrix(Util.getDeltaMatrix(numTask)); 
+    matrix = Util.getRandomComcostmatrix(Util.getRandomDeltaMatrix(numTask)); 
 
     for (int i = 0; i < numTask; i++) {
       if (matrix[i][i] != 0) {

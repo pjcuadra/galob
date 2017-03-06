@@ -1,4 +1,5 @@
 /**
+ * Graph related package.
  * 
  * @author Pedro Cuadra
  *

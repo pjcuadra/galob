@@ -3,7 +3,7 @@ package alg.util.genetics;
 import org.jenetics.Gene;
 
 /**
- * Schedule gene
+ * Schedule gene.
  * 
  * @author Pedro Cuadra
  *

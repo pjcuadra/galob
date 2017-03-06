@@ -3,14 +3,14 @@ package alg.util.genetics;
 import org.jenetics.util.ISeq;
 
 /**
- * Schedule Utile class
+ * Schedule Utile class.
  * 
  * @author Pedro Cuadra
  *
  */
 public class ScheduleUtil {
   /**
-   * Calculate the allocation matrix from a gene sequence
+   * Calculate the allocation matrix from a gene sequence.
    * 
    * @param scheduleSeq genes sequence of a valid chromosome
    * @param numCores number of cores

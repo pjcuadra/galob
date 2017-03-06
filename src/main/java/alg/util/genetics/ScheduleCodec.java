@@ -4,15 +4,15 @@
 
 package alg.util.genetics;
 
+import alg.util.HeterogeneousComputingEnv;
+import alg.util.genetics.ScheduleUtil;
+
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
 import org.jenetics.util.ISeq;
 
-import alg.util.HCE;
-import alg.util.genetics.ScheduleUtil;
-
 /**
- * Scheduler class abstraction
+ * Scheduler class abstraction.
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
@@ -20,21 +20,21 @@ import alg.util.genetics.ScheduleUtil;
  */
 public class ScheduleCodec {
   /**
-   * Heterogeneous computing environment
+   * Heterogeneous computing environment.
    */
-  protected HCE env;
+  protected HeterogeneousComputingEnv env;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param env heterogeneous computing environment
    */
-  public ScheduleCodec(HCE env) {
+  public ScheduleCodec(HeterogeneousComputingEnv env) {
     this.env = env;
   }
 
   /**
-   * Create a Jenetics codec for allocation matrix encoding/decoding
+   * Create a Jenetics codec for allocation matrix encoding/decoding.
    * 
    * @return Jenetics codec
    */
@@ -43,12 +43,13 @@ public class ScheduleCodec {
 
     return Codec.of(
         Genotype.of(ScheduleChromosome.of(env)), /*Encoder*/ 
-        gt -> ScheduleUtil.createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq(), numExecutors) /*Decoder*/
+        gt -> ScheduleUtil.createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq(), 
+            numExecutors) /*Decoder*/
         );
   }
 
   /**
-   * Create a Jenetics codec for schedule sequence encoding/decoding
+   * Create a Jenetics codec for schedule sequence encoding/decoding.
    * 
    * @return Jenetics codec
    */
@@ -60,7 +61,7 @@ public class ScheduleCodec {
   }
 
   /**
-   * Create a Jenetics codec for ScheduleChromosome encoding/decoding
+   * Create a Jenetics codec for ScheduleChromosome encoding/decoding.
    * 
    * @return Jenetics codec
    */

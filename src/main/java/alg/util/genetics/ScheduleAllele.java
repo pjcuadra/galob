@@ -33,7 +33,7 @@ public class ScheduleAllele {
   }
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param numTask number of tasks
    * @param numExecutors number of executing units
@@ -46,7 +46,7 @@ public class ScheduleAllele {
   }
 
   /**
-   * Get task ID
+   * Get task ID.
    * 
    * @return task ID
    */
@@ -55,7 +55,7 @@ public class ScheduleAllele {
   }
 
   /**
-   * Get executor ID
+   * Get executor ID.
    * 
    * @return executor ID
    */

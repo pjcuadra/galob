@@ -6,7 +6,7 @@ package alg.util.genetics;
 
 import static org.junit.Assert.assertEquals;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.Util;
 
 import org.jenetics.util.ISeq;
@@ -73,7 +73,7 @@ public class ScheduleChromosomeUt {
     matrix[1][3] = 1;
     matrix[2][3] = 1;
     
-    HCE env = new HCE(matrix, matrix);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
 
 
     // Already known valid solution
@@ -120,8 +120,8 @@ public class ScheduleChromosomeUt {
 
   @Test
   public void createCheckValid() {
-    double[][] matrix = Util.getDeltaMatrix(numTask);
-    HCE env = new HCE(matrix, matrix);
+    double[][] matrix = Util.getRandomDeltaMatrix(numTask);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     // This shall be true everytime. If not we are creating invalid solutions
@@ -131,8 +131,8 @@ public class ScheduleChromosomeUt {
   
   @Test
   public void cloneChromosome() {
-    double[][] matrix = Util.getDeltaMatrix(numTask);
-    HCE env = new HCE(matrix, matrix);
+    double[][] matrix = Util.getRandomDeltaMatrix(numTask);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
     ScheduleChromosome chromosomeOrg = new ScheduleChromosome(env);
     ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
     ScheduleGene original;
@@ -152,15 +152,13 @@ public class ScheduleChromosomeUt {
   public void knowChromosome() {
     double[][] matrix = Util.createEmptyMatrix(5, 5);
     
-    HCE env = new HCE(matrix, matrix);
-    
-    
     /* (1) -> (2) -> (3) -> (4) -> (5) */
     matrix[0][1] = 1;
     matrix[1][2] = 1;
     matrix[2][3] = 1;
     matrix[3][4] = 1;
     
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene ++) {

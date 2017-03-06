@@ -1,40 +1,40 @@
 package alg.util.graph;
 
-import java.util.Iterator;
+import alg.util.genetics.ScheduleChromosome;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import alg.util.genetics.ScheduleChromosome;
+import java.util.Iterator;
 
 /**
- * Graph statistic
+ * Graph statistic.
  * 
  * @author Pedro Cuadra
  *
  */
 public class GraphStats {
   /**
-   * Graph object
+   * Graph object.
    */
   private Graph graph;
   /**
-   * Makespan
+   * Makespan.
    */
   private Double makespan = null;
   /**
-   * Average makespan between the makespan of all cores
+   * Average makespan between the makespan of all cores.
    */
   private Double avgMakespan;
   /**
-   * Standard deviation of the makespan of all cores
+   * Standard deviation of the makespan of all cores.
    */
   private Double stdDev;
   /**
-   * Array of makespan of all cores
+   * Array of makespan of all cores.
    */
   private double[] makespanK;
   /**
-   * Allocation matrix
+   * Allocation matrix.
    */
   private int[][] omega;
 
@@ -77,10 +77,10 @@ public class GraphStats {
     // This iteration is in topological order according to JGraphT
     while (it.hasNext()) {
       GraphNode curr = it.next();
-      double currAFT = getActualFinishTime(newGraph, curr);
+      double currAft = getActualFinishTime(newGraph, curr);
       
-      if (currAFT > makespanK[getExecutionUnit(curr.getTaskId())]) {
-        makespanK[getExecutionUnit(curr.getTaskId())] = currAFT;
+      if (currAft > makespanK[getExecutionUnit(curr.getTaskId())]) {
+        makespanK[getExecutionUnit(curr.getTaskId())] = currAft;
       }
       
     }
@@ -90,7 +90,7 @@ public class GraphStats {
   }
   
   /**
-   * Calculate the actual finish time of a node
+   * Calculate the actual finish time of a node.
    * 
    * @param graph graph object
    * @param node node
@@ -112,7 +112,7 @@ public class GraphStats {
       // Add communication costs
       tempStartTime += graph.getEdgeWeight(edge);
       
-      if (tempStartTime>startTime) {
+      if (tempStartTime > startTime) {
         startTime = tempStartTime;
       }
           
@@ -128,7 +128,7 @@ public class GraphStats {
   }
   
   /**
-   * Get execution unit of a given task
+   * Get execution unit of a given task.
    * 
    * @param task task ID
    * @return execution unit
@@ -199,7 +199,7 @@ public class GraphStats {
   }
   
   /**
-   * Get the standard deviation of the makespan of the makespan of all cores
+   * Get the standard deviation of the makespan of the makespan of all cores.
    * 
    * @return average execution time of a given Chromosome
    */
@@ -232,7 +232,7 @@ public class GraphStats {
   }
   
   /**
-   * Get the fitness of a given chromosome
+   * Get the fitness of a given chromosome.
    * 
    * @param chromosome chromosome
    * @return fitness value

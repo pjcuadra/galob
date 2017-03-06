@@ -6,7 +6,7 @@ import alg.util.graph.GraphStatsFactory;
 import java.util.Random;
 
 /**
- * Simulated Annealing class
+ * Simulated Annealing class.
  * 
  * @author Pedro Cuadra
  *
@@ -21,12 +21,12 @@ public class SimulatedAnnealing {
    */
   private double temp;
   /**
-   * Graph statistics factory 
+   * Graph statistics factory.
    */
   private GraphStatsFactory st;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param gamma temperature used in simulated annealing.
    * @param temp initial temperature 
@@ -41,6 +41,7 @@ public class SimulatedAnnealing {
 
   /**
    * Check the validity based on simulated annealing.
+   * 
    * @param parent the schedule sequence of parent chromosome
    * @param child  the schedule sequence of child chromosome
    * @return true if the criteria for simulated annealing is satisfied
@@ -74,7 +75,8 @@ public class SimulatedAnnealing {
   }    
 
   /**
-   * Get current temperature of the simulated annealing object
+   * Get current temperature of the simulated annealing object.
+   * 
    * @return current temperature of the simulated annealing object 
    */
   public double getTemp() {
@@ -82,7 +84,8 @@ public class SimulatedAnnealing {
   }
 
   /**
-   * Set the current temperature of the simulated annealing object
+   * Set the current temperature of the simulated annealing object.
+   * 
    * @param temp temperature of the simulated annealing object
    */
   public void setTemp(double temp) {

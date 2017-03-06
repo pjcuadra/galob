@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Utils class 
+ * Utils class. 
  * 
  * @author Pedro Cuadra
  *
@@ -51,12 +51,12 @@ public class Util {
 
 
   /**
-   * Get dependency matrix of size rows*cols which is an upper triangular matrix.
+   * Get a random dependency matrix of size rows*cols which is an upper triangular matrix.
    * 
    * @param numTasks number of tasks
    * @return dependency matrix
    */
-  public static double[][] getDeltaMatrix(int numTasks) {
+  public static double[][] getRandomDeltaMatrix(int numTasks) {
     Random randomGen = new Random();
 
     double[][] depend = new double[numTasks][numTasks];
@@ -77,12 +77,12 @@ public class Util {
   }
 
   /**
-   * Get Communication cost matrix of size rows*cols.
+   * Get a random Communication cost matrix of size rows*cols.
    * 
    * @param  delta the dependency matrix
    * @return communication cost matrix
    */
-  public static double[][] getComcostmatrix(double[][] delta) {
+  public static double[][] getRandomComcostmatrix(double[][] delta) {
     Random randomGen = new Random();
 
     double[][] comcost = copyMatrix(delta);
@@ -307,5 +307,25 @@ public class Util {
       }
     }
 
+  }
+  
+  /**
+   * Create a random heterogeneous computing environment with unary 
+   * execution and communication costs.
+   * 
+   * @param numExecutors number of executors
+   * @param numTasks number of tasks
+   * @return random heterogeneous computing environment
+   */
+  public static HeterogeneousComputingEnv ofUnitaryCosts(int numExecutors, int numTasks) {
+    double[][] delta = getRandomDeltaMatrix(numTasks);
+    double[][] etc = getOnesMatrix(numTasks, numExecutors);
+    double[][] commCost = getOnesMatrix(numTasks, numTasks);
+    
+    commCost = matrixParallelMultiply(commCost, delta); 
+    
+    return new HeterogeneousComputingEnv(delta, etc, commCost);
+    
+    
   }
 }

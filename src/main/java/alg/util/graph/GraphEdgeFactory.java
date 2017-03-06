@@ -4,7 +4,7 @@ import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 /**
- * Graph edge factory
+ * Graph edge factory.
  * 
  * @author Pedro Cuadra
  *

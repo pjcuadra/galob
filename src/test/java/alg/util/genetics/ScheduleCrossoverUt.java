@@ -6,7 +6,7 @@ package alg.util.genetics;
 
 import static org.junit.Assert.assertEquals;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.Util;
 
 import org.jenetics.util.MSeq;
@@ -36,7 +36,7 @@ public class ScheduleCrossoverUt {
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleCrossover crossover;
   private double[][] delta;
-  HCE env;
+  HeterogeneousComputingEnv env;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -60,9 +60,9 @@ public class ScheduleCrossoverUt {
     executors =  1 + randomGen.nextInt(maxNumExecutors);
 
     // Create new dependencies randomly
-    delta = Util.getDeltaMatrix(numTask);
+    delta = Util.getRandomDeltaMatrix(numTask);
     
-    env = new HCE(delta, Util.createEmptyMatrix(numTask, executors));
+    env = new HeterogeneousComputingEnv(delta, Util.createEmptyMatrix(numTask, executors));
 
     // Always crossover
     crossover = new ScheduleCrossover(env, 1);

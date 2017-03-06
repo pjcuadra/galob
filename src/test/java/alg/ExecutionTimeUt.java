@@ -4,7 +4,7 @@
 
 package alg;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.graph.Graph;
@@ -59,9 +59,9 @@ public class ExecutionTimeUt {
     executors =  1 + randomGen.nextInt(maxNumExecutors);
 
     ones = Util.getOnesMatrix(numTask, executors);
-    delta = Util.getDeltaMatrix(numTask);
+    delta = Util.getRandomDeltaMatrix(numTask);
     
-    HCE env = new HCE(delta, ones);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, ones);
 
     chromosome = new ScheduleChromosome(env);
     Graph graph = Graph.buildGraph(env);

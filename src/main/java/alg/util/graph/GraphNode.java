@@ -1,27 +1,27 @@
 package alg.util.graph;
 
 /**
- * Graph node
+ * Graph node.
  * 
  * @author Pedro Cuadra
  *
  */
 public class GraphNode {
   /**
-   * Task ID
+   * Task ID.
    */
   private int taskId;
   /**
-   * Expected time to compute for the different cores 
+   * Expected time to compute for the different cores. 
    */
   private double[] etcRow;
   /**
-   * Custom stored value  
+   * Custom stored value.
    */
   private double value;
   
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param taskId task ID
    * @param etcRow expected time to compute for the different cores
@@ -33,7 +33,7 @@ public class GraphNode {
   }
 
   /**
-   * Get task ID
+   * Get task ID.
    * 
    * @return task ID
    */
@@ -42,7 +42,7 @@ public class GraphNode {
   }
 
   /**
-   * Set task ID of the graph node
+   * Set task ID of the graph node.
    * 
    * @param taskId task ID
    */
@@ -51,7 +51,7 @@ public class GraphNode {
   }
 
   /**
-   * Get the expected time to compute for all cores
+   * Get the expected time to compute for all cores.
    * 
    * @return expected time to compute for all cores
    */
@@ -60,7 +60,7 @@ public class GraphNode {
   }
 
   /**
-   * Set the expected time to compute for all cores
+   * Set the expected time to compute for all cores.
    * 
    * @param etcRow expected time to compute for all cores
    */
@@ -69,7 +69,7 @@ public class GraphNode {
   }
   
   /**
-   * Set custom value
+   * Set custom value.
    * 
    * @param value custom value
    */
@@ -78,7 +78,8 @@ public class GraphNode {
   }
   
   /**
-   * Get custom value
+   * Get custom value.
+   * 
    * @return custom value
    */
   public double getValue() {
@@ -86,7 +87,8 @@ public class GraphNode {
   }
   
   /**
-   * Get expected time to compute of a given core
+   * Get expected time to compute of a given core.
+   * 
    * @param exeUnit core ID
    * @return expected time to computes of the given core
    */

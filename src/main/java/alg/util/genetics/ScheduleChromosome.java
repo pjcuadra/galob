@@ -1,6 +1,6 @@
 package alg.util.genetics;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.Util;
 import alg.util.genetics.ScheduleChromosome;
 import alg.util.graph.GraphStats;
@@ -11,7 +11,6 @@ import org.jenetics.util.ISeq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-
 
 /**
  * Genetic algorithm's chromosome.
@@ -26,21 +25,20 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    */
   public ISeq<ScheduleGene> scheduleSeq;
   /**
-   * Heterogeneous computing environment
+   * Heterogeneous computing environment.
    */
-  private HCE env;
+  private HeterogeneousComputingEnv env;
   /**
-   * The statistics of the chromosome
+   * The statistics of the chromosome.
    */
   private GraphStats stats;
 
   /**
    * Constructor.
    * 
-   * @param delta dependency matrix, delta
-   * @param numExecutors number of executing units
+   * @param env heterogeneous computing environment
    */
-  public ScheduleChromosome(HCE env) {
+  public ScheduleChromosome(HeterogeneousComputingEnv env) {
     ArrayList<ScheduleAllele> toSchedule = new ArrayList<ScheduleAllele>();
     ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
     ArrayList<ScheduleAllele> allocable = null;
@@ -97,7 +95,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * @param env heterogeneous computing environment
    * @param genes sequence of already created genes
    */
-  public ScheduleChromosome(HCE env, ISeq<ScheduleGene> genes) {
+  public ScheduleChromosome(HeterogeneousComputingEnv env, ISeq<ScheduleGene> genes) {
 
     this.env = env;
 
@@ -106,7 +104,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   }
   
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param chromosome already existing chromosome
    */
@@ -212,7 +210,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * @param env heterogeneous computing environment
    * @return newly created chromosome
    */
-  public static ScheduleChromosome of(HCE env) {
+  public static ScheduleChromosome of(HeterogeneousComputingEnv env) {
     return new ScheduleChromosome(env);
   }
 
@@ -241,7 +239,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   }
   
   /**
-   * Set statistics object
+   * Set statistics object.
    * 
    * @param stats statistics object
    */
@@ -250,7 +248,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   }
   
   /**
-   * Get statistics object
+   * Get statistics object.
    * 
    * @return return statistics object
    */
@@ -259,7 +257,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   }
   
   /**
-   * Check if the chromosome has statistics set
+   * Check if the chromosome has statistics set.
    *  
    * @return true if the chromosome has statistics set false otherwise
    */

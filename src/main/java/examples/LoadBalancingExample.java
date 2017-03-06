@@ -3,7 +3,7 @@ package examples;
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
 import alg.LoadBalancingStats;
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
 import alg.util.Util;
 import alg.util.genetics.ScheduleCodec;
@@ -28,43 +28,43 @@ import org.jenetics.engine.EvolutionStatistics;
  */
 public class LoadBalancingExample {
   /**
-   * Number of tasks
+   * Number of tasks.
    */
   static final int NUM_TASKS = 10;
   /**
-   * Number of executors
+   * Number of executors.
    */
   static final int NUM_EXECUTORS = 3;
   /**
-   * Gamma value of simulated annealing
+   * Gamma value of simulated annealing.
    */
   static final double SA_GAMMA_COOLING_FACTOR = 0.85;
   /**
-   * Initial temperature of simulated annealing
+   * Initial temperature of simulated annealing.
    */
   static final double SA_INITIAL_TEMPERATURE = 900;
   /**
-   * Mutation probability
+   * Mutation probability.
    */
   static final double MUTATION_PROBABILITY = 0.01;
   /**
-   * Crossover probability
+   * Crossover probability.
    */
   static final double CROSSOVER_PROBABILITY = 0.80;
   /**
-   * Fitness function filtering factor
+   * Fitness function filtering factor.
    */
   static final double ALPHA_FILTERING_FACTOR = 0.8;
   /**
-   * Generations limit
+   * Generations limit.
    */
   static final int GEN_LIMIT = 10000;
   /**
-   * Initial population size
+   * Initial population size.
    */
   static final int POPULATION_SIZE = 15;
   /** 
-   * Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) 
+   * Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example). 
    */
   static final double[][] ETC = {{14, 16, 9},
                                  {13, 19, 18},
@@ -92,7 +92,7 @@ public class LoadBalancingExample {
     initCommCost(comCost);
 
     // Create the HCE
-    HCE env = new HCE(delta, ETC, comCost);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, ETC, comCost);
     // Build a graph from the HCE
     Graph graph = Graph.buildGraph(env);
     
@@ -134,9 +134,9 @@ public class LoadBalancingExample {
   
   
   /**
-   * Initialize the communication costs matrix
+   * Initialize the communication costs matrix.
    * 
-   * @param comCost
+   * @param comCost communication costs
    */
   private static void initCommCost(double[][] comCost) {
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
@@ -164,9 +164,9 @@ public class LoadBalancingExample {
   }
   
   /**
-   * Initialize the dependecies costs matrix
+   * Initialize the dependencies matrix.
    * 
-   * @param comCost
+   * @param delta dependencies matrix
    */
   private static void initDelta(double[][] delta) {
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */

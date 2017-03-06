@@ -4,9 +4,8 @@
 
 package alg.util.genetics;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
-
 import alg.util.Util;
 
 import org.jenetics.Alterer;
@@ -20,10 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-
-
 /**
- * Genetic Mutator of ScheduleChromosomes
+ * Genetic Mutator of ScheduleChromosomes.
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
@@ -46,10 +43,6 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * Flag to indicate if simulated anealing is required.
    */
   private boolean isSimulated;
-//  /**
-//   * Heterogeneous computing environment
-//   */
-//  private HCE env;
 
   /**
    * Constructor.
@@ -57,9 +50,8 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @param env heterogeneous computing environment
    * @param probMutator mutating probability 
    */
-  public ScheduleMutator(HCE env, double probMutator) {
+  public ScheduleMutator(HeterogeneousComputingEnv env, double probMutator) {
     this.probMutator = probMutator;
-//    this.env = env;
     isSimulated = false;
     levels =  Util.getDependenciesLevels(env.getDependencyMatrix()); 
   }

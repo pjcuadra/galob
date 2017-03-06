@@ -4,14 +4,14 @@ import alg.util.genetics.ScheduleChromosome;
 import alg.util.genetics.ScheduleUtil;
 
 /**
- * Graph statistics factory
+ * Graph statistics factory.
  * 
  * @author Pedro Cuadra
  *
  */
 public class GraphStatsFactory {
   /**
-   * Graph object 
+   * Graph object .
    */
   private Graph graph;
 
@@ -25,7 +25,7 @@ public class GraphStatsFactory {
   }
 
   /**
-   * Create a graph statistics from a given chromosome
+   * Create a graph statistics from a given chromosome.
    * 
    * @param chromosome chromosome
    * @return graph statistics
@@ -36,7 +36,8 @@ public class GraphStatsFactory {
       return chromosome.getStats();
     }
     
-    int[][] omega = ScheduleUtil.createOmegaMatrix(chromosome.toSeq(), graph.env.getNumberOfExecutors());
+    int[][] omega = ScheduleUtil.createOmegaMatrix(chromosome.toSeq(), 
+        graph.env.getNumberOfExecutors());
     
     GraphStats stats = new GraphStats(graph, omega);
     
@@ -47,7 +48,8 @@ public class GraphStatsFactory {
   }
 
   /**
-   * Get fitness value of the chromosome
+   * Get fitness value of the chromosome.
+   * 
    * @param chromosome chromosome
    * @return fitness value
    */

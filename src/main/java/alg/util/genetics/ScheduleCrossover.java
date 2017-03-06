@@ -2,7 +2,7 @@ package alg.util.genetics;
 
 import static java.lang.Math.min;
 
-import alg.util.HCE;
+import alg.util.HeterogeneousComputingEnv;
 import alg.util.Util;
 
 import org.jenetics.SinglePointCrossover;
@@ -11,9 +11,8 @@ import org.jenetics.util.MSeq;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 /**
- * Schedule crossover operation class
+ * Schedule crossover operation class.
  * 
  * @author Pedro Cuadra
  *
@@ -25,9 +24,9 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    */
   private ArrayList<ArrayList<Integer>> levels;
   /**
-   * Heterogeneous computing environment
+   * Heterogeneous computing environment.
    */
-  private HCE env;
+  private HeterogeneousComputingEnv env;
 
   /**
    * Constructor.
@@ -35,7 +34,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    * @param env heterogeneous computing environment
    * @param probCrossover crossing over probability
    */
-  public ScheduleCrossover(HCE env, double probCrossover) {
+  public ScheduleCrossover(HeterogeneousComputingEnv env, double probCrossover) {
     super(probCrossover);
     this.env = env;
 

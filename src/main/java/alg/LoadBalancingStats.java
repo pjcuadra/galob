@@ -16,8 +16,6 @@ import alg.util.graph.Graph;
 import alg.util.graph.GraphStats;
 import alg.util.graph.GraphStatsFactory;
 
-
-
 public class LoadBalancingStats extends GraphStatsFactory {
   
   /**
@@ -29,8 +27,7 @@ public class LoadBalancingStats extends GraphStatsFactory {
   /**
    * Constructor.
    * 
-   * @param etcmatrix execution time matrix
-   * @param delta dependencies matrix
+   * @param graph graph object
    */
   public LoadBalancingStats(Graph graph) {
     super(graph);
@@ -57,6 +54,6 @@ public class LoadBalancingStats extends GraphStatsFactory {
   public Double getFitness(ScheduleChromosome chromosome) {
     GraphStats stats = ofChromosome(chromosome);
     
-    return ((1-alpha)*stats.getTotalTime() + alpha*stats.getStdDev());
+    return ((1 - alpha) * stats.getTotalTime() + alpha * stats.getStdDev());
   }
 }
