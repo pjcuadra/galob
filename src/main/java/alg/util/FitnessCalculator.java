@@ -12,7 +12,7 @@ public abstract class FitnessCalculator {
   /**
    * Graph stats factory.
    */
-  private StatsFactory graphStatsFact;
+  private StatsFactory statsFactory;
   
   /**
    * Constructor.
@@ -20,7 +20,7 @@ public abstract class FitnessCalculator {
    * @param env heterogeneous computing environment
    */
   public FitnessCalculator(HeterogeneousComputingEnv env) {
-    setGraphStatsFactory(new StatsFactory(env, this));
+    setStatsFactory(new StatsFactory(env, this));
   }
 
   /**
@@ -49,7 +49,7 @@ public abstract class FitnessCalculator {
    * @return graph stats factory
    */
   public StatsFactory getGraphStatsFactory() {
-    return graphStatsFact;
+    return statsFactory;
   }
 
   /**
@@ -57,8 +57,10 @@ public abstract class FitnessCalculator {
    * 
    * @param gsf graph stats factory
    */
-  private void setGraphStatsFactory(StatsFactory gsf) {
-    this.graphStatsFact = gsf;
+  private void setStatsFactory(StatsFactory gsf) {
+    assert gsf != null;
+    
+    this.statsFactory = gsf;
   }
 
 }

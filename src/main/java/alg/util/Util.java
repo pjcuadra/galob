@@ -282,7 +282,7 @@ public class Util {
     
     // Add all tasks with random etc per cores
     for (int i = 0; i < env.getNumberOfTasks(); i++) {
-      tasks[i] = env.addTask(createRandomRow(env.getNumberOfExecutors()));
+      tasks[i] = env.addTask(etc[i]);
     }
     
     // Add dependencies

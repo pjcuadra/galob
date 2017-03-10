@@ -1,5 +1,7 @@
 package alg.util.graph;
 
+import java.util.Arrays;
+
 /**
  * Graph node.
  * 
@@ -28,8 +30,7 @@ public class GraphNode {
    */
   public GraphNode(int taskId, double[] etcRow) {
     this.setTaskId(taskId);
-    
-    this.setEtcRow(etcRow);
+    this.setEtcRow(Arrays.stream(etcRow).toArray());
   }
 
   /**
@@ -94,5 +95,13 @@ public class GraphNode {
    */
   public double getExecutionTimeOnUnit(int exeUnit) {
     return this.etcRow[exeUnit];
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public GraphNode clone() {
+    return new GraphNode(this.taskId, this.etcRow);
   }
 }

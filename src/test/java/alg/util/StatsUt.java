@@ -18,7 +18,7 @@ import java.util.Random;
  * @author Sudheera Bandi
  *
  */
-public class UtilUt {
+public class StatsUt {
   /**
    * Random generator.
    */
@@ -44,9 +44,6 @@ public class UtilUt {
   @Before
   public void setUp() throws Exception {
 
-    randomGen = new Random();
-
-    numTask =  1 + randomGen.nextInt(MAX_NUM_TASKS);
   }
 
   @Test

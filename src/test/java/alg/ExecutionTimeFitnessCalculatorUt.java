@@ -20,7 +20,7 @@ import org.junit.Test;
  * @author Sudheera Bandi
  *
  */
-public class ExecutionTimeUt {
+public class ExecutionTimeFitnessCalculatorUt {
 
   private ScheduleChromosome chromosome;
   private ExecutionTimeFitnessCalculator executionTimeGa;

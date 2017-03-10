@@ -3,7 +3,7 @@ package alg.util;
 import alg.util.graph.Graph;
 import alg.util.graph.GraphNode;
 
-import java.util.Arrays;
+import java.util.stream.DoubleStream;
 
 /**
  * Heterogeneous Computing Environment.
@@ -87,10 +87,10 @@ public class HeterogeneousComputingEnv extends Graph {
    * Add a task with expected computing time equals to 1. 
    */
   public GraphNode addUnitExecutionTimeTask() {
+    double[] etcRow;
     
-    double[] etcRow  = new double[getNumberOfExecutors()];
-    
-    etcRow = Arrays.stream(etcRow).map(i -> 1).toArray();
+    // Create ones row
+    etcRow = DoubleStream.generate(() -> 1).limit(getNumberOfExecutors()).toArray();
     
     return addTask(etcRow);
   }
@@ -104,9 +104,7 @@ public class HeterogeneousComputingEnv extends Graph {
   public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
     
     // Verify parameters
-    assert nodeSrc.getTaskId() < this.addedTasks : "Invalid task node";
     assert containsVertex(nodeSrc) : "Invalid task node";
-    assert nodeDst.getTaskId() < this.addedTasks : "Invalid task node";
     assert containsVertex(nodeDst) : "Invalid task node";
     
     try {
@@ -209,6 +207,17 @@ public class HeterogeneousComputingEnv extends Graph {
     return (Graph) ((Graph) this).clone();
   }
   
+  
+  /**
+   * Get graph node by it's internal id. (For testing)
+   * 
+   * @param id id of the task
+   * @return graph node with given id
+   */
+  protected GraphNode getGraphNodeById(int id) {
+    return super.getGraphNodeById(id);
+  }
+  
   /**
    * Generates a completely random heterogeneous computing environment.
    * 
@@ -237,5 +246,7 @@ public class HeterogeneousComputingEnv extends Graph {
       boolean maxProvided) {
     return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
   }
+  
+  
   
 }
