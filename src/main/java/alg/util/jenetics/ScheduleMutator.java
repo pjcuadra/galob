@@ -2,7 +2,7 @@
  * Genetic Mutator of ScheduleChromosomes.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
@@ -105,12 +105,12 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
       if (isSimulated) {
         // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
         if (simAnne.checkCriteria(chromosome, childChromosome)) {
-
           return childChromosome;
-        } else {
-          return null;
         }
+        
+        return null;
       }
+      
       return childChromosome;
 
     }

@@ -2,15 +2,13 @@ package examples;
 
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
-import alg.ExecutionTime;
+import alg.ExecutionTimeFitnessCalculator;
 import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
-import alg.util.Util;
-import alg.util.genetics.ScheduleCodec;
-import alg.util.genetics.ScheduleCrossover;
-import alg.util.genetics.ScheduleGene;
-import alg.util.genetics.ScheduleMutator;
-import alg.util.graph.Graph;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleCrossover;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
 
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
@@ -63,40 +61,32 @@ public class ExecutionTimeExample {
   /**
    * Initial population size.
    */
-  static final int POPULATION_SIZE = 500;
+  static final int POPULATION_SIZE = 15;
+  /**
+   * Heterogeneous Computing Environment.
+   */
+  static final HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(NUM_TASKS, 
+      NUM_EXECUTORS, 
+      false);
 
   /**
    * Main function.
    * @param args command line parameters
    */
   public static void main(String[] args) {
-    double[][] myetc = Util.getOnesMatrix(NUM_EXECUTORS, NUM_TASKS);
-    double[][] delta = Util.getRandomDeltaMatrix(NUM_TASKS);
     
-    // Initialize expected time to compute matrix
-    for (int o = 0; o < myetc[0].length; o++) {
-      myetc[0][o] = 2;
-      myetc[1][o] = 3;
-      myetc[2][o] = 5;
-    }
-    
-    // Create the HCE
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, myetc);
-    // Build a graph from the HCE
-    Graph graph = Graph.buildGraph(env);
-
     // Create a code
-    ExecutionTime stats = new ExecutionTime(graph);
+    ExecutionTimeFitnessCalculator fitnessCalc = new ExecutionTimeFitnessCalculator(env);
 
     // Set the simulated annealing to the environment
     env.setSimulatedAnnealing(new  SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
-        SA_INITIAL_TEMPERATURE, 
-        stats));
+        SA_INITIAL_TEMPERATURE,
+        fitnessCalc));
 
     // Configure and build the evolution engine.
-    final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
+    final Engine<alg.util.jenetics.ScheduleGene, Double> engine = Engine
         .builder(
-            stats::getFitness,
+            fitnessCalc::getFitness,
             (new ScheduleCodec(env)).ofChromosome())
         .populationSize(POPULATION_SIZE)
         .optimize(Optimize.MINIMUM)
@@ -115,7 +105,6 @@ public class ExecutionTimeExample {
         .peek(statistics)
         .collect(toBestPhenotype());
 
-    System.out.println("Finished!");
     System.out.println(statistics);
     System.out.println("Solution:");
     System.out.println(best);

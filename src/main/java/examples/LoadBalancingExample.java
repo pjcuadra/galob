@@ -2,22 +2,20 @@ package examples;
 
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
-import alg.LoadBalancingStats;
+import alg.LoadBalancingFitnessCalculator;
 import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
-import alg.util.Util;
-import alg.util.genetics.ScheduleCodec;
-import alg.util.genetics.ScheduleCrossover;
-import alg.util.genetics.ScheduleGene;
-import alg.util.genetics.ScheduleMutator;
-import alg.util.graph.Graph;
+import alg.util.graph.GraphNode;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleCrossover;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
+import alg.util.jenetics.ScheduleStatistics;
 
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.RouletteWheelSelector;
 import org.jenetics.engine.Engine;
-import org.jenetics.engine.EvolutionStatistics;
-
 
 /**
  * Example of load balacing optimization.
@@ -38,7 +36,7 @@ public class LoadBalancingExample {
   /**
    * Gamma value of simulated annealing.
    */
-  static final double SA_GAMMA_COOLING_FACTOR = 0.85;
+  static final double SA_GAMMA_COOLING_FACTOR = 0.9;
   /**
    * Initial temperature of simulated annealing.
    */
@@ -54,11 +52,11 @@ public class LoadBalancingExample {
   /**
    * Fitness function filtering factor.
    */
-  static final double ALPHA_FILTERING_FACTOR = 0.8;
+  static final double ALPHA_FILTERING_FACTOR = 0.85;
   /**
    * Generations limit.
    */
-  static final int GEN_LIMIT = 10000;
+  static final int GEN_LIMIT = 100;
   /**
    * Initial population size.
    */
@@ -76,36 +74,32 @@ public class LoadBalancingExample {
                                  {5, 11, 14},
                                  {18, 12, 20},
                                  {21, 7, 16}};
+  /**
+   * Heterogeneous Computing Environment.
+   */
+  static final HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(NUM_TASKS, 
+      NUM_TASKS);
 
   /**
    * Main function.
    * @param args command line parameters
    */
   public static void main(String[] args) {
-    double[][] delta = Util.createEmptyMatrix(NUM_TASKS, NUM_TASKS);
-    double[][] comCost = Util.createEmptyMatrix(NUM_TASKS, NUM_TASKS);
-
-    // Initialize dependency matrix
-    initDelta(delta);
     
-    // Initialize communication costs matrix
-    initCommCost(comCost);
-
-    // Create the HCE
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, ETC, comCost);
-    // Build a graph from the HCE
-    Graph graph = Graph.buildGraph(env);
+    // Initialize dependency matrix
+    buildEnvironment();
     
     // Create load balancing statistics calculator
-    LoadBalancingStats loadBal = new LoadBalancingStats(graph, ALPHA_FILTERING_FACTOR);
+    LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 
+        ALPHA_FILTERING_FACTOR);
     
     // Add simulated annealing to the environment
-    env.setSimulatedAnnealing(new  SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
-        SA_INITIAL_TEMPERATURE, 
+    env.setSimulatedAnnealing(new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
+        SA_INITIAL_TEMPERATURE,
         loadBal));
 
     // Configure and build the evolution engine.
-    final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
+    final Engine<alg.util.jenetics.ScheduleGene, Double> engine = Engine
         .builder(
             loadBal::getFitness,
             (new ScheduleCodec(env)).ofChromosome())
@@ -118,79 +112,61 @@ public class LoadBalancingExample {
         .build();
 
     // Create evolution statistics consumer.
-    final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
+    final ScheduleStatistics statistics = new ScheduleStatistics(env);
 
     // Run evolution stream
     final Phenotype<ScheduleGene, Double> best = engine.stream()
-        .limit(GEN_LIMIT)
         .peek(statistics)
+        .limit(GEN_LIMIT)
         .collect(toBestPhenotype());
 
-    System.out.println("Finished!");
-    System.out.println(statistics);
+    statistics.showStats();
     System.out.println("Loadbalanced solution:");
     System.out.println(best);
   }
   
-  
   /**
-   * Initialize the communication costs matrix.
-   * 
-   * @param comCost communication costs
+   * Initialize the HCE.
    */
-  private static void initCommCost(double[][] comCost) {
+  private static void buildEnvironment() {
+    GraphNode[] tasks = new GraphNode[NUM_TASKS];
+    
+    // Create all tasks
+    for (int i = 0; i < ETC.length; i++) {
+      tasks[i] = env.addTask(ETC[i]);
+    }
+        
+    // Create dependencies
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-    comCost[0][1] = 18;
-    comCost[0][2] = 12;
-    comCost[0][3] = 9;
-    comCost[0][4] = 11;
-    comCost[0][5] = 14;
+    
+    // From task 0
+    env.addDependency(tasks[0], tasks[1], 18);
+    env.addDependency(tasks[0], tasks[2], 12);
+    env.addDependency(tasks[0], tasks[3], 9);
+    env.addDependency(tasks[0], tasks[4], 11);
+    env.addDependency(tasks[0], tasks[5], 14);
 
-    comCost[1][7] = 19;
-    comCost[1][8] = 16;
+    // From task 1
+    env.addDependency(tasks[1], tasks[7], 19);
+    env.addDependency(tasks[1], tasks[8], 16);
+    
+    // From task 2
+    env.addDependency(tasks[2], tasks[6], 23);
 
-    comCost[2][6] = 23;
+    // From task 3
+    env.addDependency(tasks[3], tasks[7], 27);
+    env.addDependency(tasks[3], tasks[8], 23);
 
-    comCost[3][7] = 27;
-    comCost[3][8] = 23;
+    // From task 4
+    env.addDependency(tasks[4], tasks[8], 13);
 
-    comCost[4][8] = 13;
+    // From task 5
+    env.addDependency(tasks[5], tasks[7], 15);
 
-    comCost[5][7] = 15;
-
-    comCost[6][9] = 17;
-    comCost[7][9] = 11;
-    comCost[8][9] = 13;
-  }
-  
-  /**
-   * Initialize the dependencies matrix.
-   * 
-   * @param delta dependencies matrix
-   */
-  private static void initDelta(double[][] delta) {
-    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-    delta[0][1] = 1;
-    delta[0][2] = 1;
-    delta[0][3] = 1;
-    delta[0][4] = 1;
-    delta[0][5] = 1;
-
-    delta[1][7] = 1;
-    delta[1][8] = 1;
-
-    delta[2][6] = 1;
-
-    delta[3][7] = 1;
-    delta[3][8] = 1;
-
-    delta[4][8] = 1;
-
-    delta[5][7] = 1;
-
-    delta[6][9] = 1;
-    delta[7][9] = 1;
-    delta[8][9] = 1;
+    // To task 9
+    env.addDependency(tasks[6], tasks[9], 17);
+    env.addDependency(tasks[7], tasks[9], 11);
+    env.addDependency(tasks[8], tasks[9], 13);
   }
 
 }

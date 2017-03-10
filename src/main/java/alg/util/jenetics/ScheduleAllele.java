@@ -1,4 +1,4 @@
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import java.util.Random;
 

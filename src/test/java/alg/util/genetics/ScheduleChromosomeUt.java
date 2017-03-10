@@ -7,7 +7,10 @@ package alg.util.genetics;
 import static org.junit.Assert.assertEquals;
 
 import alg.util.HeterogeneousComputingEnv;
-import alg.util.Util;
+import alg.util.graph.GraphNode;
+import alg.util.jenetics.ScheduleAllele;
+import alg.util.jenetics.ScheduleChromosome;
+import alg.util.jenetics.ScheduleGene;
 
 import org.jenetics.util.ISeq;
 import org.junit.After;
@@ -62,19 +65,24 @@ public class ScheduleChromosomeUt {
 
   @Test
   public void checkvalidity() {
-    double[][] matrix = new double[4][4];
+    final int numTasks = 4;
     ArrayList<ScheduleGene> allelList = new ArrayList<ScheduleGene>();
     ScheduleAllele allel = null;
+    GraphNode[] tasks = new GraphNode[numTasks];
 
-    // Define a delta matrix
-    matrix[0][1] = 1;
-    matrix[0][2] = 1;
-    matrix[1][2] = 1;
-    matrix[1][3] = 1;
-    matrix[2][3] = 1;
+    // Create the HCE
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(numTasks, numTask);
     
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
-
+    for (int i = 0; i < numTasks; i++) {
+      tasks[i] = env.addUnitExecutionTimeTask();
+    }
+    
+    // Define a delta matrix
+    env.addDependency(tasks[0], tasks[1], 0);
+    env.addDependency(tasks[0], tasks[2], 0);
+    env.addDependency(tasks[1], tasks[2], 0);
+    env.addDependency(tasks[1], tasks[3], 0);
+    env.addDependency(tasks[2], tasks[3], 0);
 
     // Already known valid solution
     int[] chromosomeSeq1 = {0, 1, 2, 3};
@@ -87,7 +95,7 @@ public class ScheduleChromosomeUt {
 
     ScheduleChromosome chromosome;
     chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
-    assertEquals(chromosome.isValid(), true);
+    assertEquals(true, chromosome.isValid());
 
 
     // Already known invalid solution
@@ -101,7 +109,7 @@ public class ScheduleChromosomeUt {
     }
 
     chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
-    assertEquals(chromosome.isValid(), false);
+    assertEquals(false, chromosome.isValid());
 
     // Already known invalid solution (repeat task)
     int[] chromosomeSeq3 = {0,1,2,0};
@@ -114,14 +122,15 @@ public class ScheduleChromosomeUt {
     }
 
     chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
-    assertEquals(chromosome.isValid(), false);
+    assertEquals(false, chromosome.isValid());
 
   }
 
   @Test
   public void createCheckValid() {
-    double[][] matrix = Util.getRandomDeltaMatrix(numTask);
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
+    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(maxNumTask, 
+        maxNumExecutors, 
+        true);
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     // This shall be true everytime. If not we are creating invalid solutions
@@ -131,8 +140,9 @@ public class ScheduleChromosomeUt {
   
   @Test
   public void cloneChromosome() {
-    double[][] matrix = Util.getRandomDeltaMatrix(numTask);
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
+    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(maxNumTask, 
+        maxNumExecutors, 
+        true);
     ScheduleChromosome chromosomeOrg = new ScheduleChromosome(env);
     ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
     ScheduleGene original;
@@ -150,15 +160,28 @@ public class ScheduleChromosomeUt {
   
   @Test
   public void knowChromosome() {
-    double[][] matrix = Util.createEmptyMatrix(5, 5);
+    GraphNode src;
+    GraphNode dst;
+    
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(5, 3);
     
     /* (1) -> (2) -> (3) -> (4) -> (5) */
-    matrix[0][1] = 1;
-    matrix[1][2] = 1;
-    matrix[2][3] = 1;
-    matrix[3][4] = 1;
+    src = env.addUnitExecutionTimeTask();
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
     
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(matrix, matrix);
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+    
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+    
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+    
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene ++) {

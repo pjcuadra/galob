@@ -72,7 +72,7 @@ public class UtilUt {
 
   @Test
   public void checkcol() {
-    double[][] ones = Util.getOnesMatrix(3, 5);
+    double[][] ones = Util.createOnesMatrix(3, 5);
     assertEquals(Util.checkColZero(ones, 4), false);
     for (int i = 0; i < 3; i++) {
       ones[i][2] = 0;

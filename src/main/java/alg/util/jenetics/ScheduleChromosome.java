@@ -1,9 +1,9 @@
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import alg.util.HeterogeneousComputingEnv;
+import alg.util.Stats;
 import alg.util.Util;
-import alg.util.genetics.ScheduleChromosome;
-import alg.util.graph.GraphStats;
+import alg.util.jenetics.ScheduleChromosome;
 
 import org.jenetics.Chromosome;
 import org.jenetics.util.ISeq;
@@ -31,7 +31,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * The statistics of the chromosome.
    */
-  private GraphStats stats;
+  private Stats stats;
 
   /**
    * Constructor.
@@ -243,7 +243,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * 
    * @param stats statistics object
    */
-  public void setStats(GraphStats stats) {
+  public void setStats(Stats stats) {
     this.stats = stats;
   }
   
@@ -252,7 +252,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
    * 
    * @return return statistics object
    */
-  public GraphStats getStats() {
+  public Stats getStats() {
     return this.stats;
   }
   

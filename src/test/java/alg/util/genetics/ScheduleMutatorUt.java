@@ -6,13 +6,15 @@ package alg.util.genetics;
 
 import static org.junit.Assert.assertEquals;
 
-import alg.ExecutionTime;
-import alg.LoadBalancingStats;
+import alg.ExecutionTimeFitnessCalculator;
+import alg.LoadBalancingFitnessCalculator;
 import alg.util.HeterogeneousComputingEnv;
 import alg.util.SimulatedAnnealing;
 
-import alg.util.Util;
-import alg.util.graph.Graph;
+import alg.util.jenetics.ScheduleChromosome;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
 
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
@@ -38,13 +40,10 @@ public class ScheduleMutatorUt {
 
   private Random randomGen;
 
-  private int numTask;
-  private int executors;
   static final int maxNumTask = 16 /* Actual max*/;
   static final int maxNumExecutors = 16 /* Actual max*/;
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
-  private double[][] delta;
   HeterogeneousComputingEnv env;
 
   @BeforeClass
@@ -62,22 +61,14 @@ public class ScheduleMutatorUt {
    */
   @Before
   public void setUp() throws Exception {
-
+    
     randomGen = new Random();
 
-    numTask =  1 + randomGen.nextInt(maxNumTask);
-    executors =  1 + randomGen.nextInt(maxNumExecutors);
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
+        maxNumExecutors, 
+        false);
     
-    // Create new dependencies randomly
-    delta = Util.getRandomDeltaMatrix(numTask);
-    double[][] comCost = Util.getRandomComcostmatrix(delta);
-    double[][] etc = Util.getOnesMatrix(numTask, executors);
-    
-    env = new HeterogeneousComputingEnv(delta, etc, comCost);
-    
-    Graph graph = Graph.buildGraph(env);
-
-    LoadBalancingStats loadBal = new LoadBalancingStats(graph, 0.6);
+    LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 0.6);
     SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal);
     
     env.setSimulatedAnnealing(simAnne);
@@ -133,12 +124,13 @@ public class ScheduleMutatorUt {
 
   @Test
   public void populationMutattion() {
-    double[][] myetc = Util.getOnesMatrix(numTask, executors);
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
     
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(delta, myetc);
-    Graph graph = Graph.buildGraph(env);
-    ExecutionTime myOpt = new ExecutionTime(graph);
+    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
+        maxNumExecutors, 
+        true);
+    
+    ExecutionTimeFitnessCalculator myOpt = new ExecutionTimeFitnessCalculator(env);
     ScheduleCodec codec = new ScheduleCodec(env);
     Phenotype<ScheduleGene, Double> phenoFactory;
     int populationSize;  

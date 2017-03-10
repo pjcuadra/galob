@@ -1,9 +1,12 @@
-package alg.util.graph;
+package alg.util;
 
-import alg.util.genetics.ScheduleChromosome;
+import alg.util.graph.Graph;
+import alg.util.graph.GraphNode;
+import alg.util.jenetics.ScheduleChromosome;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -12,11 +15,11 @@ import java.util.Iterator;
  * @author Pedro Cuadra
  *
  */
-public class GraphStats {
+public class Stats {
   /**
    * Graph object.
    */
-  private Graph graph;
+  private HeterogeneousComputingEnv env;
   /**
    * Makespan.
    */
@@ -37,16 +40,21 @@ public class GraphStats {
    * Allocation matrix.
    */
   private int[][] omega;
+  /**
+   * Fitness calculator.
+   */
+  private FitnessCalculator fitnessCalculator;
 
   /**
    * Constructor.
    * 
-   * @param graph graph object
+   * @param env heterogeneous computing environment
    * @param omega allocation matrix
    */
-  public GraphStats(Graph graph, int[][] omega) {
-    this.graph = graph;
+  public Stats(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator, int[][] omega) {
+    this.env = env;
     this.omega = omega;
+    this.fitnessCalculator = fitnessCalculator;
   }
 
 
@@ -70,7 +78,7 @@ public class GraphStats {
     
     makespanK = new double[omega.length];
     
-    Graph newGraph = graph.clone();
+    Graph newGraph = env.getGraphCopy();
     
     Iterator<GraphNode> it = newGraph.iterator();
     
@@ -160,15 +168,9 @@ public class GraphStats {
     }
     
     double[] sumTime = getNodesExecutionTime();
-    makespan = new Double(0);
     
-
-    for (double time : sumTime) {
-      if (time > makespan) {
-        makespan = time;
-      }
-    }
-
+    makespan = new Double(Arrays.stream(sumTime).max().getAsDouble());
+    
     return makespan;
 
   }
@@ -184,15 +186,8 @@ public class GraphStats {
     }
     
     double[] sumTime = getNodesExecutionTime();
-    double totalTime = 0;
-
-    for (double time : sumTime) {
-
-      totalTime += time;
-
-    }
     
-    avgMakespan = new Double(totalTime / sumTime.length);
+    avgMakespan = new Double(Arrays.stream(sumTime).average().getAsDouble());
 
     return avgMakespan;
 
@@ -209,18 +204,13 @@ public class GraphStats {
       return stdDev;
     }
     
-    stdDev = new Double(0);
-    
     double[] nodesExecutionTime = getNodesExecutionTime();
     double avgTime = getAverageTime();
     
-    // First calculate sum = (sumTime(i) - averageTime)^2
-    for (double time: nodesExecutionTime) {
-      stdDev += Math.pow((time - avgTime), 2);
-    }
-
-    // Now multiply the sum with 1/(M - 1)
-    stdDev = stdDev / ((double)(nodesExecutionTime.length - 1));
+    stdDev = Arrays.stream(nodesExecutionTime)
+      .map(i -> Math.pow(i - avgTime, 2))
+      .sum() / (nodesExecutionTime.length - 1);
+    
 
     // And finally take the square root
     stdDev = Math.sqrt(stdDev);
@@ -238,8 +228,7 @@ public class GraphStats {
    * @return fitness value
    */
   public Double getFitness(ScheduleChromosome chromosome) {
-    return (double) 0;
-    
+    return (double) fitnessCalculator.getFitness(chromosome);
   }
   
 }

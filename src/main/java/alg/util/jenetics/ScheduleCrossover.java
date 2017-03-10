@@ -1,4 +1,4 @@
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import static java.lang.Math.min;
 
@@ -62,13 +62,14 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
    * @see org.jenetics.SinglePointCrossover#crossover(org.jenetics.util.MSeq,
    * org.jenetics.util.MSeq)
    */
-  @Override  
-  protected int crossover(MSeq<ScheduleGene> that, MSeq<ScheduleGene> other) {
+  @Override
+  public int crossover(MSeq<ScheduleGene> that, MSeq<ScheduleGene> other) {
     Random randomGen = new Random();
     MSeq<ScheduleGene> tempother = other.copy();
     MSeq<ScheduleGene> tempthat = that.copy();
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
     ScheduleChromosome chrFac = new ScheduleChromosome(env);
+    int modified = 0;
 
 
     //cond1: the tasks immediately before the crossover point must be of same level
@@ -82,20 +83,26 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
           // temp: parent sequence, that : child sequemce
           if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempthat.toISeq()), 
               chrFac.newInstance(that.toISeq()))) {
-            return 2;
+            modified++;
           } else {
             // unswap: return the original chromosome as the criteria failed.
             that = tempthat.copy();
+          }
+          
+          if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempother.toISeq()), 
+              chrFac.newInstance(other.toISeq()))) {
+            modified++;
+          } else {
+            // unswap: return the original chromosome as the criteria failed.
             other = tempother.copy();
-            return 0;
           }
           
         }
-        return 2;
+        return modified;
       }
       
     }
-    return 0;    
+    return modified;    
   }
 
 }

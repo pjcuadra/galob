@@ -2,10 +2,10 @@
  * Scheduler class abstraction.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import alg.util.HeterogeneousComputingEnv;
-import alg.util.genetics.ScheduleUtil;
+import alg.util.Util;
 
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
@@ -43,7 +43,7 @@ public class ScheduleCodec {
 
     return Codec.of(
         Genotype.of(ScheduleChromosome.of(env)), /*Encoder*/ 
-        gt -> ScheduleUtil.createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq(), 
+        gt -> Util.createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq(), 
             numExecutors) /*Decoder*/
         );
   }

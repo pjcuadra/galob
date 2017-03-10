@@ -7,7 +7,9 @@ package alg.util.genetics;
 import static org.junit.Assert.assertEquals;
 
 import alg.util.HeterogeneousComputingEnv;
-import alg.util.Util;
+import alg.util.jenetics.ScheduleChromosome;
+import alg.util.jenetics.ScheduleCrossover;
+import alg.util.jenetics.ScheduleGene;
 
 import org.jenetics.util.MSeq;
 import org.junit.After;
@@ -15,8 +17,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Random;
 
 /**
  * Schedule Crossover unit testing.
@@ -27,15 +27,10 @@ import java.util.Random;
  */
 public class ScheduleCrossoverUt {
 
-  private Random randomGen;
-
-  private int numTask;
-  private int executors;
   static final int maxNumTask = 9 /* Actual max*/;
   static final int maxNumExecutors = 6 /* Actual max*/;
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleCrossover crossover;
-  private double[][] delta;
   HeterogeneousComputingEnv env;
 
   @BeforeClass
@@ -54,15 +49,10 @@ public class ScheduleCrossoverUt {
   @Before
   public void setUp() throws Exception {
 
-    randomGen = new Random();
-
-    numTask =  1 + randomGen.nextInt(maxNumTask);
-    executors =  1 + randomGen.nextInt(maxNumExecutors);
-
-    // Create new dependencies randomly
-    delta = Util.getRandomDeltaMatrix(numTask);
-    
-    env = new HeterogeneousComputingEnv(delta, Util.createEmptyMatrix(numTask, executors));
+    // Create a random HCE
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask,
+        maxNumExecutors, 
+        true);
 
     // Always crossover
     crossover = new ScheduleCrossover(env, 1);

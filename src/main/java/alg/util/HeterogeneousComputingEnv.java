@@ -1,12 +1,21 @@
 package alg.util;
 
+import alg.util.graph.Graph;
+import alg.util.graph.GraphNode;
+
+import java.util.Arrays;
+
 /**
  * Heterogeneous Computing Environment.
  * 
  * @author Pedro Cuadra
  *
  */
-public class HeterogeneousComputingEnv {
+public class HeterogeneousComputingEnv extends Graph {
+  /**
+   * Serial ID.
+   */
+  private static final long serialVersionUID = 11L;
   /**
    * Dependencies matrix.
    */
@@ -20,51 +29,100 @@ public class HeterogeneousComputingEnv {
    */
   private double[][] commCost;
   /**
-   * Communication costs availability.
-   */
-  private boolean commCostAvailable;
-  /**
-   * Simulated annealing.
+   * Simulated Annealing.
    */
   private SimulatedAnnealing simAnn;
-
+  /**
+   * Add tasks counter.
+   */
+  private int addedTasks;
+  
   /**
    * Constructor.
    * 
-   * @param delta dependencies matrix
-   * @param etc expected time to compute matrix
+   * @param numTask number of tasks of the HCE
+   * @param numCore number of cores available in the HCE
    */
-  public HeterogeneousComputingEnv(double[][] delta, double[][] etc) {
-    this.delta = delta;
-    this.etc = etc;
-    this.commCost = Util.createEmptyMatrix(delta.length, delta.length);
-    commCostAvailable = false;
-
+  public HeterogeneousComputingEnv(int numTask, int numCore) {
+    super();
+    
+    assert numTask > 0 : "Number of tasks shall be greater than 0";
+    assert numCore > 0 : "Number of cores shall be greater than 0";
+    
+    // Initalize empty matrices
+    this.delta = Util.createEmptyMatrix(numTask, numTask);
+    this.commCost = Util.createEmptyMatrix(numTask, numTask);
+    this.etc = Util.createEmptyMatrix(numTask, numCore);
+    
+    // Set added tasks counter to zero
+    this.addedTasks = 0;
   }
-
+  
   /**
-   * Constructor.
+   * Wrapper of add vertex to allow to add task to the graph.
    * 
-   * @param delta dependencies matrix
-   * @param etc expected time to compute matrix
-   * @param commCost communication costs matrix
+   * @param etcPerCore array containing the expected computing time for every core
    */
-  public HeterogeneousComputingEnv(double[][] delta, double[][] etc, double[][] commCost) {
-    this.delta = delta;
-    this.etc = etc;
-    this.commCost = commCost;
-    commCostAvailable = true;
+  public GraphNode addTask(double[] etcPerCore) {
+    // Verify parameters
+    assert this.addedTasks < getNumberOfTasks() : "Tasks limit has been reached";
+    assert etcPerCore.length == getNumberOfExecutors() : "ETC per core array with wrong size";
+    
+    // Copy the ETC row to matrix
+    etc[this.addedTasks] = etcPerCore.clone();
+    
+    // Create the task node
+    GraphNode taskNode = new GraphNode(this.addedTasks, etc[this.addedTasks]);
+    
+    // Add the task as vertex to the graph
+    addVertex(taskNode);
+    
+    // Increase the task id counter
+    this.addedTasks++;
+    
+    return taskNode;
   }
-
+  
   /**
-   * Check the availability of communication costs.
-   * 
-   * @return true if HCE has communication costs and false otherwise
+   * Add a task with expected computing time equals to 1. 
    */
-  public boolean hasCommunicationCosts() {
-    return commCostAvailable;
+  public GraphNode addUnitExecutionTimeTask() {
+    
+    double[] etcRow  = new double[getNumberOfExecutors()];
+    
+    etcRow = Arrays.stream(etcRow).map(i -> 1).toArray();
+    
+    return addTask(etcRow);
   }
-
+  
+  /* (non-Javadoc)
+   * @see alg.util.graph.Graph#addDependency(alg.util.graph.GraphNode, 
+   *                                         alg.util.graph.GraphNode, 
+   *                                         double)
+   */
+  @Override
+  public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
+    
+    // Verify parameters
+    assert nodeSrc.getTaskId() < this.addedTasks : "Invalid task node";
+    assert containsVertex(nodeSrc) : "Invalid task node";
+    assert nodeDst.getTaskId() < this.addedTasks : "Invalid task node";
+    assert containsVertex(nodeDst) : "Invalid task node";
+    
+    try {
+      // Add dependency to the graph
+      super.addDependency(nodeSrc, nodeDst, cost);
+      
+      // Add dependency to the matrices
+      this.delta[nodeSrc.getTaskId()][nodeDst.getTaskId()] = 1;
+      this.commCost[nodeSrc.getTaskId()][nodeDst.getTaskId()] = cost;
+      
+    } catch (org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException e) {
+      e.printStackTrace();
+    }
+    
+  }
+  
   /**
    * Get the number of executors in the HCE.
    * 
@@ -80,7 +138,7 @@ public class HeterogeneousComputingEnv {
    * @return number of tasks in the HCE
    */
   public int getNumberOfTasks() {
-    return delta[0].length;
+    return delta.length;
   }
 
   /**
@@ -89,6 +147,7 @@ public class HeterogeneousComputingEnv {
    * @return a copy of the dependency matrix
    */
   public double[][] getDependencyMatrix() {
+    assert this.addedTasks > 0 : "No tasks added to the HCE";
     return Util.copyMatrix(delta);
   }
 
@@ -98,6 +157,7 @@ public class HeterogeneousComputingEnv {
    * @return a copy of the communication costs matrix
    */
   public double[][] getCommunicationCostsMatrix() {
+    assert this.addedTasks > 0 : "No tasks added to the HCE";
     return Util.copyMatrix(commCost);
   }
 
@@ -107,6 +167,7 @@ public class HeterogeneousComputingEnv {
    * @return a copy of the expected time to compute matrix
    */
   public double[][] getExpectedTimeToComputeMatrix() {
+    assert this.addedTasks > 0 : "No tasks added to the HCE";
     return Util.copyMatrix(etc);
   }
 
@@ -125,6 +186,7 @@ public class HeterogeneousComputingEnv {
    * @param simAnn simulated annealing object
    */
   public void setSimulatedAnnealing(SimulatedAnnealing simAnn) {
+    assert simAnn != null : "Null parameter";
     this.simAnn = simAnn;
   }
 
@@ -136,5 +198,44 @@ public class HeterogeneousComputingEnv {
   public SimulatedAnnealing getSimulatedAnnealing() {
     return simAnn;
   }
-
+  
+  /**
+   * Get a copy of the graph representation of the HCE.
+   * 
+   * @return copy of graph representation of the HCE
+   */
+  public Graph getGraphCopy() {
+    assert this.addedTasks > 0 : "No tasks added to the HCE";
+    return (Graph) ((Graph) this).clone();
+  }
+  
+  /**
+   * Generates a completely random heterogeneous computing environment.
+   * 
+   * @param numTasks number of tasks
+   * @param numCores number of cores
+   * @param maxProvided numTasks and numCores are maximum values if 
+   *      true or exact values if false
+   * @return random heterogeneous computing environment
+   */
+  public static HeterogeneousComputingEnv ofRandom(int numTasks, 
+      int numCores, 
+      boolean maxProvided) {
+    return Util.ofRandom(numTasks, numCores, maxProvided);
+  }
+  
+  /**
+   * Generates a random heterogeneous computing environment with: unit execution time, 
+   * unit communication costs and random dependencies.
+   * 
+   * @param numTasks number of tasks
+   * @param numCores number of cores
+   * @return random heterogeneous computing environment
+   */
+  public static HeterogeneousComputingEnv ofRandomUnitary(int numTasks, 
+      int numCores, 
+      boolean maxProvided) {
+    return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
+  }
+  
 }

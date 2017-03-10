@@ -1,7 +1,6 @@
 package alg.util;
 
-import alg.util.genetics.ScheduleChromosome;
-import alg.util.graph.GraphStatsFactory;
+import alg.util.jenetics.ScheduleChromosome;
 
 import java.util.Random;
 
@@ -13,59 +12,53 @@ import java.util.Random;
  */
 public class SimulatedAnnealing {
   /**
-   * The cooling factor used in simulated anealing.
+   * The cooling factor used in simulated annealing.
    */
   private double gamma;
   /**
-   * The initial temperature used in simulated anealing.
+   * The initial temperature used in simulated annealing.
    */
   private double temp;
   /**
-   * Graph statistics factory.
+   * Fitness calculator.
    */
-  private GraphStatsFactory st;
+  private FitnessCalculator fitnessCalculator;
 
   /**
    * Constructor.
    * 
    * @param gamma temperature used in simulated annealing.
    * @param temp initial temperature 
-   * @param st graph statistics factory
    * 
    */
-  public SimulatedAnnealing(double gamma, double temp, GraphStatsFactory st) {
+  public SimulatedAnnealing(double gamma, double temp, FitnessCalculator fitnessCalculator) {
     this.gamma = gamma;
     this.temp = temp;
-    this.st = st;
+    this.fitnessCalculator = fitnessCalculator;
   }
 
   /**
    * Check the validity based on simulated annealing.
    * 
-   * @param parent the schedule sequence of parent chromosome
-   * @param child  the schedule sequence of child chromosome
+   * @param oldChromosome the schedule sequence of parent chromosome
+   * @param newChromosom  the schedule sequence of child chromosome
    * @return true if the criteria for simulated annealing is satisfied
    */
-  public boolean checkCriteria(ScheduleChromosome parent, ScheduleChromosome child) {
-    
-    if (st == null) {
-      System.out.println("WARNING! No StatsFactory was set to the simmulated anealing");
-      return true;
-    }
+  public boolean checkCriteria(ScheduleChromosome oldChromosome, ScheduleChromosome newChromosom) {
     
     double probFactor;
     Random randomGen = new Random();
     // Random probability factor
     probFactor = randomGen.nextDouble();
 
-    double fitChild = st.getFitness(child);
-    double fitParent = st.getFitness(parent);
-
-    if (fitChild > fitParent) {
+    double fitNew = fitnessCalculator.getFitness(newChromosom);
+    double fitOld = fitnessCalculator.getFitness(oldChromosome);
+    
+    if (fitNew > fitOld) {
       return true;
     } else {
       // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-(fitParent - fitChild) / this.temp)))) > probFactor) {   
+      if ((Math.min(1, (Math.exp(-(fitOld - fitNew) / this.temp)))) > probFactor) {   
         this.temp = this.gamma * this.temp;
         return true;
       }

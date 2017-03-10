@@ -3,5 +3,5 @@
  * 
  * @author Pedro Cuadra
  */
-package alg.util.genetics;
+package alg.util.jenetics;
 
