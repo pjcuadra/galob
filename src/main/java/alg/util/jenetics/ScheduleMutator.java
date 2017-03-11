@@ -5,14 +5,9 @@
 package alg.util.jenetics;
 
 import alg.util.HeterogeneousComputingEnv;
-import alg.util.SimulatedAnnealing;
-import alg.util.Util;
+import alg.util.graph.GraphNode;
 
-import org.jenetics.Alterer;
-import org.jenetics.Chromosome;
-import org.jenetics.Genotype;
-import org.jenetics.Phenotype;
-import org.jenetics.Population;
+import org.jenetics.SwapMutator;
 import org.jenetics.util.MSeq;
 
 import java.util.ArrayList;
@@ -26,23 +21,11 @@ import java.util.Random;
  * @author Sudheera Bandi
  *
  */
-public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
+public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
   /**
-   * Mutation probability.
+   * Heterogeneous computing environment.
    */
-  private double probMutator;
-  /**
-   * Levels partitioning of dependencies.
-   */
-  private ArrayList<ArrayList<Integer>> levels;
-  /**
-   * Object of simulated anneling.
-   */
-  private SimulatedAnnealing simAnne;
-  /**
-   * Flag to indicate if simulated anealing is required.
-   */
-  private boolean isSimulated;
+  private HeterogeneousComputingEnv env;
 
   /**
    * Constructor.
@@ -51,120 +34,74 @@ public class ScheduleMutator implements Alterer<ScheduleGene, Double> {
    * @param probMutator mutating probability 
    */
   public ScheduleMutator(HeterogeneousComputingEnv env, double probMutator) {
-    this.probMutator = probMutator;
-    isSimulated = false;
-    levels =  Util.getDependenciesLevels(env.getDependencyMatrix()); 
-  }
-
-  /**
-   * Mutate a chromosome by swapping two genes of same dependency level.
-   * 
-   * @param chromosome chromosome to be mutated
-   * @return mutated chromosome
-   */
-  public ScheduleChromosome mutateChromosome(ScheduleChromosome chromosome) {
-    ScheduleChromosome childChromosome;
-    Random randomGen = new Random();
-    int randLevel = randomGen.nextInt(levels.size());
-    int firstGeneLocus = 0;
-    int secondGeneLocus = 0;
-
-    if (levels.get(randLevel).size() < 2) {
-      return null;
-    }
-
-    Integer firstGene = 0;
-    Integer secondGene = 0;
-
-    // Shuffle and get candidates
-    Collections.shuffle(levels.get(randLevel));
-    firstGene = levels.get(randLevel).get(0);
-    secondGene = levels.get(randLevel).get(1);
-
-    // Get the locus of the genes
-    for (int i = 0; i < chromosome.length(); i++) {
-      if (chromosome.getGene(i).getAllele().getTaskId() == firstGene) {
-        firstGeneLocus = i;
-      }
-
-      if (chromosome.getGene(i).getAllele().getTaskId() == secondGene) {
-        secondGeneLocus = i;
-      }
-    }
-
-    final MSeq<ScheduleGene> cSeq = chromosome.toSeq().copy();
-
-    // Swap genes
-    if (secondGeneLocus != firstGeneLocus) {
-
-      Collections.swap(cSeq.asList(), secondGeneLocus, firstGeneLocus);
-
-      childChromosome = chromosome.newInstance(cSeq.toISeq());
-
-      //check if simulated anealing is required
-      if (isSimulated) {
-        // use the fitness functions for loadbalancing if the mutation is on loadbalancing 
-        if (simAnne.checkCriteria(chromosome, childChromosome)) {
-          return childChromosome;
-        }
-        
-        return null;
-      }
-      
-      return childChromosome;
-
-    }
-    return null;
-
-
+    super(probMutator);
+    this.env = env;
   }
 
   /* (non-Javadoc)
-   * @see org.jenetics.Alterer#alter(org.jenetics.Population, long)
+   * @see org.jenetics.SwapMutator#mutate(org.jenetics.util.MSeq, double)
    */
   @Override
-  public int alter(Population<ScheduleGene, Double> population, long generation) {
+  protected int mutate(final MSeq<ScheduleGene> genes, final double prob) {
     Random randomGen = new Random();
-    Genotype<ScheduleGene> genotype;
-    int alteredGenes = 0;
-    ScheduleChromosome chromosome;
+    
+    // If probability not meet return and don't mutate
+    if (randomGen.nextDouble() < prob) {
+      return 0;
+    }
+    
+    int randLevel = randomGen.nextInt(env.getMaxTopologicalLevel());
+    int firstGeneLocus = 0;
+    int secondGeneLocus = 0;
+    ArrayList<GraphNode> level = env.getTologicalLevelNodes(randLevel);
 
-    for (Phenotype<ScheduleGene, Double> phenoType: population) {
-      // Randomly decide if this individual is going to mutate
-      if (randomGen.nextInt(100) + 0.001 > probMutator * 100) {
-        continue;
-      }
-
-      genotype = phenoType.getGenotype();
-
-      // Copy the chromosome sequence
-      final MSeq<Chromosome<ScheduleGene>> cSeq = genotype.toSeq().copy();
-
-      // Decide randomly which chromosome to mutate
-      final int chromosomeIdxToMutate = randomGen.nextInt(genotype.length());
-
-      // Mutate the chromosome
-      chromosome = (ScheduleChromosome) genotype.getChromosome(chromosomeIdxToMutate);
-      chromosome = mutateChromosome(chromosome);
-
-      // If no mutation was performed then continue
-      if (chromosome == null) {
-        continue;
-      }
-
-      // Modified genes are done in pairs
-      alteredGenes += 2;
-
-      // Replace the chromosome with the mutated chromosome
-      cSeq.set(chromosomeIdxToMutate, chromosome);
-
-      // Replace the phenotype with the mutated phenotype
-      population.set(
-          population.indexOf(phenoType),
-          phenoType.newInstance(Genotype.of(cSeq.toISeq()), generation));
+    if (level.size() < 2) {
+      return 0;
     }
 
-    return alteredGenes;
+    // Shuffle and get candidates
+    Collections.shuffle(level);
+    final Integer firstGene = level.get(0).getTaskId();
+    final Integer secondGene = level.get(1).getTaskId();
+    
+    // Get the locus of the genes
+    for (int i = 0; i < genes.size(); i++) {
+      if (genes.get(i).getAllele().getTaskId() == firstGene) {
+        firstGeneLocus = i;
+      }
+
+      if (genes.get(i).getAllele().getTaskId() == secondGene) {
+        secondGeneLocus = i;
+      }
+    }
+    
+    // Apply mutation
+    if (secondGeneLocus != firstGeneLocus) {
+      ScheduleChromosome chrFac = new ScheduleChromosome(env);
+      
+      ScheduleChromosome oldChr = chrFac.newInstance(genes.toISeq().copy().toISeq());
+      //
+      genes.swap(firstGeneLocus, secondGeneLocus);
+      
+      ScheduleChromosome newChr = chrFac.newInstance(genes.toISeq());
+      //
+      //check if simulated annealing is required
+      if (env.getSimulatedAnnealingEnabled()) {
+        if (env.getSimulatedAnnealing().checkCriteria(oldChr, newChr)) {
+          return 2;
+        }
+        
+        // If criteria not meet unswap genes
+        genes.swap(firstGeneLocus, secondGeneLocus);
+        return 0;
+      }
+
+      return 2;
+    }
+
+    return 2;
+    
   }
+
 
 }
