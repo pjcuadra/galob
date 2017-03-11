@@ -48,7 +48,7 @@ public class LoadBalancingExample {
   /**
    * Crossover probability.
    */
-  static final double CROSSOVER_PROBABILITY = 0.00;
+  static final double CROSSOVER_PROBABILITY = 0.50;
   /**
    * Fitness function filtering factor.
    */

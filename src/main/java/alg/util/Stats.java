@@ -117,8 +117,11 @@ public class Stats {
         continue;
       }
       
-      // Add communication costs
-      tempStartTime += graph.getEdgeWeight(edge);
+      // If were allocated in the same core don't add communications
+      if (getExecutionUnit(node.getTaskId()) != getExecutionUnit(anc.getTaskId())) {
+        // Add communication costs
+        tempStartTime += graph.getEdgeWeight(edge);
+      }
       
       if (tempStartTime > startTime) {
         startTime = tempStartTime;
@@ -126,12 +129,11 @@ public class Stats {
           
     }
     
-    startTime += getExecutionUnit(node.getTaskId());
+    startTime += node.getExecutionTimeOnUnit(getExecutionUnit(node.getTaskId()));
     
     node.setValue(startTime);
     
     return startTime;
-    
     
   }
   
