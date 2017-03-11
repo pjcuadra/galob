@@ -56,6 +56,7 @@ public class HeterogeneousComputingEnv extends Graph {
     
     // Set added tasks counter to zero
     this.addedTasks = 0;
+    
   }
   
   /**
@@ -246,7 +247,4 @@ public class HeterogeneousComputingEnv extends Graph {
       boolean maxProvided) {
     return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
   }
-  
-  
-  
 }

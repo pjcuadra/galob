@@ -48,7 +48,7 @@ public class LoadBalancingExample {
   /**
    * Crossover probability.
    */
-  static final double CROSSOVER_PROBABILITY = 0.80;
+  static final double CROSSOVER_PROBABILITY = 0.00;
   /**
    * Fitness function filtering factor.
    */
@@ -109,6 +109,7 @@ public class LoadBalancingExample {
         .alterers(
             new ScheduleMutator(env, MUTATION_PROBABILITY),
             new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+        .individualCreationRetries(1)
         .build();
 
     // Create evolution statistics consumer.

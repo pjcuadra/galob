@@ -16,8 +16,6 @@ import org.jenetics.RouletteWheelSelector;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionStatistics;
 
-
-
 /**
  * Example of execution time optimization.
  * 

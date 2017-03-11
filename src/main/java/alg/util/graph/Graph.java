@@ -21,6 +21,14 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * Edges list.
    */
   private ArrayList<DefaultWeightedEdge> edges;
+  /**
+   * Levels partitioning of dependencies.
+   */
+  private ArrayList<ArrayList<GraphNode>> levels;
+  /**
+   * Node to topological level mapping.
+   */
+  private ArrayList<Integer> nodeLevelMap;
 
   /**
    * Constructor.
@@ -29,6 +37,9 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     super(new GraphEdgeFactory());
     
     edges = new ArrayList<DefaultWeightedEdge>();
+    
+    nodeLevelMap = new ArrayList<Integer>();
+    
   }
   
   /**
@@ -47,6 +58,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     setEdgeWeight(edge, cost);
     
     edges.add(edge);
+    
   }
   
   /**
@@ -58,6 +70,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
   protected GraphNode getGraphNodeById(int id) {
     Iterator<GraphNode> it = this.iterator();
     
+    // TODO: This can be improved by a hashmap
     while (it.hasNext()) {
       GraphNode node = it.next();
       
@@ -102,10 +115,97 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
             
     }
     
+    // This shouldn't be created again.
+    graph.levels = levels;    
     
     return graph;
   }
   
+  /**
+   * Updates the topological levels lists.
+   */
+  private void buildTopologicalLevels() {
+    levels = new ArrayList<ArrayList<GraphNode>>();
+    levels.add(new ArrayList<GraphNode>());
+    nodeLevelMap.clear();
+    
+    Iterator<GraphNode> it = this.iterator();
+    
+    // Assumes that the nodes are topologically ordered
+    while (it.hasNext()) {
+      GraphNode currNode = it.next();
+      
+      int nodeLevel = 0;
+      
+      // Get maximum level inherited from predecesors
+      for (GraphNode depNode: getAncestors(this, currNode)) {
+        if (nodeLevel > depNode.getValue() + 1) {
+          nodeLevel = (int) (depNode.getValue() + 1);
+        }
+      }
+      
+      // If level is bigger add new level (works because of the iteration order)
+      while (nodeLevel + 1 > levels.size()) {
+        levels.add(new ArrayList<GraphNode>());
+      }
+      
+      // If nodeLevelMap size isn't big enough
+      while (currNode.getTaskId() + 1 > nodeLevelMap.size()) {
+        nodeLevelMap.add(new Integer(0));
+      }
+      
+      // Add node to the level
+      levels.get(nodeLevel).add(currNode);
+      currNode.setValue(nodeLevel);
+      nodeLevelMap.add(currNode.getTaskId(), new Integer(nodeLevel));
+    }
+    
+  }
+  
+  /**
+   * Get the list of nodes in a given topological level.
+   * 
+   * @param topoIndex topological level index
+   * @return list of nodes in the topological level
+   */
+  public ArrayList<GraphNode> getTologicalLevelNodes(int topoIndex) {
+    if (levels == null) {
+      buildTopologicalLevels();
+    }
+    
+    assert topoIndex < levels.size() : "Out of bound topological level";
+    
+    return levels.get(topoIndex);
+  }
+  
+  /**
+   * Get the maximum topological level.
+   * 
+   * @return maximum topological level
+   */
+  public int getMaxTopologicalLevel() {
+    if (levels == null) {
+      buildTopologicalLevels();
+    }
+    
+    return levels.size();
+  }
+  
+  /**
+   * Get topological level of a node.
+   * 
+   * @param taskId task id
+   * @return topological level of given node
+   */
+  public int getNodeTopologicalLevel(int taskId) {
+    if (levels == null) {
+      buildTopologicalLevels();
+    }
+    
+    assert taskId < nodeLevelMap.size();
+    
+    return (int) nodeLevelMap.get(taskId);
+  }
   
 
 }

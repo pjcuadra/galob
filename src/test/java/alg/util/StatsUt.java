@@ -50,7 +50,7 @@ public class StatsUt {
   public void checkDeltaMatrix() {
     double[][] matrix;
     int count = 0;
-    matrix = Util.getRandomDeltaMatrix(numTask);
+    matrix = Util.createRandomDependencyMatrix(numTask);
     
     // Lower diagonal has to be zero
     for (int i = numTask; i < numTask; i++) {
@@ -79,7 +79,7 @@ public class StatsUt {
     double[][] matrix;
     boolean flag = false;
 
-    matrix = Util.getRandomComcostmatrix(Util.getRandomDeltaMatrix(numTask)); 
+    matrix = Util.createRandomCommunicationCostsMatrix(Util.createRandomDependencyMatrix(numTask)); 
 
     for (int i = 0; i < numTask; i++) {
       if (matrix[i][i] != 0) {

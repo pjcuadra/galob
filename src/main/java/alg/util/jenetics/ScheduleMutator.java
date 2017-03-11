@@ -42,7 +42,7 @@ public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
    * @see org.jenetics.SwapMutator#mutate(org.jenetics.util.MSeq, double)
    */
   @Override
-  protected int mutate(final MSeq<ScheduleGene> genes, final double prob) {
+  public int mutate(final MSeq<ScheduleGene> genes, final double prob) {
     Random randomGen = new Random();
     
     // If probability not meet return and don't mutate

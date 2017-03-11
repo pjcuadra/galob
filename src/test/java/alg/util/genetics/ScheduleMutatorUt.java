@@ -20,6 +20,7 @@ import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
 import org.jenetics.Phenotype;
 import org.jenetics.Population;
+import org.jenetics.util.MSeq;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -105,19 +106,19 @@ public class ScheduleMutatorUt {
   @Test
   public void singleMutation() {
     ScheduleChromosome originalChromosome = new ScheduleChromosome(env);
-    ScheduleChromosome mutatedChromosome = originalChromosome.clone();
+    MSeq<ScheduleGene> mutationSeq = originalChromosome.toSeq().copy();
     int alterations = 0;
     int alterationsCount = 0;
 
     // Mutate the chromosome
-    mutatedChromosome = (ScheduleChromosome) mutator.mutateChromosome(originalChromosome);
+    alterations = mutator.mutate(mutationSeq, 1);
+    
+    // Create mutated chromosome
+    ScheduleChromosome mutatedChromosome = originalChromosome.newInstance(mutationSeq.toISeq());
 
-    if (mutatedChromosome !=  null) {
-      alterations = 2;
-
-
-      alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
-    }
+    // Count alterations
+    alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
+    
     assertEquals(alterationsCount, alterations);
     
   }

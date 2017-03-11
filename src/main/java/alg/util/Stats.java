@@ -143,6 +143,8 @@ public class Stats {
    */
   private int getExecutionUnit(int task) {
     
+    assert omega[0].length > task : "Task index out of bound";
+    
     for (int i = 0; i < omega.length; i++) {
       if (omega[i][task] == 1) {
         return i;

@@ -6,7 +6,6 @@ import alg.util.jenetics.ScheduleGene;
 
 import org.jenetics.util.ISeq;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
@@ -56,7 +55,7 @@ public class Util {
    * @param numTasks number of tasks
    * @return dependency matrix
    */
-  public static double[][] getRandomDeltaMatrix(int numTasks) {
+  public static double[][] createRandomDependencyMatrix(int numTasks) {
     Random randomGen = new Random();
     
 
@@ -78,7 +77,7 @@ public class Util {
    * @param  delta the dependency matrix
    * @return communication cost matrix
    */
-  public static double[][] getRandomComcostmatrix(double[][] delta) {
+  public static double[][] createRandomCommunicationCostsMatrix(double[][] delta) {
     return matrixParallelMultiply(
         createRandomMatrix(delta.length, delta[0].length), 
         delta);
@@ -150,6 +149,29 @@ public class Util {
         .map(i -> i)
         .sum();
   }
+  
+  /**
+   * Get sum of values of a given column.
+   * 
+   * @param matrix values matrix
+   * @param col given col
+   * @return sum of values of given row
+   */
+  public static double getColSum(double[][] matrix, int col) {
+    
+    // Verify parameters
+    assert col < matrix[0].length;
+    
+    double sum = 0;
+
+    // Iterate over the rows
+    for (int i = 0; i < matrix.length; i++) {
+      // Add all elements in the col
+      sum += matrix[i][col];
+    }
+    
+    return sum;
+  }
 
   /**
    * Check if the given column has all zeroes.
@@ -166,7 +188,6 @@ public class Util {
 
     // Iterate over the rows
     for (int i = 0; i < matrix.length; i++) {
-      // Add all elements in the col
       if (matrix[i][col] != 0) {
         return false;
       }
@@ -186,7 +207,7 @@ public class Util {
     // Verify parameters
     assert row < matrix.length;
     
-    matrix[row] = Arrays.stream(matrix[row]).map(i -> 0).toArray();
+    matrix[row] = DoubleStream.generate(() -> 0).limit(matrix.length).toArray();
     
   }
 
@@ -199,6 +220,12 @@ public class Util {
    * @return multiplied matrix
    */
   public static double[][] matrixParallelMultiply(double[][] matrixA, double[][] matrixB) {
+    // Verify parameters
+    assert matrixA.length > 0 : "Invalid matrices dimensions";
+    assert matrixA.length == matrixB.length : "Invalid matrices dimensions";
+    assert matrixA[0].length > 0 : "Invalid matrices dimensions";
+    assert matrixA[0].length == matrixB[0].length : "Invalid matrices dimensions";
+    
     double[][] resMatrix =  new double[matrixA.length][matrixA[0].length];
     
     for (int i = 0; i < resMatrix.length; i++) {
@@ -210,58 +237,6 @@ public class Util {
     return resMatrix;
   }
 
-  /**
-   * Create the levels representation of the dependencies.
-   * 
-   * @param delta dependencies matrix
-   */
-  public static ArrayList<ArrayList<Integer>> getDependenciesLevels(double[][] delta) {
-    ArrayList<ArrayList<Integer>> levels = new ArrayList<ArrayList<Integer>>();
-    ArrayList<Integer> toDet = new ArrayList<Integer>();
-    ArrayList<Integer> thisLevel;
-    double[][] myDelta = Util.copyMatrix(delta);
-    for (int i = 0; i < delta.length ;i++) {
-      toDet.add(new Integer(i));
-    }
-
-    while (!toDet.isEmpty()) {
-      thisLevel =  new ArrayList<Integer>();
-
-      for (Integer task = 0; task < delta.length; task++) {
-
-        if (!toDet.contains(task)) {
-          continue;
-        }
-
-
-        /*
-         * check if there is a dependency with a successive task
-         * check for ones in the column
-         */
-
-        if (!(Util.checkColZero(myDelta, task))) {
-          continue;
-        }
-
-        toDet.remove(task);
-
-        thisLevel.add(task);
-
-      }
-      for (Integer iterator:thisLevel) {
-        //to clear the elements of the row
-        Util.clearRow(myDelta, iterator);
-      }
-
-      levels.add(thisLevel);
-
-
-    }
-    
-    return levels;
-
-  }
-  
   /**
    * Fills the graph inside the HCE.
    * 
@@ -345,8 +320,8 @@ public class Util {
     HeterogeneousComputingEnv env = createRandomEnv(numTasks, numCores, maxProvided);
     
     // Create random dependencies, communication costs and etc matrices
-    double[][] delta = getRandomDeltaMatrix(env.getNumberOfTasks());
-    double[][] commCost = getRandomComcostmatrix(delta);
+    double[][] delta = createRandomDependencyMatrix(env.getNumberOfTasks());
+    double[][] commCost = createRandomCommunicationCostsMatrix(delta);
     double[][] etc = createRandomMatrix(env.getNumberOfTasks(), env.getNumberOfExecutors());
     
     // Build the graph
@@ -370,7 +345,7 @@ public class Util {
     HeterogeneousComputingEnv env = createRandomEnv(numTasks, numCores, maxProvided);
     
     // Create random dependencies, communication costs and etc matrices
-    double[][] delta = getRandomDeltaMatrix(env.getNumberOfTasks());
+    double[][] delta = createRandomDependencyMatrix(env.getNumberOfTasks());
     double[][] commCost = copyMatrix(delta);
     double[][] etc = createOnesMatrix(env.getNumberOfTasks(), env.getNumberOfExecutors());
     

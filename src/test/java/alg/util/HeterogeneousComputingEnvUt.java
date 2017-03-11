@@ -393,5 +393,21 @@ public class HeterogeneousComputingEnvUt {
     }
     
   }
-
+  
+  /**
+   * Test getTologicalLevelNodes.
+   */  
+  @Test
+  public void getTologicalLevelNodes() {
+    assertTrue(false);
+  }
+  
+  /**
+   * Test getMaxTopologicalLevel.
+   */  
+  @Test
+  public void getMaxTopologicalLevel() {
+    assertTrue(false);
+  }
+   
 }
