@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import alg.LoadBalancingFitnessCalculator;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Random;
@@ -15,11 +16,11 @@ public class SimulatedAnnealingTest {
    */
   private Random randomGen;
   /**
-   * Max. temp.
+   * Max. temperature.
    */
   private static final int MAX_TEMP = 1000;
   /**
-   * Current temp.
+   * Current temperature.
    */
   private static double randTemp;
   /**
@@ -55,6 +56,7 @@ public class SimulatedAnnealingTest {
 
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testCheckCriteria() throws Exception {
     throw new RuntimeException("not yet implemented");

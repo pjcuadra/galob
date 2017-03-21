@@ -5,9 +5,7 @@
 package alg.util.graph;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 
 /**
@@ -20,14 +18,6 @@ import org.junit.BeforeClass;
 public class GraphTest {
 
   //  private Random randomGen;
-
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-  }
 
   /**
    * Unit testing set-up.

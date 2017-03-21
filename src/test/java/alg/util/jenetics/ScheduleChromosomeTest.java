@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -191,56 +192,67 @@ public class ScheduleChromosomeTest {
 
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testIsValid() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testIterator() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testNewInstance() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetGene() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testLength() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testToSeq() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testOf() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testClone() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testSetStats() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetStats() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testHasStats() throws Exception {
     throw new RuntimeException("not yet implemented");

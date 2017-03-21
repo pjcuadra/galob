@@ -107,10 +107,6 @@ public class ScheduleMutatorTest {
   public void populationMutattion() {
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
     
-    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
-        maxNumExecutors, 
-        true);
-    
     ExecutionTimeFitnessCalculator myOpt = new ExecutionTimeFitnessCalculator(env);
     ScheduleCodec codec = new ScheduleCodec(env);
     Phenotype<ScheduleGene, Double> phenoFactory;

@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -105,9 +106,9 @@ public class UtilTest {
   /**
    * Tests graphBuilder.
    */
+  @Ignore("Note yet implemented")
   @Test
   public void testGraphBuilder() {
-    assertTrue(false);
   }
   
   @Test
@@ -128,6 +129,8 @@ public class UtilTest {
     assertEquals(count, 0);
   }
 
+  
+  @Ignore("Note yet implemented")
   @Test
   public void testCreateRandomCommunicationCostsMatrix() throws Exception {
     throw new RuntimeException("not yet implemented");
@@ -193,11 +196,13 @@ public class UtilTest {
     }
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetColSum() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetRowSum() throws Exception {
     testCreateOnesMatrix();
@@ -255,21 +260,25 @@ public class UtilTest {
     assertEquals(numTask, randomRow.length);
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testCreateOmegaMatrix() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testOfRandomUnitary() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testOfRandom() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testCreateRandomEnv() throws Exception {
     throw new RuntimeException("not yet implemented");

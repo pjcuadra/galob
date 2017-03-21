@@ -79,9 +79,10 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
           // unswap: return the original chromosome as the criteria failed.
           other = tempother.copy();
         }
-
+      } else {
+        modified = 2;
       }
-      return modified;
+      
     }
       
     return modified;    

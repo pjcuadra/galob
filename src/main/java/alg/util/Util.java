@@ -63,7 +63,7 @@ public class Util {
     // Initialize the upper triangular matrix with ones randomly
 
     for (int i = 0; i < numTasks; i++) {
-      for (int j = i + 1; j < numTasks; j++) {
+      for (int j = 0; j < i; j++) {
         depend[i][j] = randomGen.nextBoolean() ? 1 : 0;
       }
     }

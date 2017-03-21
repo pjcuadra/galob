@@ -145,7 +145,8 @@ public class Stats {
    */
   private int getExecutionUnit(int task) {
     
-    assert omega[0].length > task : "Task index out of bound";
+    assert omega[0].length > task : "Task index out of bound: " + omega[0].length 
+    + " maximum, " + task + " provided.";
     
     for (int i = 0; i < omega.length; i++) {
       if (omega[i][task] == 1) {
@@ -210,6 +211,12 @@ public class Stats {
     
     double[] nodesExecutionTime = getNodesExecutionTime();
     double avgTime = getAverageTime();
+    
+    // Take the case when only one core is available 
+    if (nodesExecutionTime.length == 1) {
+      stdDev = new Double(0);
+      return stdDev;
+    }
     
     stdDev = Arrays.stream(nodesExecutionTime)
       .map(i -> Math.pow(i - avgTime, 2))

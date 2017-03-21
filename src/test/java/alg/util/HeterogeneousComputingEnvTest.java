@@ -209,7 +209,7 @@ public class HeterogeneousComputingEnvTest {
   @Test
   public void testAddTask() {
     double[] etcRow = {1, 2, 3};
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(numTasks, etcRow.length);
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(numTasks + 1, etcRow.length);
     GraphNode task;
     
     // Add the task

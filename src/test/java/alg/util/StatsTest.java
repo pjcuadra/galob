@@ -5,9 +5,10 @@
 package alg.util;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Random;
+//import java.util.Random;
 
 /**
  * Utils unit testing.
@@ -20,11 +21,11 @@ public class StatsTest {
   /**
    * Random generator.
    */
-  private Random randomGen;
+//  private Random randomGen;
   /**
    * Number of tasks.
    */
-  private int numTask;
+//  private int numTask;
   /**
    * Max. number of tasks.
    */
@@ -44,36 +45,43 @@ public class StatsTest {
 
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetNodesExecutionTime() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetActualFinishTime() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetExecutionUnit() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetTotalTime() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetAverageTime() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetStdDev() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
+  @Ignore("Note yet implemented")
   @Test
   public void testGetFitness() throws Exception {
     throw new RuntimeException("not yet implemented");
