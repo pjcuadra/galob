@@ -2,20 +2,20 @@ package examples;
 
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 
-import alg.LoadBalancing;
-import alg.util.SimulatedAnneling;
-import alg.util.Util;
-import alg.util.genetics.ScheduleCrossover;
-import alg.util.genetics.ScheduleGene;
-import alg.util.genetics.ScheduleMutator;
+import alg.LoadBalancingFitnessCalculator;
+import alg.util.HeterogeneousComputingEnv;
+import alg.util.SimulatedAnnealing;
+import alg.util.graph.GraphNode;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleCrossover;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
+import alg.util.jenetics.ScheduleStatistics;
 
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.RouletteWheelSelector;
 import org.jenetics.engine.Engine;
-import org.jenetics.engine.EvolutionStatistics;
-
-
 
 /**
  * Example of load balacing optimization.
@@ -25,112 +25,149 @@ import org.jenetics.engine.EvolutionStatistics;
  *
  */
 public class LoadBalancingExample {
-
-  static final int numOfTasks = 10;
-  static final int numOfExecutors = 3;
-  static final double gamma = 0.85;
-
-  /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-  static final double[][] etc = {{14, 13, 11, 13, 12, 13, 7, 5, 18, 21},
-      {16, 19, 13, 8, 13, 16, 15, 11, 12, 7},
-      {9, 18, 19, 17, 10, 9, 11, 14, 20, 16}};
+  /**
+   * Number of tasks.
+   */
+  static final int NUM_TASKS = 10;
+  /**
+   * Number of executors.
+   */
+  static final int NUM_EXECUTORS = 3;
+  /**
+   * Gamma value of simulated annealing.
+   */
+  static final double SA_GAMMA_COOLING_FACTOR = 0.9;
+  /**
+   * Initial temperature of simulated annealing.
+   */
+  static final double SA_INITIAL_TEMPERATURE = 900;
+  /**
+   * Mutation probability.
+   */
+  static final double MUTATION_PROBABILITY = 0.01;
+  /**
+   * Crossover probability.
+   */
+  static final double CROSSOVER_PROBABILITY = 0.50;
+  /**
+   * Fitness function filtering factor.
+   */
+  static final double ALPHA_FILTERING_FACTOR = 0.85;
+  /**
+   * Generations limit.
+   */
+  static final int GEN_LIMIT = 10000;
+  /**
+   * Initial population size.
+   */
+  static final int POPULATION_SIZE = 15;
+  /** 
+   * Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example). 
+   */
+  static final double[][] ETC = {{14, 16, 9},
+                                 {13, 19, 18},
+                                 {11, 13, 19},
+                                 {13, 8, 17},
+                                 {12, 13, 10},
+                                 {13, 16, 9},
+                                 {7, 15, 11},
+                                 {5, 11, 14},
+                                 {18, 12, 20},
+                                 {21, 7, 16}};
+  /**
+   * Heterogeneous Computing Environment.
+   */
+  static final HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(NUM_TASKS, 
+      NUM_TASKS);
 
   /**
    * Main function.
    * @param args command line parameters
    */
-
   public static void main(String[] args) {
-    double[][] delta = Util.createEmptyMatrix(numOfTasks, numOfTasks);
-
-
-    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-    delta[0][1] = 1;
-    delta[0][2] = 1;
-    delta[0][3] = 1;
-    delta[0][4] = 1;
-    delta[0][5] = 1;
-
-    delta[1][7] = 1;
-    delta[1][8] = 1;
-
-    delta[2][6] = 1;
-
-    delta[3][7] = 1;
-    delta[3][8] = 1;
-
-    delta[4][8] = 1;
-
-    delta[5][7] = 1;
-
-    delta[6][9] = 1;
-    delta[7][9] = 1;
-    delta[8][9] = 1;
-
-
-    double[][] comCost = Util.createEmptyMatrix(numOfTasks, numOfTasks);
-
-    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-    comCost[0][1] = 18;
-    comCost[0][2] = 12;
-    comCost[0][3] = 9;
-    comCost[0][4] = 11;
-    comCost[0][5] = 14;
-
-    comCost[1][7] = 19;
-    comCost[1][8] = 16;
-
-    comCost[2][6] = 23;
-
-    comCost[3][7] = 27;
-    comCost[3][8] = 23;
-
-    comCost[4][8] = 13;
-
-    comCost[5][7] = 15;
-
-    comCost[6][9] = 17;
-    comCost[7][9] = 11;
-    comCost[8][9] = 13;
     
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.8, comCost);
-    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.9, 900, loadBal);
+    // Initialize dependency matrix
+    buildEnvironment();
+    
+    // Create load balancing statistics calculator
+    LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 
+        ALPHA_FILTERING_FACTOR);
+    
+    // Add simulated annealing to the environment
+    env.setSimulatedAnnealing(new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
+        SA_INITIAL_TEMPERATURE,
+        loadBal));
 
-    /* The values in this examples are taken form "A fast hybrid genetic 
-     * algorithm in heterogeneous computing environment" (Zhiyang Jiang, 
-     * Shengzhong Feng) */
     // Configure and build the evolution engine.
-    final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
+    final Engine<alg.util.jenetics.ScheduleGene, Double> engine = Engine
         .builder(
             loadBal::getFitness,
-            loadBal.ofSeq())
-        .populationSize(100)
-        .optimize(Optimize.MAXIMUM)
+            (new ScheduleCodec(env)).ofChromosome())
+        .populationSize(POPULATION_SIZE)
+        .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            // use simulated annealing technique
-            new ScheduleMutator(delta, 0.01, simAnn),
-            new ScheduleCrossover(delta, 0.8, simAnn))
+            new ScheduleMutator(env, MUTATION_PROBABILITY),
+            new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+        .individualCreationRetries(1)
         .build();
 
     // Create evolution statistics consumer.
-    final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
+    final ScheduleStatistics statistics = new ScheduleStatistics(env);
 
+    // Run evolution stream
     final Phenotype<ScheduleGene, Double> best = engine.stream()
-        // The evolution will stop after maximal 10000
-        // generations.
-        .limit(10000)
-        // Update the evaluation statistics after
-        // each generation
         .peek(statistics)
-        // Collect (reduce) the evolution stream to
-        // its best phenotype.
+        .limit(GEN_LIMIT)
         .collect(toBestPhenotype());
 
-    System.out.println("Finished!");
-    System.out.println(statistics);
+    statistics.showStats();
     System.out.println("Loadbalanced solution:");
     System.out.println(best);
+  }
+  
+  /**
+   * Initialize the HCE.
+   */
+  private static void buildEnvironment() {
+    GraphNode[] tasks = new GraphNode[NUM_TASKS];
+    
+    // Create all tasks
+    for (int i = 0; i < ETC.length; i++) {
+      tasks[i] = env.addTask(ETC[i]);
+    }
+        
+    // Create dependencies
+    /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
+    
+    // From task 0
+    env.addDependency(tasks[0], tasks[1], 18);
+    env.addDependency(tasks[0], tasks[2], 12);
+    env.addDependency(tasks[0], tasks[3], 9);
+    env.addDependency(tasks[0], tasks[4], 11);
+    env.addDependency(tasks[0], tasks[5], 14);
+
+    // From task 1
+    env.addDependency(tasks[1], tasks[7], 19);
+    env.addDependency(tasks[1], tasks[8], 16);
+    
+    // From task 2
+    env.addDependency(tasks[2], tasks[6], 23);
+
+    // From task 3
+    env.addDependency(tasks[3], tasks[7], 27);
+    env.addDependency(tasks[3], tasks[8], 23);
+
+    // From task 4
+    env.addDependency(tasks[4], tasks[8], 13);
+
+    // From task 5
+    env.addDependency(tasks[5], tasks[7], 15);
+
+    // To task 9
+    env.addDependency(tasks[6], tasks[9], 17);
+    env.addDependency(tasks[7], tasks[9], 11);
+    env.addDependency(tasks[8], tasks[9], 13);
   }
 
 }

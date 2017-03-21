@@ -2,21 +2,25 @@
  * Schedule Mutator unit testing.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import static org.junit.Assert.assertEquals;
 
-import alg.ExecutionTime;
-import alg.LoadBalancing;
+import alg.ExecutionTimeFitnessCalculator;
+import alg.LoadBalancingFitnessCalculator;
+import alg.util.HeterogeneousComputingEnv;
+import alg.util.SimulatedAnnealing;
 
-import alg.util.SimulatedAnneling;
-
-import alg.util.Util;
+import alg.util.jenetics.ScheduleChromosome;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
 
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
 import org.jenetics.Phenotype;
 import org.jenetics.Population;
+import org.jenetics.util.MSeq;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,17 +37,15 @@ import java.util.Random;
  * @author Sudheera Bandi
  *
  */
-public class ScheduleMutatorUt {
+public class ScheduleMutatorTest {
 
   private Random randomGen;
 
-  private int numTask;
-  private int executors;
   static final int maxNumTask = 16 /* Actual max*/;
   static final int maxNumExecutors = 16 /* Actual max*/;
   static final int maxPopulation = 50 /* Actual max*/;
   private ScheduleMutator mutator;
-  private double[][] delta;
+  HeterogeneousComputingEnv env;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -60,22 +62,20 @@ public class ScheduleMutatorUt {
    */
   @Before
   public void setUp() throws Exception {
-
+    
     randomGen = new Random();
 
-    numTask =  1 + randomGen.nextInt(maxNumTask);
-    executors =  1 + randomGen.nextInt(maxNumExecutors);
-    double[][] etc = Util.getOnesMatrix(executors, numTask);
-   
-    // Create new dependencies randomly
-    delta = Util.getDeltaMatrix(numTask);
-    double[][] comCost = Util.getComcostmatrix(delta);
-
-    LoadBalancing loadBal = new LoadBalancing(etc, delta, 0.6, comCost);
-    SimulatedAnneling simAnne = new SimulatedAnneling(0.8, 900, loadBal);
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
+        maxNumExecutors, 
+        false);
+    
+    LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 0.6);
+    SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal);
+    
+    env.setSimulatedAnnealing(simAnne);
    
     // Always mutate probability 1
-    mutator = new ScheduleMutator(delta, 0.6, simAnne);
+    mutator = new ScheduleMutator(env, 0.6);
 
   }
 
@@ -104,39 +104,20 @@ public class ScheduleMutatorUt {
   }
 
   @Test
-  public void singleMutation() {
-    ScheduleChromosome originalChromosome = new ScheduleChromosome(delta, executors);
-    ScheduleChromosome mutatedChromosome = originalChromosome.clone();
-    int alterations = 0;
-    int alterationsCount = 0;
-
-    // Mutate the chromosome
-    mutatedChromosome = (ScheduleChromosome) mutator.mutateChromosome(originalChromosome);
-
-    if (mutatedChromosome !=  null) {
-      alterations = 2;
-
-
-      alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
-    }
-    assertEquals(alterationsCount, alterations);
-    
-  }
-
-  @Test
   public void populationMutattion() {
-    double[][] myetc = Util.getOnesMatrix(executors, numTask);
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
-    ExecutionTime myOpt = new ExecutionTime(myetc, delta);
+    
+    ExecutionTimeFitnessCalculator myOpt = new ExecutionTimeFitnessCalculator(env);
+    ScheduleCodec codec = new ScheduleCodec(env);
     Phenotype<ScheduleGene, Double> phenoFactory;
     int populationSize;  
     int alterationsCount = 0;
 
     // Create a phenotype to be used as factory for others
     phenoFactory = Phenotype.of(
-        Genotype.of(ScheduleChromosome.of(delta, executors)), 
+        Genotype.of(ScheduleChromosome.of(env)), 
         0, 
-        gt -> myOpt.getFitness(myOpt.ofSeq().decode(gt))
+        gt -> myOpt.getFitness(codec.ofChromosome().decode(gt))
         );
 
     // Random population size
@@ -146,7 +127,7 @@ public class ScheduleMutatorUt {
     phenoList = new ArrayList<Phenotype<ScheduleGene, Double>>();
     for (int individualIdx = 0; individualIdx < populationSize; individualIdx++) {
       phenoList.add(
-          phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(delta, executors))));
+          phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(env))));
     }
 
     Population<ScheduleGene, Double> originalPopulation = Population.empty();
@@ -172,6 +153,25 @@ public class ScheduleMutatorUt {
     }
 
     // Verify the alterations match
+    assertEquals(alterationsCount, alterations);
+  }
+
+  @Test
+  public void testMutate() throws Exception {
+    ScheduleChromosome originalChromosome = new ScheduleChromosome(env);
+    MSeq<ScheduleGene> mutationSeq = originalChromosome.toSeq().copy();
+    int alterations = 0;
+    int alterationsCount = 0;
+
+    // Mutate the chromosome
+    alterations = mutator.mutate(mutationSeq, 1);
+    
+    // Create mutated chromosome
+    ScheduleChromosome mutatedChromosome = originalChromosome.newInstance(mutationSeq.toISeq());
+
+    // Count alterations
+    alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
+    
     assertEquals(alterationsCount, alterations);
   }
 }

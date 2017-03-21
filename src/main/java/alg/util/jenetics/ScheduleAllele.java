@@ -1,4 +1,4 @@
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import java.util.Random;
 
@@ -21,6 +21,9 @@ public class ScheduleAllele {
 
   /**
    * Constructor.
+   * 
+   * @param numTasks number of tasks
+   * @param numExecutors number of executors
    */
   public ScheduleAllele(int numTasks, int numExecutors) {
     Random randGen = new Random();
@@ -31,6 +34,7 @@ public class ScheduleAllele {
 
   /**
    * Constructor.
+   * 
    * @param numTask number of tasks
    * @param numExecutors number of executing units
    * @param taskId ID of the task
@@ -43,6 +47,7 @@ public class ScheduleAllele {
 
   /**
    * Get task ID.
+   * 
    * @return task ID
    */
   public int getTaskId() {
@@ -51,6 +56,7 @@ public class ScheduleAllele {
 
   /**
    * Get executor ID.
+   * 
    * @return executor ID
    */
   public int getExecutorId() {

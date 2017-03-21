@@ -14,7 +14,16 @@ repositories {
 }
 
 dependencies {
-    compile 'org.bitbucket.fwilhelm:org.jenetics:3.6.0'
+	// https://mvnrepository.com/artifact/org.knowm.xchart/xchart
+	compile group: 'org.knowm.xchart', name: 'xchart', version: '3.2.2'
+
+    // https://mvnrepository.com/artifact/io.jenetics/jenetics
+    compile group: 'io.jenetics', name: 'jenetics', version: '3.7.0'
+    
+    // JGraphT
+    compile 'org.jgrapht:jgrapht-core:0.9.0',
+            'org.jgrapht:jgrapht-ext:1.0.0',
+    	    'jgraph:jgraph:5.13.0.0'
     testCompile 'junit:junit:4.12'
 
 }

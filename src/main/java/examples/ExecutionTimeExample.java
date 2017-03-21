@@ -1,22 +1,20 @@
 package examples;
 
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
-import static org.jenetics.engine.limit.bySteadyFitness;
 
-import alg.ExecutionTime;
-import alg.util.SimulatedAnneling;
-import alg.util.Util;
-import alg.util.genetics.ScheduleCrossover;
-import alg.util.genetics.ScheduleGene;
-import alg.util.genetics.ScheduleMutator;
+import alg.ExecutionTimeFitnessCalculator;
+import alg.util.HeterogeneousComputingEnv;
+import alg.util.SimulatedAnnealing;
+import alg.util.jenetics.ScheduleCodec;
+import alg.util.jenetics.ScheduleCrossover;
+import alg.util.jenetics.ScheduleGene;
+import alg.util.jenetics.ScheduleMutator;
 
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.RouletteWheelSelector;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionStatistics;
-
-
 
 /**
  * Example of execution time optimization.
@@ -26,63 +24,87 @@ import org.jenetics.engine.EvolutionStatistics;
  *
  */
 public class ExecutionTimeExample {
-
-  static final int numTasks = 16;
-  static final int numExecutors = 4;
-  static ExecutionTime etOpt;
+  /**
+   * Number of tasks.
+   */
+  static final int NUM_TASKS = 10;
+  /**
+   * Number of executors.
+   */
+  static final int NUM_EXECUTORS = 3;
+  /**
+   * Gamma value of simulated annealing.
+   */
+  static final double SA_GAMMA_COOLING_FACTOR = 0.85;
+  /**
+   * Initial temperature of simulated annealing.
+   */
+  static final double SA_INITIAL_TEMPERATURE = 900;
+  /**
+   * Mutation probability.
+   */
+  static final double MUTATION_PROBABILITY = 0.01;
+  /**
+   * Crossover probability.
+   */
+  static final double CROSSOVER_PROBABILITY = 0.80;
+  /**
+   * Fitness function filtering factor.
+   */
+  static final double ALPHA_FILTERING_FACTOR = 0.8;
+  /**
+   * Generations limit.
+   */
+  static final int GEN_LIMIT = 10000;
+  /**
+   * Initial population size.
+   */
+  static final int POPULATION_SIZE = 15;
+  /**
+   * Heterogeneous Computing Environment.
+   */
+  static final HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(NUM_TASKS, 
+      NUM_EXECUTORS, 
+      false);
 
   /**
    * Main function.
    * @param args command line parameters
    */
   public static void main(String[] args) {
-    double[][] myetc = Util.getOnesMatrix(numExecutors, numTasks);
-    double[][] delta = Util.getDeltaMatrix(numTasks);
-    ExecutionTime etOpt = null;
+    
+    // Create a code
+    ExecutionTimeFitnessCalculator fitnessCalc = new ExecutionTimeFitnessCalculator(env);
 
-
-    for (int o = 0; o < myetc[0].length; o++) {
-      myetc[0][o] = 2;
-      myetc[1][o] = 3;
-      myetc[2][o] = 5;
-    }
-
-    etOpt = new ExecutionTime(myetc, delta);
-    SimulatedAnneling  simAnn = new  SimulatedAnneling(0.8, 900, etOpt);
+    // Set the simulated annealing to the environment
+    env.setSimulatedAnnealing(new  SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
+        SA_INITIAL_TEMPERATURE,
+        fitnessCalc));
 
     // Configure and build the evolution engine.
-    final Engine<alg.util.genetics.ScheduleGene, Double> engine = Engine
+    final Engine<alg.util.jenetics.ScheduleGene, Double> engine = Engine
         .builder(
-            etOpt::getFitness,
-            etOpt.ofSeq())
-        .populationSize(500)
+            fitnessCalc::getFitness,
+            (new ScheduleCodec(env)).ofChromosome())
+        .populationSize(POPULATION_SIZE)
         .optimize(Optimize.MINIMUM)
         .selector(new RouletteWheelSelector<>())
         .alterers(
-            new ScheduleMutator(delta, 0.55, simAnn),
-            new ScheduleCrossover(delta, 0.55, simAnn))
+            new ScheduleMutator(env, MUTATION_PROBABILITY),
+            new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
         .build();
 
     // Create evolution statistics consumer.
     final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
 
+    // Run the evolution stream
     final Phenotype<ScheduleGene, Double> best = engine.stream()
-        // Truncate the evolution stream after 7 "steady"
-        // generations.
-        .limit(bySteadyFitness(7))
-        // The evolution will stop after maximal 100
-        // generations.
-        .limit(100)
-        // Update the evaluation statistics after
-        // each generation
+        .limit(GEN_LIMIT)
         .peek(statistics)
-        // Collect (reduce) the evolution stream to
-        // its best phenotype.
         .collect(toBestPhenotype());
 
-    System.out.println("Finished!");
-
     System.out.println(statistics);
+    System.out.println("Solution:");
     System.out.println(best);
 
   }

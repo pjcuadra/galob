@@ -1,8 +1,22 @@
 package alg.util;
 
-import java.util.ArrayList;
-import java.util.Random;
+import alg.util.graph.GraphNode;
+import alg.util.jenetics.ScheduleAllele;
+import alg.util.jenetics.ScheduleGene;
 
+import org.jenetics.util.ISeq;
+
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.DoubleStream;
+
+
+/**
+ * Utils class. 
+ * 
+ * @author Pedro Cuadra
+ *
+ */
 public class Util {
 
   /**
@@ -12,13 +26,12 @@ public class Util {
    * @param cols columns of the matrix
    * @return ones matrix
    */
-  public static double[][] getOnesMatrix(int rows, int cols) {
+  public static double[][] createOnesMatrix(int rows, int cols) {
     double[][] ones = new double[rows][cols];
+    
     // Initialize ones matrix with ones}
     for (int currRow = 0; currRow < rows; currRow++) {
-      for (int currCol = 0; currCol < cols; currCol++) {
-        ones[currRow][currCol] = 1;
-      }
+      ones[currRow] = DoubleStream.generate(() -> 1).limit(cols).toArray();
     }
 
     return ones;
@@ -32,69 +45,76 @@ public class Util {
    * @return empty matrix
    */
   public static double[][] createEmptyMatrix(int rows, int cols) {
-    double[][] ones = new double[rows][cols];
-    // Initialize ones matrix with ones}
-    for (int currRow = 0; currRow < rows; currRow++) {
-      for (int currCol = 0; currCol < cols; currCol++) {
-        ones[currRow][currCol] = 0;
-      }
-    }
-
-    return ones;
+    return new double[rows][cols];
   }
 
 
   /**
-   * Get dependency matrix of size rows*cols which is an upper triangular matrix.
+   * Get a random dependency matrix of size rows*cols which is an upper triangular matrix.
    * 
    * @param numTasks number of tasks
    * @return dependency matrix
    */
-
-  public static double[][] getDeltaMatrix(int numTasks) {
+  public static double[][] createRandomDependencyMatrix(int numTasks) {
     Random randomGen = new Random();
+    
 
     double[][] depend = new double[numTasks][numTasks];
     // Initialize the upper triangular matrix with ones randomly
 
-    for (int currRow = 0; currRow < numTasks; currRow++) {  
-
-      for (int currCol = currRow + 1; currCol < numTasks; currCol++) {
-        // Randomly fill 0 or 1 with a randomness probability of 49%
-        if ((randomGen.nextInt(20)) > 9) {
-          depend[currRow][currCol] = 1;
-        }
+    for (int i = 0; i < numTasks; i++) {
+      for (int j = 0; j < i; j++) {
+        depend[i][j] = randomGen.nextBoolean() ? 1 : 0;
       }
-
     }
 
     return depend;
   }
 
   /**
-   * Get Communication cost matrix of size rows*cols.
+   * Get a random Communication cost matrix out of a dependency matrix.
+   * 
    * @param  delta the dependency matrix
    * @return communication cost matrix
    */
-
-  public static double[][] getComcostmatrix(double[][] delta) {
+  public static double[][] createRandomCommunicationCostsMatrix(double[][] delta) {
+    return matrixParallelMultiply(
+        createRandomMatrix(delta.length, delta[0].length), 
+        delta);
+  }
+  
+  /**
+   * Create a random matrix row.
+   * 
+   * @param columns number of columns
+   * @return random matrix row
+   */
+  public static double[] createRandomRow(int columns) {
+    
     Random randomGen = new Random();
+    
+    return randomGen.doubles(columns).toArray();
+  }
+  
+  /**
+   * Get a matrix with random values.
+   * 
+   * @param numRows number of rows
+   * @param numCols number of columns
+   * @return matrix with random values
+   */
+  public static double[][] createRandomMatrix(int numRows, int numCols) {
+    // Verify
+    assert numRows > 0;
+    assert numCols > 0;
 
-    double[][] comcost = copyMatrix(delta);
+    double[][] randMatrix = new double[numRows][];
 
-    for (int currRow = 0; currRow < comcost.length; currRow++) {
-      for (int currCol = currRow + 1; currCol < comcost.length; currCol++) {
-        double rand = randomGen.nextDouble();
-        if (comcost[currRow][currCol] != 0) {
-          comcost[currRow][currCol] = Math.floor(rand * 100) / 100;
-        }
-      }
-
-      comcost[currRow][currRow] = 0;
-
+    for (int currRow = 0; currRow < numRows; currRow++) {
+      randMatrix[currRow] = createRandomRow(numCols);
     }
 
-    return comcost;
+    return randMatrix;
   }
 
 
@@ -105,17 +125,11 @@ public class Util {
    * @param matrix reference matrix to be copied
    * @return cloned matrix from matrix1
    */
+  public static double[][] copyMatrix(double[][] matrix) {
 
-  public static double[][] copyMatrix(double[][]matrix) {
-
-    double[][] copiedMatrix =  new double[matrix.length][matrix[0].length];
-
-    for (int i = 0; i < matrix.length; i++) {
-      for (int j = 0; j < matrix[i].length; j++) {
-        copiedMatrix[i][j] = matrix[i][j];
-      }
-    }
-    return copiedMatrix;
+    return Arrays.stream(matrix)
+        .map((double[] row) -> row.clone())
+        .toArray((int length) -> new double[length][]);
 
   }
 
@@ -127,15 +141,36 @@ public class Util {
    * @return sum of values of given row
    */
   public static double getRowSum(double[][] matrix, int row) {
-    double rowSum = 0;
+    
+    // Verify parameters
+    assert row < matrix.length;
 
-    // Iterate over the nodes
-    for (int j = 0; j < matrix[0].length; j++) {
-      // Add all execution times
-      rowSum += matrix[row][j];
+    return Arrays.stream(matrix[row])
+        .map(i -> i)
+        .sum();
+  }
+  
+  /**
+   * Get sum of values of a given column.
+   * 
+   * @param matrix values matrix
+   * @param col given col
+   * @return sum of values of given row
+   */
+  public static double getColSum(double[][] matrix, int col) {
+    
+    // Verify parameters
+    assert col < matrix[0].length;
+    
+    double sum = 0;
+
+    // Iterate over the rows
+    for (int i = 0; i < matrix.length; i++) {
+      // Add all elements in the col
+      sum += matrix[i][col];
     }
-
-    return rowSum;
+    
+    return sum;
   }
 
   /**
@@ -146,10 +181,13 @@ public class Util {
    * @return true if the col has all zeroes; else false
    */
   public static boolean checkColZero(double[][] matrix, int col) {
+    
+    // Verify parameters
+    assert matrix.length > 0;
+    assert matrix[0].length >= col : matrix[0].length + " " + col;
 
     // Iterate over the rows
     for (int i = 0; i < matrix.length; i++) {
-      // Add all elements in the col
       if (matrix[i][col] != 0) {
         return false;
       }
@@ -165,12 +203,12 @@ public class Util {
    * @param row row to be cleared
    */
   public static void clearRow(double[][] matrix, int row) {
-
-    // Iterate over the rows
-    for (int i = 0; i < matrix.length; i++) {
-      // Add all elements in the col
-      matrix[row][i] = 0; 
-    }
+    
+    // Verify parameters
+    assert row < matrix.length;
+    
+    matrix[row] = DoubleStream.generate(() -> 0).limit(matrix.length).toArray();
+    
   }
 
   
@@ -182,9 +220,14 @@ public class Util {
    * @return multiplied matrix
    */
   public static double[][] matrixParallelMultiply(double[][] matrixA, double[][] matrixB) {
+    // Verify parameters
+    assert matrixA.length > 0 : "Invalid matrices dimensions";
+    assert matrixA.length == matrixB.length : "Invalid matrices dimensions";
+    assert matrixA[0].length > 0 : "Invalid matrices dimensions";
+    assert matrixA[0].length == matrixB[0].length : "Invalid matrices dimensions";
+    
     double[][] resMatrix =  new double[matrixA.length][matrixA[0].length];
-
-
+    
     for (int i = 0; i < resMatrix.length; i++) {
       for (int j = 0; j < resMatrix[0].length; j++) {
         resMatrix[i][j] =  matrixA[i][j] * matrixB[i][j];
@@ -195,107 +238,143 @@ public class Util {
   }
 
   /**
-   * Convert a integer matrix into double matrix.
+   * Fills the graph inside the HCE.
    * 
-   * @param matrix integer matrix
-   * @return double matrix
+   * @param env heterogeneous computing environment
+   * @param delta dependency matrix
+   * @param commCost communication costs matrix
+   * @param etc expected time to compute matrix
    */
-  public static double[][] intMatrixtoDouble(int[][] matrix) {
-    double[][] resMatrix =  new double[matrix.length][matrix[0].length];
-
-    for (int i = 0; i < resMatrix.length; i++) {
-      for (int j = 0; j < resMatrix[0].length; j++) {
-        resMatrix[i][j] = (double) matrix[i][j];
-      }
-    }
-
-    return resMatrix;
-
-  }
-  
-  /**
-   * Create the levels representation of the dependencies.
-   * 
-   * @param delta dependencies matrix
-   */
-  public static ArrayList<ArrayList<Integer>> getDependenciesLevels(double[][] delta) {
-    ArrayList<ArrayList<Integer>> levels = new ArrayList<ArrayList<Integer>>();
-    ArrayList<Integer> toDet = new ArrayList<Integer>();
-    ArrayList<Integer> thisLevel;
-    double[][] myDelta = Util.copyMatrix(delta);
-    for (int i = 0; i < delta.length ;i++) {
-      toDet.add(new Integer(i));
-    }
-
-    while (!toDet.isEmpty()) {
-      thisLevel =  new ArrayList<Integer>();
-
-      for (Integer task = 0; task < delta.length; task++) {
-
-        if (!toDet.contains(task)) {
-          continue;
-        }
-
-
-        /*
-         * check if there is a dependency with a successive task
-         * check for ones in the column
-         */
-
-        if (!(Util.checkColZero(myDelta, task))) {
-          continue;
-        }
-
-        toDet.remove(task);
-
-        thisLevel.add(task);
-
-      }
-      for (Integer iterator:thisLevel) {
-        //to clear the elements of the row
-        Util.clearRow(myDelta, iterator);
-      }
-
-      levels.add(thisLevel);
-
-
+  private static void graphBuilder(HeterogeneousComputingEnv env, 
+      double[][] delta,
+      double[][] commCost,
+      double[][] etc) {
+    
+    GraphNode[] tasks;
+    
+    // Create tasks array
+    tasks = new GraphNode[env.getNumberOfTasks()];
+    
+    // Add all tasks with random etc per cores
+    for (int i = 0; i < env.getNumberOfTasks(); i++) {
+      tasks[i] = env.addTask(etc[i]);
     }
     
-    return levels;
-
-  }
-  
-  /**
-   * Decrement all the values in a row by one until it's zero.
-   * @param commCost communication cost matrix
-   * @param row row
-   */
-  public static void decrementRow(double[][] commCost, int row) {
-    for (int i = 0; i < commCost[0].length; i++) {
-      if (--commCost[row][i] < 0) {
-        commCost[row][i] = 0;
-      }
-    }
-  }
-  
-  /**
-   * Clear communication costs that are zero because of same
-   * node allocation.
-   * @param commCost Communication cost matrix
-   * @param omega allocation matrix
-   */
-  public static void allocComCost(double[][] commCost, int[][] omega) {
-    for (int i = 0; i < commCost.length; i++) {
-      for (int j = 0; j < commCost[0].length; j ++) {
-        if (commCost[i][j] != 0) {
-          for (int excId = 0; excId < omega.length; excId++) {
-            if ((omega[excId][i] == omega[excId][j]) && (omega[excId][i] == 1)) {
-              commCost[i][j] = 0;
-            }
-          }
+    // Add dependencies
+    for (int i = 0; i < env.getNumberOfTasks(); i++) {
+      for (int j = 0; j < env.getNumberOfTasks(); j++) {
+        if (delta[i][j] == 0) {
+          continue;
         }
+        
+        // Add the dependency
+        env.addDependency(tasks[i], tasks[j], commCost[i][j]);
+        
       }
     }
-  
+    
   }
+  
+  /**
+   * Create an empty HCE with random number of tasks and cores.
+   * 
+   * @param numTasks number of tasks
+   * @param numCores number of cores
+   * @param maxProvided numTasks and numCores are maximum values if 
+   *      true or exact values if false
+   * @return empty HCE.
+   */
+  private static HeterogeneousComputingEnv createRandomEnv(int numTasks, 
+      int numCores, 
+      boolean maxProvided) {
+    
+    Random randomGen = new Random();
+    
+    int actualNumTasks = numTasks;
+    int actualNumCores = numCores;
+    
+    // Get random number of tasks and cores
+    if (maxProvided) {
+      actualNumTasks =  1 + randomGen.nextInt(numTasks);
+      actualNumCores =  1 + randomGen.nextInt(numCores);
+    }
+    
+    // Create the new environment
+    return new HeterogeneousComputingEnv(actualNumTasks, actualNumCores);
+    
+  }
+  
+  /**
+   * Generates a completely random heterogeneous computing environment.
+   * 
+   * @param numTasks number of tasks
+   * @param numCores number of cores
+   * @param maxProvided numTasks and numCores are maximum values if 
+   *      true or exact values if false
+   * @return random heterogeneous computing environment
+   */
+  protected static HeterogeneousComputingEnv ofRandom(int numTasks, 
+      int numCores, 
+      boolean maxProvided) {
+    
+    HeterogeneousComputingEnv env = createRandomEnv(numTasks, numCores, maxProvided);
+    
+    // Create random dependencies, communication costs and etc matrices
+    double[][] delta = createRandomDependencyMatrix(env.getNumberOfTasks());
+    double[][] commCost = createRandomCommunicationCostsMatrix(delta);
+    double[][] etc = createRandomMatrix(env.getNumberOfTasks(), env.getNumberOfExecutors());
+    
+    // Build the graph
+    graphBuilder(env, delta, commCost, etc);    
+    
+    return env;
+    
+  }
+  
+  /**
+   * Generates a random heterogeneous computing environment with: unit execution time, 
+   * unit communication costs and random dependencies.
+   * 
+   * @param numTasks number of tasks
+   * @param numCores number of cores
+   * @return random heterogeneous computing environment
+   */
+  protected static HeterogeneousComputingEnv ofRandomUnitary(int numTasks, 
+      int numCores, 
+      boolean maxProvided) {
+    HeterogeneousComputingEnv env = createRandomEnv(numTasks, numCores, maxProvided);
+    
+    // Create random dependencies, communication costs and etc matrices
+    double[][] delta = createRandomDependencyMatrix(env.getNumberOfTasks());
+    double[][] commCost = copyMatrix(delta);
+    double[][] etc = createOnesMatrix(env.getNumberOfTasks(), env.getNumberOfExecutors());
+    
+    // Build the graph
+    graphBuilder(env, delta, commCost, etc);    
+    
+    return env;
+    
+  }
+  
+  /**
+   * Calculate the allocation matrix from a gene sequence.
+   * 
+   * @param scheduleSeq genes sequence of a valid chromosome
+   * @param numCores number of cores
+   * 
+   * @return CONV matrix
+   */
+  public static int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq, final int numCores) { 
+    int[][] omega = new int[numCores][scheduleSeq.size()];
+    ScheduleAllele currAllel = null;
+
+    // Just set to one where it is allocated
+    for (ScheduleGene gene: scheduleSeq) {
+      currAllel = gene.getAllele();
+      omega[currAllel.getExecutorId()][currAllel.getTaskId()] = 1;
+    }
+
+    return omega;
+  }
+  
 }

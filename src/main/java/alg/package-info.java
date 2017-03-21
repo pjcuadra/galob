@@ -1,5 +1,5 @@
 /**
- * Task/runnables scheduling using genetic algorithms. 
+ * Heterogeneous computing environment task scheduling using genetic algorithms. 
  * 
  * @author Pedro Cuadra
  * @author Sudheera Bandi
