@@ -2,7 +2,7 @@
  * Schedule Mutator unit testing.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,7 +37,7 @@ import java.util.Random;
  * @author Sudheera Bandi
  *
  */
-public class ScheduleMutatorUt {
+public class ScheduleMutatorTest {
 
   private Random randomGen;
 
@@ -104,26 +104,6 @@ public class ScheduleMutatorUt {
   }
 
   @Test
-  public void singleMutation() {
-    ScheduleChromosome originalChromosome = new ScheduleChromosome(env);
-    MSeq<ScheduleGene> mutationSeq = originalChromosome.toSeq().copy();
-    int alterations = 0;
-    int alterationsCount = 0;
-
-    // Mutate the chromosome
-    alterations = mutator.mutate(mutationSeq, 1);
-    
-    // Create mutated chromosome
-    ScheduleChromosome mutatedChromosome = originalChromosome.newInstance(mutationSeq.toISeq());
-
-    // Count alterations
-    alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
-    
-    assertEquals(alterationsCount, alterations);
-    
-  }
-
-  @Test
   public void populationMutattion() {
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
     
@@ -177,6 +157,25 @@ public class ScheduleMutatorUt {
     }
 
     // Verify the alterations match
+    assertEquals(alterationsCount, alterations);
+  }
+
+  @Test
+  public void testMutate() throws Exception {
+    ScheduleChromosome originalChromosome = new ScheduleChromosome(env);
+    MSeq<ScheduleGene> mutationSeq = originalChromosome.toSeq().copy();
+    int alterations = 0;
+    int alterationsCount = 0;
+
+    // Mutate the chromosome
+    alterations = mutator.mutate(mutationSeq, 1);
+    
+    // Create mutated chromosome
+    ScheduleChromosome mutatedChromosome = originalChromosome.newInstance(mutationSeq.toISeq());
+
+    // Count alterations
+    alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
+    
     assertEquals(alterationsCount, alterations);
   }
 }

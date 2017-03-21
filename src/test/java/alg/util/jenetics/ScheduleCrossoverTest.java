@@ -2,7 +2,7 @@
  * Schedule Crossover unit testing.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author Sudheera Bandi
  *
  */
-public class ScheduleCrossoverUt {
+public class ScheduleCrossoverTest {
 
   static final int maxNumTask = 9 /* Actual max*/;
   static final int maxNumExecutors = 6 /* Actual max*/;
@@ -64,7 +64,7 @@ public class ScheduleCrossoverUt {
   }
 
   @Test
-  public void singleCrossover() {
+  public void testCrossover() throws Exception {
     ScheduleChromosome p1Chromosome = new ScheduleChromosome(env);
     ScheduleChromosome p2Chromosome = new ScheduleChromosome(env);
     MSeq<ScheduleGene> p1Seq = p1Chromosome.toSeq().copy();
@@ -86,7 +86,6 @@ public class ScheduleCrossoverUt {
     }
 
     assertEquals(alterationsCount, alterations);
-
   }
 
 

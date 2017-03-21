@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
  * @author Sudheera Bandi
  *
  */
-public class GraphUt {
+public class GraphTest {
 
   //  private Random randomGen;
 

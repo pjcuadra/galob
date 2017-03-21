@@ -2,7 +2,7 @@
  * Schedule Chromosome unit testing.
  */
 
-package alg.util.genetics;
+package alg.util.jenetics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +29,7 @@ import java.util.Random;
  * @author Sudheera Bandi
  *
  */
-public class ScheduleChromosomeUt {
+public class ScheduleChromosomeTest {
 
   private Random randomGen;
 
@@ -189,5 +189,60 @@ public class ScheduleChromosomeUt {
       
     }
 
+  }
+
+  @Test
+  public void testIsValid() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testIterator() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testNewInstance() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testGetGene() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testLength() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testToSeq() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testOf() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testClone() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testSetStats() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testGetStats() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Test
+  public void testHasStats() throws Exception {
+    throw new RuntimeException("not yet implemented");
   }
 }
