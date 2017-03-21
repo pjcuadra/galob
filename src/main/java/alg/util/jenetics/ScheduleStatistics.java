@@ -1,7 +1,7 @@
 package alg.util.jenetics;
 
-import alg.util.ChartInfo;
 import alg.util.HeterogeneousComputingEnv;
+import alg.util.PaneInfo;
 import alg.util.jenetics.ScheduleStatistics;
 
 import org.jenetics.Genotype;
@@ -207,7 +207,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
   /**
    * Show plots of simulated annealing evolution.
    */
-  public void createSimulatedAnnealingCharts(DefaultMutableTreeNode top) {
+  public void createSimulatedAnnealingItems(DefaultMutableTreeNode top) {
     
     // categories
     DefaultMutableTreeNode category = null;
@@ -227,7 +227,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
       .setMarker(SeriesMarkers.NONE);
     
     DefaultMutableTreeNode defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Temperature Evolution", 
+        new PaneInfo("Temperature Evolution", 
         chart));
     category.add(defaultMutableTreeNode);
   
@@ -236,7 +236,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
   /**
    * Show plots of makespan evolution.
    */
-  public void createMakespanCharts(DefaultMutableTreeNode top) {
+  public void createMakespanItems(DefaultMutableTreeNode top) {
     // categories
     DefaultMutableTreeNode category = null;
     // General
@@ -261,7 +261,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
  
     
     DefaultMutableTreeNode defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Best schedule evolution", 
+        new PaneInfo("Best schedule evolution", 
         chart));
     category.add(defaultMutableTreeNode);
 
@@ -292,7 +292,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
         new ArrayList<Double>(Arrays.asList(makespan)));
 
     defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Per Computing Resources (Bars)", 
+        new PaneInfo("Per Computing Resources (Bars)", 
         catChart));
     category.add(defaultMutableTreeNode);
   }
@@ -300,7 +300,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
   /**
    * Show plot of fitness evolution.
    */
-  private void createGeneralCharts(DefaultMutableTreeNode top) {
+  private void createGeneralItems(DefaultMutableTreeNode top) {
     // categories
     DefaultMutableTreeNode category = null;
     // General
@@ -320,7 +320,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
       .setMarker(SeriesMarkers.NONE);
     
     DefaultMutableTreeNode defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Best fitness Evolution", 
+        new PaneInfo("Best fitness Evolution", 
         chart));
     category.add(defaultMutableTreeNode);
     
@@ -374,7 +374,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
       .setMarker(SeriesMarkers.NONE);
     
     defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Fitness distribution", 
+        new PaneInfo("Fitness distribution", 
         chart));
     category.add(defaultMutableTreeNode);
     
@@ -397,7 +397,11 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
         statistics.getEvaluationDuration().getSum());
     
     defaultMutableTreeNode = new DefaultMutableTreeNode(
-        new ChartInfo("Time Distribution", pieChart));
+        new PaneInfo("Time Distribution", pieChart));
+    category.add(defaultMutableTreeNode);
+    
+    defaultMutableTreeNode = new DefaultMutableTreeNode(
+        new PaneInfo("Graph", env.getGraphPanel()));
     category.add(defaultMutableTreeNode);
     
   }
@@ -433,14 +437,14 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
     DefaultMutableTreeNode top = new DefaultMutableTreeNode("Evolution Stream Statistics");
     
     // Create general plots
-    createGeneralCharts(top);
+    createGeneralItems(top);
     
     // Makespan plots
-    createMakespanCharts(top);
+    createMakespanItems(top);
     
     // Simulated Annealing plots
     if (env.getSimulatedAnnealingEnabled()) {
-      createSimulatedAnnealingCharts(top);
+      createSimulatedAnnealingItems(top);
     }
     
     // Create a tree that allows one selection at a time.
@@ -453,9 +457,11 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
     // Create the scroll pane and add the tree to it.
     JScrollPane treeView = new JScrollPane(tree);
     
-    Chart<?, ?> firstChart = ((ChartInfo)((DefaultMutableTreeNode)top.getChildAt(0).getChildAt(0))
+    Chart<?, ?> firstChart = (Chart<?, ?>) ((PaneInfo)((DefaultMutableTreeNode)top
+        .getChildAt(0)
+        .getChildAt(0))
         .getUserObject())
-        .getChart();
+        .getCookie();
 
     // Create Chart Panel
     chartPanel = new XChartPanel<Chart<?, ?>>(firstChart);
@@ -499,15 +505,25 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
     Object nodeInfo = node.getUserObject();
     // tree leaf
     if (node.isLeaf()) {
-      ChartInfo chartInfo = (ChartInfo) nodeInfo;
-      // displayURL(chartInfo.bookURL);
-      chartPanel = new XChartPanel<Chart<?, ?>>(chartInfo.getChart());
-      splitPane.setBottomComponent(chartPanel);
-
+      PaneInfo paneInfo = (PaneInfo) nodeInfo;
+      
+      Object pane = paneInfo.getCookie();
+      
+      // If it's a chart
+      if (pane instanceof Chart<?, ?>) {
+        chartPanel = new XChartPanel<Chart<?, ?>>((Chart<?, ?>) paneInfo.getCookie());
+        splitPane.setBottomComponent(chartPanel);
+        return;
+      }
+      
+      // Get the plain JPanel
+      JPanel panel = (JPanel) pane;
+      
+      // Other kind of panels
+      splitPane.setBottomComponent(panel);
+      
     }
     
   }
-  
-  
 
 }

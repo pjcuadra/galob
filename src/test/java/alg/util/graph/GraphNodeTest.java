@@ -31,13 +31,13 @@ public class GraphNodeTest {
 
   @Ignore("Note yet implemented")
   @Test
-  public void testSetValue() throws Exception {
+  public void testSetCookie() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
   @Ignore("Note yet implemented")
   @Test
-  public void testGetValue() throws Exception {
+  public void testGetCookie() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 
