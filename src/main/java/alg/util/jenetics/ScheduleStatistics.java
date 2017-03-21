@@ -516,6 +516,7 @@ public class ScheduleStatistics extends JPanel implements TreeSelectionListener,
         return;
       }
       
+      // Get the plain JPanel
       JPanel panel = (JPanel) pane;
       
       // Other kind of panels

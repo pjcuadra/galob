@@ -6,8 +6,13 @@ package alg.util;
  * @author Pedro Cuadra
  */
 public final class PaneInfo {
-
-  private final String chartName;
+  /**
+   * Pane name.
+   */
+  private final String paneName;
+  /**
+   * Pane cookie or pane itself.
+   */
   private final Object cookie;
 
   /**
@@ -18,24 +23,32 @@ public final class PaneInfo {
    */
   public PaneInfo(String paneName, Object cookie) {
 
-    this.chartName = paneName;
+    this.paneName = paneName;
     this.cookie = cookie;
   }
 
-  public String getExampleChartName() {
-
-    return chartName;
+  /**
+   * Get the name of the pane.
+   * @return pane name
+   */
+  public String getPaneName() {
+    return paneName;
   }
 
+  /**
+   * Get cookie or pane.
+   * @return cookie or pane
+   */
   public Object getCookie() {
-
     return cookie;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
-
-    return this.chartName;
+    return this.paneName;
   }
 
 }

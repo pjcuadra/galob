@@ -167,7 +167,6 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       currNode.setCookie(nodeLevel);
       nodeLevelMap.add(currNode.getTaskId(), new Integer(nodeLevel));
       
-      System.out.println(currNode + "->" + nodeLevel);
     }
     
   }
@@ -217,7 +216,13 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     return (int) nodeLevelMap.get(taskId);
   }
   
-  public class GraphDrawer extends JPanel {
+  /**
+   * Panel class to handle graphical representation of graph.
+   * 
+   * @author Pedro Cuadra
+   *
+   */
+  private class GraphDrawer extends JPanel {
     /**
      * Graph class. 
      */
@@ -242,42 +247,44 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       super();
 
       mxgraph = new mxGraph();
-      
-      int maxNodesOnLevel = 0;
-      
-      for (int l = 0; l < getMaxTopologicalLevel(); l++) {
-        if (maxNodesOnLevel < getTologicalLevelNodes(l).size()) {
-          maxNodesOnLevel = getTologicalLevelNodes(l).size();
-        }
-      }
 
+      // Begin adding all graph's elements
       mxgraph.getModel().beginUpdate();
       
       try {
         
+        // Add nodes per level
         for (int l = 0; l < getMaxTopologicalLevel(); l++) {
-          insertLevel(l, maxNodesOnLevel);
+          insertLevel(l);
         }
        
       } finally {
+        
+        // Finish adding graph's elements
         mxgraph.getModel().endUpdate();
       }
       
+      // Set the hierarchical layout
       mxHierarchicalLayout layout = new mxHierarchicalLayout(mxgraph);
-      
       layout.execute(mxgraph.getDefaultParent());
-      
+
+      // Create graph component and add graph to it
       mxGraphComponent graphComponent = new mxGraphComponent(mxgraph);
       this.add(graphComponent);
     }
     
-    private void insertLevel(int level, int maxNodesOnLevel) {
+    /**
+     * Insert all vertex and edges of a topological level.
+     * @param level topological level
+     */
+    private void insertLevel(int level) {
       ArrayList<GraphNode> nodes = getTologicalLevelNodes(level);
       Object defParent = mxgraph.getDefaultParent();
       
-      
+      // Iterate over all node in the level      
       for (int n = 0; n < nodes.size(); n++) {
         
+        // Add node as vertex
         Object v1 = mxgraph.insertVertex(defParent, 
             null, 
             nodes.get(n), 
@@ -287,33 +294,40 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
             NODE_HEIGHT,
             "shape=ellipse");
         
+        // Set resulting object as cookie
         nodes.get(n).setCookie(v1);
         
         if (level == 0) {
           continue;
         } 
         
+        // Get all parents of the given node
         ArrayList<GraphNode> parents = getParents(nodes.get(n));
         
         Graph graph = getGraph();
         
+        // Add all the edges from all this node's parents to this node
         for (GraphNode parent: parents) {
-            
           mxgraph.insertEdge(defParent, 
               null, 
               graph.getEdgeWeight(graph.getEdge(parent, nodes.get(n))), 
               parent.getCookie(), 
               v1);
         }
-        
       }
-      
     }
-    
+
+    /**
+     * Get all parents of a given node.
+     * 
+     * @param node given node
+     * @return a list of all parents of the given node
+     */
     private ArrayList<GraphNode> getParents(GraphNode node) {
       ArrayList<GraphNode> parents = new ArrayList<GraphNode>();
       Graph graph = getGraph();
       
+      // Iterate over all predecessors and find direct links
       for (GraphNode pred: graph.getAncestors(graph, node)) {
         if (graph.getAllEdges(pred, node).size() > 0) {
           parents.add(pred);
@@ -325,6 +339,10 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
 
   }
   
+  /**
+   * Get the graph object.
+   * @return graph object
+   */
   protected Graph getGraph() {
     return this;
   }
@@ -333,7 +351,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * Draw graph.
    */
   public void drawGraph() {
-    GraphDrawer panel = getGraphPanel();
+    JPanel panel = getGraphPanel();
     
     // Create and set up the window.
     JFrame frame = new JFrame("Graph Representation of HCE");
@@ -353,8 +371,8 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    *
    * @return graph panel
    */
-  public GraphDrawer getGraphPanel() {
-    GraphDrawer panel = new GraphDrawer();
+  public JPanel getGraphPanel() {
+    JPanel panel = new GraphDrawer();
     
     panel.setEnabled(false);
     
