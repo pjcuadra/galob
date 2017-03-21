@@ -20,6 +20,9 @@ dependencies {
     // https://mvnrepository.com/artifact/io.jenetics/jenetics
     compile group: 'io.jenetics', name: 'jenetics', version: '3.7.0'
     
+    // https://mvnrepository.com/artifact/org.tinyjee.jgraphx/jgraphx
+	compile group: 'org.tinyjee.jgraphx', name: 'jgraphx', version: '3.4.1.3'
+     
     // JGraphT
     compile 'org.jgrapht:jgrapht-core:0.9.0',
             'org.jgrapht:jgrapht-ext:1.0.0',

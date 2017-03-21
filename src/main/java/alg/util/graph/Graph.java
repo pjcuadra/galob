@@ -1,10 +1,18 @@
 package alg.util.graph;
 
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
+
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * Graph representation of a HCE.
@@ -135,12 +143,12 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     while (it.hasNext()) {
       GraphNode currNode = it.next();
       
-      int nodeLevel = 0;
+      Integer nodeLevel = new Integer(0);
       
       // Get maximum level inherited from predecesors
       for (GraphNode depNode: getAncestors(this, currNode)) {
-        if (nodeLevel > depNode.getValue() + 1) {
-          nodeLevel = (int) (depNode.getValue() + 1);
+        if (nodeLevel < ((Integer)depNode.getCookie()) + 1) {
+          nodeLevel = (Integer) (((Integer)depNode.getCookie()) + 1);
         }
       }
       
@@ -156,8 +164,10 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       
       // Add node to the level
       levels.get(nodeLevel).add(currNode);
-      currNode.setValue(nodeLevel);
+      currNode.setCookie(nodeLevel);
       nodeLevelMap.add(currNode.getTaskId(), new Integer(nodeLevel));
+      
+      System.out.println(currNode + "->" + nodeLevel);
     }
     
   }
@@ -207,5 +217,148 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     return (int) nodeLevelMap.get(taskId);
   }
   
+  public class GraphDrawer extends JPanel {
+    /**
+     * Graph class. 
+     */
+    protected mxGraph mxgraph;
+    /**
+     * Serial UID.
+     */
+    private static final long serialVersionUID = -2707712944901661771L;
+    /**
+     * Node's width.
+     */
+    private static final int NODE_WIDTH = 40;
+    /**
+     * Node's height.
+     */
+    private static final int NODE_HEIGHT = 40;
+
+    /**
+     * Constructor.
+     */
+    public GraphDrawer() {
+      super();
+
+      mxgraph = new mxGraph();
+      
+      int maxNodesOnLevel = 0;
+      
+      for (int l = 0; l < getMaxTopologicalLevel(); l++) {
+        if (maxNodesOnLevel < getTologicalLevelNodes(l).size()) {
+          maxNodesOnLevel = getTologicalLevelNodes(l).size();
+        }
+      }
+
+      mxgraph.getModel().beginUpdate();
+      
+      try {
+        
+        for (int l = 0; l < getMaxTopologicalLevel(); l++) {
+          insertLevel(l, maxNodesOnLevel);
+        }
+       
+      } finally {
+        mxgraph.getModel().endUpdate();
+      }
+      
+      mxHierarchicalLayout layout = new mxHierarchicalLayout(mxgraph);
+      
+      layout.execute(mxgraph.getDefaultParent());
+      
+      mxGraphComponent graphComponent = new mxGraphComponent(mxgraph);
+      this.add(graphComponent);
+    }
+    
+    private void insertLevel(int level, int maxNodesOnLevel) {
+      ArrayList<GraphNode> nodes = getTologicalLevelNodes(level);
+      Object defParent = mxgraph.getDefaultParent();
+      
+      
+      for (int n = 0; n < nodes.size(); n++) {
+        
+        Object v1 = mxgraph.insertVertex(defParent, 
+            null, 
+            nodes.get(n), 
+            0, 
+            0, 
+            NODE_WIDTH,
+            NODE_HEIGHT,
+            "shape=ellipse");
+        
+        nodes.get(n).setCookie(v1);
+        
+        if (level == 0) {
+          continue;
+        } 
+        
+        ArrayList<GraphNode> parents = getParents(nodes.get(n));
+        
+        Graph graph = getGraph();
+        
+        for (GraphNode parent: parents) {
+            
+          mxgraph.insertEdge(defParent, 
+              null, 
+              graph.getEdgeWeight(graph.getEdge(parent, nodes.get(n))), 
+              parent.getCookie(), 
+              v1);
+        }
+        
+      }
+      
+    }
+    
+    private ArrayList<GraphNode> getParents(GraphNode node) {
+      ArrayList<GraphNode> parents = new ArrayList<GraphNode>();
+      Graph graph = getGraph();
+      
+      for (GraphNode pred: graph.getAncestors(graph, node)) {
+        if (graph.getAllEdges(pred, node).size() > 0) {
+          parents.add(pred);
+        }
+      }
+      
+      return parents;
+    }
+
+  }
+  
+  protected Graph getGraph() {
+    return this;
+  }
+
+  /**
+   * Draw graph.
+   */
+  public void drawGraph() {
+    GraphDrawer panel = getGraphPanel();
+    
+    // Create and set up the window.
+    JFrame frame = new JFrame("Graph Representation of HCE");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    // Add content to the window.
+    frame.add(panel);
+
+    // Display the window.
+    frame.pack();
+    frame.setVisible(true);
+    frame.setEnabled(false);
+  }
+  
+  /**
+   * Get the graph panel.
+   *
+   * @return graph panel
+   */
+  public GraphDrawer getGraphPanel() {
+    GraphDrawer panel = new GraphDrawer();
+    
+    panel.setEnabled(false);
+    
+    return panel;
+  }
 
 }

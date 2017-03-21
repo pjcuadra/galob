@@ -428,7 +428,7 @@ public class HeterogeneousComputingEnvTest {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
       
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
-      assertEquals(node.getValue(), envNode.getValue(), EPSILON);
+      assertEquals(node.getCookie(), envNode.getCookie());
     }
     
     currNode = graphCopy.iterator();
@@ -436,7 +436,7 @@ public class HeterogeneousComputingEnvTest {
     // Let's modify the copy
     while (currNode.hasNext()) {
       GraphNode node = currNode.next();
-      node.setValue(10);
+      node.setCookie(10);
     }
     
     currNode = graphCopy.iterator();
@@ -447,7 +447,7 @@ public class HeterogeneousComputingEnvTest {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
       
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
-      assertNotEquals(node.getValue(), envNode.getValue(), EPSILON);
+      assertNotEquals(node.getCookie(), envNode.getCookie());
     }
   }
 

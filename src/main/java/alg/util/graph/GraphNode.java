@@ -20,7 +20,7 @@ public class GraphNode {
   /**
    * Custom stored value.
    */
-  private double value;
+  private Object cookie;
   
   /**
    * Constructor.
@@ -72,10 +72,10 @@ public class GraphNode {
   /**
    * Set custom value.
    * 
-   * @param value custom value
+   * @param cookie custom value
    */
-  public void setValue(double value) {
-    this.value = value;
+  public void setCookie(Object cookie) {
+    this.cookie = cookie;
   }
   
   /**
@@ -83,8 +83,8 @@ public class GraphNode {
    * 
    * @return custom value
    */
-  public double getValue() {
-    return this.value;
+  public Object getCookie() {
+    return this.cookie;
   }
   
   /**
@@ -103,5 +103,13 @@ public class GraphNode {
   @Override
   public GraphNode clone() {
     return new GraphNode(this.taskId, this.etcRow);
+  }
+  
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "(" + this.taskId + ")";
   }
 }

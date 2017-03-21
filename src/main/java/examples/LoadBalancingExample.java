@@ -89,6 +89,9 @@ public class LoadBalancingExample {
     // Initialize dependency matrix
     buildEnvironment();
     
+    // Draw graph to visually verify
+    env.drawGraph();
+    
     // Create load balancing statistics calculator
     LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 
         ALPHA_FILTERING_FACTOR);

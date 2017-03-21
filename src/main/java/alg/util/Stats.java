@@ -110,7 +110,7 @@ public class Stats {
     
     // Get earliest start time
     for (GraphNode anc : graph.getAncestors(graph, node)) {
-      double tempStartTime = anc.getValue();
+      Double tempStartTime = (Double) anc.getCookie();
       DefaultWeightedEdge edge = graph.getEdge(anc, node);
       
       if (edge == null) {
@@ -131,7 +131,7 @@ public class Stats {
     
     startTime += node.getExecutionTimeOnUnit(getExecutionUnit(node.getTaskId()));
     
-    node.setValue(startTime);
+    node.setCookie(new Double(startTime));
     
     return startTime;
     
