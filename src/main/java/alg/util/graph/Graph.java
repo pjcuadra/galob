@@ -5,14 +5,17 @@ import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  * Graph representation of a HCE.
@@ -20,7 +23,7 @@ import javax.swing.JPanel;
  * @author Pedro Cuadra
  *
  */
-public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> {
+public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> {
   /**
    * Serial version UID.
    */
@@ -32,12 +35,31 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
   /**
    * Levels partitioning of dependencies.
    */
-  private ArrayList<ArrayList<GraphNode>> levels;
+  private HashMap<Integer, ArrayList<GraphNode>> levels;
   /**
    * Node to topological level mapping.
    */
-  private ArrayList<Integer> nodeLevelMap;
-
+  private HashMap<GraphNode, Integer> nodeLevelMap;
+  /**
+   * Id to nod map.
+   */
+  private HashMap<Integer, GraphNode> nodeId;
+  /**
+   * Has cycles flag. 
+   */
+  private boolean hasCycles;
+  
+  /**
+   * Cycle found exception.
+   */
+  public static class CycleException extends RuntimeException {
+    /**
+     * Serial Version UID.
+     */
+    private static final long serialVersionUID = 1L;
+    
+  }
+  
   /**
    * Constructor.
    */
@@ -46,7 +68,21 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     
     edges = new ArrayList<DefaultWeightedEdge>();
     
-    nodeLevelMap = new ArrayList<Integer>();
+    nodeLevelMap = new HashMap<GraphNode, Integer>();
+       
+    nodeId = new HashMap<Integer, GraphNode>();
+    
+  }
+  
+  /* (non-Javadoc)
+   * @see org.jgrapht.graph.AbstractBaseGraph#addVertex(java.lang.Object)
+   */
+  @Override
+  public boolean addVertex(GraphNode node) {
+    
+    nodeId.put(node.getTaskId(), node);
+    
+    return super.addVertex(node);
     
   }
   
@@ -58,15 +94,36 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * @param cost communication cost
    * @throws CycleFoundException cycle found
    */
-  public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) 
-      throws CycleFoundException {
+  public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
     DefaultWeightedEdge edge = this.getEdgeFactory().createEdge(nodeSrc, nodeDst);
-
-    addDagEdge(nodeSrc, nodeDst, edge);
-    setEdgeWeight(edge, cost);
+    double prevCommCost = getCommunicationCost(nodeSrc, nodeDst);
     
-    edges.add(edge);
+    // Multiple edges are merged together summing their costs
+    if (!this.containsEdge(nodeSrc, nodeDst)) {
+      addEdge(nodeSrc, nodeDst, edge);
+      edges.add(edge);
+    }
     
+    setEdgeWeight(this.getEdge(nodeSrc, nodeDst), prevCommCost + cost);
+    
+    CycleDetector<GraphNode, DefaultWeightedEdge> cd = 
+        new CycleDetector<GraphNode, DefaultWeightedEdge>(this);
+    
+    hasCycles = cd.detectCycles();
+    
+  }
+  
+  /**
+   * Get communication cost between to tasks.
+   * @param nodeSrc source node
+   * @param nodeDst destination node
+   * @return communication cost (zero for non-existing edges)
+   */
+  public double getCommunicationCost(GraphNode nodeSrc, GraphNode nodeDst) {
+    if (this.getEdge(nodeSrc, nodeDst) == null) {
+      return 0;
+    }
+    return this.getEdgeWeight(this.getEdge(nodeSrc, nodeDst));
   }
   
   /**
@@ -76,18 +133,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * @return graph node with given id
    */
   protected GraphNode getGraphNodeById(int id) {
-    Iterator<GraphNode> it = this.iterator();
-    
-    // TODO: This can be improved by a hashmap
-    while (it.hasNext()) {
-      GraphNode node = it.next();
-      
-      if (node.getTaskId() == id) {
-        return node;
-      }
-    }
-    
-    return null;
+    return nodeId.get(new Integer(id));
   }
   
   /* (non-Javadoc)
@@ -96,11 +142,9 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
   @Override
   public Graph clone() {
     Graph graph = new Graph();
-    Iterator<GraphNode> currNode = this.iterator();
     
     // Copy all vertex
-    while (currNode.hasNext()) {
-      GraphNode node = currNode.next();
+    for (GraphNode node: this.vertexSet()) {
       graph.addVertex(node.clone());
     }
     
@@ -108,18 +152,14 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
     for (DefaultWeightedEdge edge : edges) {
       GraphNode src = this.getEdgeSource(edge);
       GraphNode dst = this.getEdgeTarget(edge);
+      
       double weight = this.getEdgeWeight(edge);
       
       // Get the actual nodes in the current graph
       src = graph.getGraphNodeById(src.getTaskId());
       dst = graph.getGraphNodeById(dst.getTaskId());
       
-      try {
-        graph.addDependency(src, dst, weight);
-      } catch (org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException e) {
-        e.printStackTrace();
-        return null;
-      }
+      graph.addDependency(src, dst, weight);
             
     }
     
@@ -133,42 +173,58 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * Updates the topological levels lists.
    */
   private void buildTopologicalLevels() {
-    levels = new ArrayList<ArrayList<GraphNode>>();
-    levels.add(new ArrayList<GraphNode>());
     nodeLevelMap.clear();
+    levels = new HashMap<Integer, ArrayList<GraphNode>>();
     
-    Iterator<GraphNode> it = this.iterator();
-    
-    // Assumes that the nodes are topologically ordered
-    while (it.hasNext()) {
-      GraphNode currNode = it.next();
-      
-      Integer nodeLevel = new Integer(0);
-      
-      // Get maximum level inherited from predecesors
-      for (GraphNode depNode: getAncestors(this, currNode)) {
-        if (nodeLevel < ((Integer)depNode.getCookie()) + 1) {
-          nodeLevel = (Integer) (((Integer)depNode.getCookie()) + 1);
-        }
-      }
-      
-      // If level is bigger add new level (works because of the iteration order)
-      while (nodeLevel + 1 > levels.size()) {
-        levels.add(new ArrayList<GraphNode>());
-      }
-      
-      // If nodeLevelMap size isn't big enough
-      while (currNode.getTaskId() + 1 > nodeLevelMap.size()) {
-        nodeLevelMap.add(new Integer(0));
-      }
-      
-      // Add node to the level
-      levels.get(nodeLevel).add(currNode);
-      currNode.setCookie(nodeLevel);
-      nodeLevelMap.add(currNode.getTaskId(), new Integer(nodeLevel));
-      
+    // Check for cycles before
+    if (checkCycles()) {
+      throw new CycleException();
     }
     
+    // Assumes that the nodes are topologically ordered
+    for (GraphNode currNode: this.vertexSet()) {
+      getTopologicalLevel(currNode);
+    }
+    
+  }
+
+  /**
+   * Calculate the topological level of a node.
+   * 
+   * @param node graph node
+   * @return topological level
+   */
+  private Integer getTopologicalLevel(GraphNode node) {
+    Integer nodeLevel = new Integer(0);
+    
+    assert !checkCycles() : "Cycle found!";
+    
+    // If cookie already set
+    if (node.getCookie() != null) {
+      return (Integer) node.getCookie();
+    }
+
+    // Get maximum level inherited from predecessors
+    for (DefaultWeightedEdge inEdge: incomingEdgesOf(node)) {
+      GraphNode depNode = this.getEdgeSource(inEdge);
+      
+      if (nodeLevel < (getTopologicalLevel(depNode) + 1)) {
+        nodeLevel = (Integer) (((Integer)depNode.getCookie()) + 1);
+      }
+    }
+    
+    node.setCookie(nodeLevel);
+    
+    // If level doesn't exist create it
+    if (levels.get(nodeLevel) == null) {
+      levels.put(nodeLevel, new ArrayList<GraphNode>());
+    }
+    
+    // Add node to the level
+    levels.get(nodeLevel).add(node);
+    nodeLevelMap.put(node, new Integer(nodeLevel));
+    
+    return nodeLevel;    
   }
   
   /**
@@ -182,6 +238,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       buildTopologicalLevels();
     }
     
+    assert !checkCycles() : "Cycle found!";
     assert topoIndex < levels.size() : "Out of bound topological level";
     
     return levels.get(topoIndex);
@@ -197,7 +254,9 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       buildTopologicalLevels();
     }
     
-    return levels.size();
+    assert !checkCycles() : "Cycle found!";
+    
+    return levels.keySet().size();
   }
   
   /**
@@ -211,9 +270,10 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       buildTopologicalLevels();
     }
     
-    assert taskId < nodeLevelMap.size();
+    assert !checkCycles() : "Cycle found!";
+    assert taskId < nodeLevelMap.keySet().size();
     
-    return (int) nodeLevelMap.get(taskId);
+    return (int) nodeLevelMap.get(getGraphNodeById(taskId));
   }
   
   /**
@@ -245,7 +305,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
      */
     public GraphDrawer() {
       super();
-
+      
       mxgraph = new mxGraph();
 
       // Begin adding all graph's elements
@@ -254,9 +314,7 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       try {
         
         // Add nodes per level
-        for (int l = 0; l < getMaxTopologicalLevel(); l++) {
-          insertLevel(l);
-        }
+        buildGraph();
        
       } finally {
         
@@ -271,70 +329,63 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
       // Create graph component and add graph to it
       mxGraphComponent graphComponent = new mxGraphComponent(mxgraph);
       this.add(graphComponent);
+      
+      mxgraph.setCellsEditable(false);
     }
     
     /**
      * Insert all vertex and edges of a topological level.
      * @param level topological level
      */
-    private void insertLevel(int level) {
-      ArrayList<GraphNode> nodes = getTologicalLevelNodes(level);
+    private void buildGraph() {
       Object defParent = mxgraph.getDefaultParent();
       
-      // Iterate over all node in the level      
-      for (int n = 0; n < nodes.size(); n++) {
+      Graph graph = getGraph().clone();
+      
+      // Iterate over all node   
+      for (GraphNode node : graph.vertexSet()) {
+        insertNode(node);     
         
-        // Add node as vertex
-        Object v1 = mxgraph.insertVertex(defParent, 
-            null, 
-            nodes.get(n), 
-            0, 
-            0, 
-            NODE_WIDTH,
-            NODE_HEIGHT,
-            "shape=ellipse");
-        
-        // Set resulting object as cookie
-        nodes.get(n).setCookie(v1);
-        
-        if (level == 0) {
-          continue;
-        } 
-        
-        // Get all parents of the given node
-        ArrayList<GraphNode> parents = getParents(nodes.get(n));
-        
-        Graph graph = getGraph();
-        
-        // Add all the edges from all this node's parents to this node
-        for (GraphNode parent: parents) {
+        // Add all incomming edges
+        for (DefaultWeightedEdge inEdges: graph.incomingEdgesOf(node)) {
+          GraphNode parent = graph.getEdgeSource(inEdges);
+          
+          // Add parent in case it wasn't already added
+          insertNode(parent);
+          
           mxgraph.insertEdge(defParent, 
               null, 
-              graph.getEdgeWeight(graph.getEdge(parent, nodes.get(n))), 
+              graph.getEdgeWeight(graph.getEdge(parent, node)), 
               parent.getCookie(), 
-              v1);
+              node.getCookie());
         }
       }
     }
-
+    
     /**
-     * Get all parents of a given node.
-     * 
-     * @param node given node
-     * @return a list of all parents of the given node
+     * Insert node if wasn't already added.
+     * @param node node to be inserted
      */
-    private ArrayList<GraphNode> getParents(GraphNode node) {
-      ArrayList<GraphNode> parents = new ArrayList<GraphNode>();
-      Graph graph = getGraph();
+    private void insertNode(GraphNode node) {
       
-      // Iterate over all predecessors and find direct links
-      for (GraphNode pred: graph.getAncestors(graph, node)) {
-        if (graph.getAllEdges(pred, node).size() > 0) {
-          parents.add(pred);
-        }
+      if (node.getCookie() != null) {
+        return;
       }
       
-      return parents;
+      Object defParent = mxgraph.getDefaultParent();
+      
+      // Add node as vertex
+      Object v1 = mxgraph.insertVertex(defParent, 
+          null, 
+          node, 
+          0, 
+          0, 
+          NODE_WIDTH,
+          NODE_HEIGHT,
+          "shape=ellipse");
+      
+      // Set resulting object as cookie
+      node.setCookie(v1);
     }
 
   }
@@ -351,19 +402,17 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    * Draw graph.
    */
   public void drawGraph() {
-    JPanel panel = getGraphPanel();
-    
     // Create and set up the window.
     JFrame frame = new JFrame("Graph Representation of HCE");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+    
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    
     // Add content to the window.
-    frame.add(panel);
-
+    frame.add(getGraphPanel());
+    
     // Display the window.
     frame.pack();
     frame.setVisible(true);
-    frame.setEnabled(false);
   }
   
   /**
@@ -371,12 +420,25 @@ public class Graph extends DirectedAcyclicGraph<GraphNode, DefaultWeightedEdge> 
    *
    * @return graph panel
    */
-  public JPanel getGraphPanel() {
+  public Component getGraphPanel() {
     JPanel panel = new GraphDrawer();
     
-    panel.setEnabled(false);
+    // add the panel to a JScrollPane
+    JScrollPane scrollPane = new JScrollPane(panel);
+    // only a configuration to the jScrollPane...
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
-    return panel;
+    return (Component) scrollPane;
+  }
+  
+  /**
+   * Check if there are cycles in the graph.
+   * 
+   * @return true if the graph has cycles and false otherwise
+   */
+  public boolean checkCycles() {
+    return this.hasCycles;
   }
 
 }

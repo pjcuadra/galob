@@ -108,18 +108,17 @@ public class HeterogeneousComputingEnv extends Graph {
     assert containsVertex(nodeSrc) : "Invalid task node";
     assert containsVertex(nodeDst) : "Invalid task node";
     
-    try {
-      // Add dependency to the graph
-      super.addDependency(nodeSrc, nodeDst, cost);
-      
-      // Add dependency to the matrices
-      this.delta[nodeSrc.getTaskId()][nodeDst.getTaskId()] = 1;
-      this.commCost[nodeSrc.getTaskId()][nodeDst.getTaskId()] = cost;
-      
-    } catch (org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException e) {
-      e.printStackTrace();
+    if (nodeSrc.getTaskId() == nodeDst.getTaskId()) {
+      return;
     }
     
+    // Add dependency to the graph
+    super.addDependency(nodeSrc, nodeDst, cost);
+
+    // Add dependency to the matrices
+    this.delta[nodeSrc.getTaskId()][nodeDst.getTaskId()] = 1;
+    this.commCost[nodeSrc.getTaskId()][nodeDst.getTaskId()] += cost;
+
   }
   
   /**
@@ -147,6 +146,7 @@ public class HeterogeneousComputingEnv extends Graph {
    */
   public double[][] getDependencyMatrix() {
     assert this.addedTasks > 0 : "No tasks added to the HCE";
+    
     return Util.copyMatrix(delta);
   }
 

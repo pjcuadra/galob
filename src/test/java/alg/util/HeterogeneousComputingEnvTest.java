@@ -14,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Iterator;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
@@ -311,24 +310,15 @@ public class HeterogeneousComputingEnvTest {
   public void testGetDependencyMatrix() {
     HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(numTasks, numCores, false);
     double[][] matrix;
-    int count = 0;
     matrix = env.getDependencyMatrix();
     
     // Verify size
     assertEquals(numTasks, matrix.length);
     assertEquals(numTasks, matrix[0].length);
     
-    // Lower diagonal has to be zero
-    for (int i = 0; i < numTasks; i++) {
-      for (int j = i + 1; j < numTasks; j++) {
-        if (matrix[i][j] != 0) {
-          count++;
-        }
-      }
-    }
-
-    // Loops count
-    assertEquals(count, 0);
+    // Check for cycles
+    assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
+    assertEquals(false, env.checkCycles());
   }
 
   @Test
@@ -420,30 +410,23 @@ public class HeterogeneousComputingEnvTest {
   public void testGetGraphCopy() {
     HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(numTasks, numCores, false);
     Graph graphCopy = env.getGraphCopy();
-    Iterator<GraphNode> currNode = graphCopy.iterator();
     
     // Verify that it was correctly copied
-    while (currNode.hasNext()) {
-      GraphNode node = currNode.next();
+    for (GraphNode node: graphCopy.vertexSet()) {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
       
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
       assertEquals(node.getCookie(), envNode.getCookie());
     }
     
-    currNode = graphCopy.iterator();
     
     // Let's modify the copy
-    while (currNode.hasNext()) {
-      GraphNode node = currNode.next();
+    for (GraphNode node: graphCopy.vertexSet()) {
       node.setCookie(10);
     }
     
-    currNode = graphCopy.iterator();
-    
     // Let's compare again
-    while (currNode.hasNext()) {
-      GraphNode node = currNode.next();
+    for (GraphNode node: graphCopy.vertexSet()) {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
       
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
@@ -482,13 +465,10 @@ public class HeterogeneousComputingEnvTest {
     HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandomUnitary(numTasks, 
         numCores, 
         false);
-    Iterator<GraphNode> currNode = env.iterator();
     double[] expectedRow = DoubleStream.generate(() -> 1).limit(numCores).toArray();
     
     // Verify that it was correctly copied
-    while (currNode.hasNext()) {
-      GraphNode node = currNode.next();
-      
+    for (GraphNode node: env.vertexSet()) {
       assertArrayEquals(expectedRow, node.getEtcRow(), EPSILON);
     }
     

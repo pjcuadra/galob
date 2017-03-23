@@ -78,7 +78,7 @@ public class LoadBalancingExample {
    * Heterogeneous Computing Environment.
    */
   static final HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(NUM_TASKS, 
-      NUM_TASKS);
+      NUM_EXECUTORS);
 
   /**
    * Main function.
@@ -132,7 +132,7 @@ public class LoadBalancingExample {
   /**
    * Initialize the HCE.
    */
-  private static void buildEnvironment() {
+  private static void buildEnvironment() { 
     GraphNode[] tasks = new GraphNode[NUM_TASKS];
     
     // Create all tasks

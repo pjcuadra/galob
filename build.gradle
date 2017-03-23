@@ -1,7 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'eclipse'
-apply plugin: 'checkstyle'
+plugins {
+	id 'java'
+	id 'eclipse'
+	id 'checkstyle'
+	id 'jvm-component'
+    id 'java-lang'
+}
 
 version = '1.0'
 sourceCompatibility = 1.8
@@ -27,12 +30,18 @@ dependencies {
     compile 'org.jgrapht:jgrapht-core:0.9.0',
             'org.jgrapht:jgrapht-ext:1.0.0',
     	    'jgraph:jgraph:5.13.0.0'
+    	    
+    	    
     testCompile 'junit:junit:4.12'
 
 }
 
-// Run default example
-mainClassName = 'examples.ExecutionTimeExample'
+
+// Check the style of Java code
+checkstyle {
+    configFile = file("${project.rootDir}/config/google_checks.xml")
+    toolVersion = '6.7'
+}
 
 // Run only execution time optimization example
 task runExecutionTimeExample(type: JavaExec) {
@@ -46,8 +55,15 @@ task runLoadBalancingExample(type: JavaExec) {
   main = 'examples.LoadBalancingExample'
 }
 
-// Check the style of Java code
-checkstyle {
-    configFile = file("${project.rootDir}/config/google_checks.xml")
-    toolVersion = '6.7'
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+        	'Implementation-Version': 1.0,
+        	'Main-Class': 'examples.LoadBalancingExample'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }

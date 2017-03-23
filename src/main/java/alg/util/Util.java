@@ -62,9 +62,9 @@ public class Util {
     double[][] depend = new double[numTasks][numTasks];
     // Initialize the upper triangular matrix with ones randomly
 
-    for (int i = 0; i < numTasks; i++) {
-      for (int j = 0; j < i; j++) {
-        depend[i][j] = randomGen.nextBoolean() ? 1 : 0;
+    for (int col = 0; col < numTasks; col++) {
+      for (int row = 0; row < col; row++) {
+        depend[row][col] = randomGen.nextBoolean() ? 1 : 0;
       }
     }
 
@@ -375,6 +375,25 @@ public class Util {
     }
 
     return omega;
+  }
+  
+  /**
+   * Check dependency matrix for cycles.
+   * @param delta dependency matrix
+   * @return true if a cycle was found and false otherwise
+   */
+  public static boolean checkCycleRandomDependencyMatrix(double[][] delta) {
+    // Lower diagonal has to be zero
+    for (int col = 0; col < delta.length; col++) {
+      for (int row = col + 1; row < delta.length; row++) {
+        if (delta[row][col] != 0) {
+          System.out.println("Cycle detected => (" + row + ")->(" + col + ")");
+          return true;
+        }
+      }
+    }
+    
+    return false;
   }
   
 }
