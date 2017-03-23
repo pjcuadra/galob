@@ -7,7 +7,6 @@ import alg.util.jenetics.ScheduleChromosome;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * Graph statistic.
@@ -80,12 +79,16 @@ public class Stats {
     
     Graph newGraph = env.getGraphCopy();
     
-    Iterator<GraphNode> it = newGraph.iterator();
-    
     // This iteration is in topological order according to JGraphT
-    while (it.hasNext()) {
-      GraphNode curr = it.next();
-      double currAft = getActualFinishTime(newGraph, curr);
+    for (GraphNode curr: newGraph.vertexSet()) {
+      double currAft = 0;
+      
+      
+      if (newGraph.checkCycles()) {
+        throw new Graph.CycleException();
+      }
+      
+      currAft = getActualFinishTime(newGraph, curr);
       
       if (currAft > makespanK[getExecutionUnit(curr.getTaskId())]) {
         makespanK[getExecutionUnit(curr.getTaskId())] = currAft;
@@ -108,19 +111,19 @@ public class Stats {
     
     double startTime = 0;
     
+    if (node.getCookie() != null) {
+      return (double) node.getCookie();
+    }
+    
     // Get earliest start time
-    for (GraphNode anc : graph.getAncestors(graph, node)) {
-      Double tempStartTime = (Double) anc.getCookie();
-      DefaultWeightedEdge edge = graph.getEdge(anc, node);
-      
-      if (edge == null) {
-        continue;
-      }
+    for (DefaultWeightedEdge inEdge : graph.incomingEdgesOf(node)) {
+      GraphNode anc = graph.getEdgeSource(inEdge);
+      Double tempStartTime = (Double) getActualFinishTime(graph, anc);
       
       // If were allocated in the same core don't add communications
       if (getExecutionUnit(node.getTaskId()) != getExecutionUnit(anc.getTaskId())) {
         // Add communication costs
-        tempStartTime += graph.getEdgeWeight(edge);
+        tempStartTime += graph.getEdgeWeight(inEdge);
       }
       
       if (tempStartTime > startTime) {

@@ -3,6 +3,7 @@ package alg.util.jenetics;
 import alg.util.HeterogeneousComputingEnv;
 import alg.util.Stats;
 import alg.util.Util;
+import alg.util.graph.Graph;
 import alg.util.jenetics.ScheduleChromosome;
 
 import org.jenetics.Chromosome;
@@ -46,9 +47,14 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     this.env = env;
     double[][] deltaTemp =  env.getDependencyMatrix();
     
+    // Check for cycles first!
+    if (env.checkCycles()) {
+      throw new Graph.CycleException();
+    }
+    
     // Create a gene to use it as factory
     gene =  ScheduleGene.of(env.getNumberOfTasks(), env.getNumberOfExecutors());
-
+    
     // Initialize the alleles list
     for (int i = 0; i < env.getNumberOfTasks(); i++) {
       toSchedule.add(new ScheduleAllele(env.getNumberOfTasks(), env.getNumberOfExecutors(), i));

@@ -114,19 +114,9 @@ public class UtilTest {
   @Test
   public void testCreateRandomDependencyMatrix() throws Exception {
     double[][] matrix;
-    int count = 0;
     matrix = Util.createRandomDependencyMatrix(numTask);
     
-    // Lower diagonal has to be zero
-    for (int i = 0; i < numTask; i++) {
-      for (int j = i + 1; j < numTask; j++) {
-        if (matrix[i][j] != 0) {
-          count++;
-        }
-      }
-    }
-
-    assertEquals(count, 0);
+    assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
   }
 
   
@@ -281,6 +271,12 @@ public class UtilTest {
   @Ignore("Note yet implemented")
   @Test
   public void testCreateRandomEnv() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testCheckCycle() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
   
