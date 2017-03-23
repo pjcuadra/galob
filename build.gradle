@@ -2,8 +2,6 @@ plugins {
 	id 'java'
 	id 'eclipse'
 	id 'checkstyle'
-	id 'jvm-component'
-    id 'java-lang'
 }
 
 version = '1.0'
@@ -56,14 +54,13 @@ task runLoadBalancingExample(type: JavaExec) {
 }
 
 
-//create a single Jar with all dependencies
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File Example',
-        	'Implementation-Version': 1.0,
-        	'Main-Class': 'examples.LoadBalancingExample'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+// Create a single Jar exposing all our dependencies
+task api(type: Jar) {
+  manifest {
+    attributes 'Implementation-Title': 'API Jar File',
+               'Implementation-Version': 1.0
+  }
+  baseName = project.name + '-api'
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+  with jar
 }
