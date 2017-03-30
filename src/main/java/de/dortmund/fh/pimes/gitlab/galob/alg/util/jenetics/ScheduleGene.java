@@ -23,6 +23,8 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
 import org.jenetics.Gene;
 
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
+
 /**
  * Schedule gene.
  * 
@@ -35,13 +37,9 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
    */
   private ScheduleAllele allele;
   /**
-   * Number of tasks.
+   * Heterogeneous Computing Environment.
    */
-  private int numTasks;
-  /**
-   * Number of executing units.
-   */
-  private int numExecutors;
+  private HeterogeneousComputingEnv env;
 
   /**
    * Constructor.
@@ -49,25 +47,8 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
    * @param numTasks number of tasks
    * @param numExecutors number of executing units
    */
-  public ScheduleGene(int numTasks, int numExecutors) {
-    this.numTasks = numTasks;
-    this.numExecutors = numExecutors;
-
-    allele = new ScheduleAllele(numTasks, numExecutors);
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param numTasks number of tasks
-   * @param numExecutors number of executing units
-   * @param allele existing allele
-   */
-  public ScheduleGene(int numTasks, int numExecutors, ScheduleAllele allele) {
-    this.numTasks = numTasks;
-    this.numExecutors = numExecutors;
-
-    this.allele = allele;
+  public ScheduleGene(HeterogeneousComputingEnv env) {
+    this.env = env;
   }
 
   /* (non-Javadoc)
@@ -92,15 +73,15 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
    */
   @Override
   public ScheduleGene newInstance() {
-    return new ScheduleGene(numTasks, numExecutors);
+    return ScheduleGene.ofRandom(env);
   }
 
   /* (non-Javadoc)
    * @see org.jenetics.Gene#newInstance(java.lang.Object)
    */
   @Override
-  public ScheduleGene newInstance(ScheduleAllele value) {
-    return new ScheduleGene(numTasks, numExecutors, value);
+  public ScheduleGene newInstance(ScheduleAllele allele) {
+    return ScheduleGene.ofAllele(env, allele);
   }
 
   /* (non-Javadoc)
@@ -111,23 +92,37 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
   }
 
   /**
-   * Static constructor.
+   * Random gene builder.
    * 
-   * @param numTasks number of tasks
-   * @param numExecutors number of executors
+   * @param env Heterogeneous Computing Environment
    * @return newly created gene
    */
-  public static ScheduleGene of(int numTasks, int numExecutors) {
-    return new ScheduleGene(numTasks, numExecutors);
+  public static ScheduleGene ofRandom(HeterogeneousComputingEnv env) {
+    ScheduleGene gene = new ScheduleGene(env);
+    gene.allele =  ScheduleAllele.ofRandom(env);
+    return gene;
+  }
+  
+  /**
+   * Gene builder for a given Allele.
+   * 
+   * @param env Heterogeneous Computing Environment
+   * @param allele allele to be assigned to the gene
+   * @return newly created gene
+   */
+  public static ScheduleGene ofAllele(HeterogeneousComputingEnv env, ScheduleAllele allele) {
+    ScheduleGene gene = new ScheduleGene(env);
+    gene.allele = allele;
+    return gene;
   }
 
   /**
    * Mutate a gene by setting a new allele.
    * 
-   * @param value new allele
+   * @param allele new allele
    */
-  public void mutate(ScheduleAllele value) {
-    allele = value;
+  public void mutate(ScheduleAllele allele) {
+    this.allele = allele;
   }
   
   /* (non-Javadoc)
@@ -146,4 +141,5 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
     return gene.allele.equals(this.allele);
     
   }
+  
 }

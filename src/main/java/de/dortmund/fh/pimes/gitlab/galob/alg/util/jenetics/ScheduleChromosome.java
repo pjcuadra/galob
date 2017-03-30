@@ -45,7 +45,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Scheduling sequence of ScheduleItem's genes.
    */
-  public ISeq<ScheduleGene> scheduleSeq;
+  private ISeq<ScheduleGene> scheduleSeq;
   /**
    * Heterogeneous computing environment.
    */
@@ -74,11 +74,11 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     }
     
     // Create a gene to use it as factory
-    gene =  ScheduleGene.of(env.getNumberOfTasks(), env.getNumberOfExecutors());
+    gene =  ScheduleGene.ofRandom(env);
     
     // Initialize the alleles list
-    for (int i = 0; i < env.getNumberOfTasks(); i++) {
-      toSchedule.add(new ScheduleAllele(env.getNumberOfTasks(), env.getNumberOfExecutors(), i));
+    for (int taskId = 0; taskId < env.getNumberOfTasks(); taskId++) {
+      toSchedule.add(ScheduleAllele.ofTask(env, taskId));
     }
 
     // Finish until everything is allocated (assuming no cycles)

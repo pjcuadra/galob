@@ -84,8 +84,8 @@ public class ScheduleChromosomeTest {
   @Test
   public void checkvalidity() {
     final int numTasks = 4;
-    ArrayList<ScheduleGene> allelList = new ArrayList<ScheduleGene>();
-    ScheduleAllele allel = null;
+    ArrayList<ScheduleGene> alleleList = new ArrayList<ScheduleGene>();
+    ScheduleAllele allele = null;
     GraphNode[] tasks = new GraphNode[numTasks];
 
     // Create the HCE
@@ -107,12 +107,12 @@ public class ScheduleChromosomeTest {
 
     // Create first chromosome
     for (int task: chromosomeSeq1) {
-      allel = new ScheduleAllele(4, 4, task);
-      allelList.add(new ScheduleGene(4, 4, allel));
+      allele = ScheduleAllele.ofTask(env, task);
+      alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
 
     ScheduleChromosome chromosome;
-    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(alleleList));
     assertEquals(true, chromosome.isValid());
 
 
@@ -120,26 +120,26 @@ public class ScheduleChromosomeTest {
     int[] chromosomeSeq2 = {0, 2, 1, 3};
 
     // Create second chromosom
-    allelList = new ArrayList<ScheduleGene>();
+    alleleList = new ArrayList<ScheduleGene>();
     for (int task: chromosomeSeq2) {
-      allel = new ScheduleAllele(4, 4, task);
-      allelList.add(new ScheduleGene(4, 4, allel));
+      allele = ScheduleAllele.ofTask(env, task);
+      alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
 
-    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(alleleList));
     assertEquals(false, chromosome.isValid());
 
     // Already known invalid solution (repeat task)
     int[] chromosomeSeq3 = {0,1,2,0};
 
     // Create second chromosome
-    allelList = new ArrayList<ScheduleGene>();
+    alleleList = new ArrayList<ScheduleGene>();
     for (int task: chromosomeSeq3) {
-      allel = new ScheduleAllele(4, 4, task);
-      allelList.add(new ScheduleGene(4, 4, allel));
+      allele = ScheduleAllele.ofTask(env, task);
+      alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
 
-    chromosome = new ScheduleChromosome(env, ISeq.of(allelList));
+    chromosome = new ScheduleChromosome(env, ISeq.of(alleleList));
     assertEquals(false, chromosome.isValid());
 
   }

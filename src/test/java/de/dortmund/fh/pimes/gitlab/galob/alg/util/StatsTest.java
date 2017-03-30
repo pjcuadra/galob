@@ -55,7 +55,7 @@ public class StatsTest {
   /**
    * Test environment set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception failure exception
    */
   @Before
   public void setUp() throws Exception {
