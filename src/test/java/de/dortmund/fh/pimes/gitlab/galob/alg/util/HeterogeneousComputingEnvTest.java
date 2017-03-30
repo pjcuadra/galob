@@ -27,12 +27,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.SimulatedAnnealing;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.Util;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.Graph;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
 
+import org.jenetics.Optimize;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,7 +70,7 @@ public class HeterogeneousComputingEnvTest {
 
   /**
    * Unit testing set-up.
-   * 
+   *
    * @throws Exception
    *           failure exception
    */
@@ -387,7 +385,7 @@ public class HeterogeneousComputingEnvTest {
     double gammaFactor = 0.8;
     int initialTemp = 900;
     SimulatedAnnealing expectedSimAnn =
-        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc);
+        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc, Optimize.MINIMUM);
 
     assertEquals(false, env.getSimulatedAnnealingEnabled());
 
@@ -404,7 +402,7 @@ public class HeterogeneousComputingEnvTest {
     double gammaFactor = 0.8;
     int initialTemp = 900;
     SimulatedAnnealing expectedSimAnn =
-        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc);
+        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc, Optimize.MINIMUM);
 
     SimulatedAnnealing actualSimAnn;
 

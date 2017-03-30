@@ -22,13 +22,17 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import de.dortmund.fh.pimes.gitlab.galob.alg.ExecutionTimeFitnessCalculator;
 import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.SimulatedAnnealing;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleAllele;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
+import org.jenetics.Optimize;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Random;
@@ -65,7 +69,7 @@ public class SimulatedAnnealingTest {
 
   /**
    * Set up test.
-   * 
+   *
    * @throws Exception
    *           when fails
    */
@@ -81,17 +85,67 @@ public class SimulatedAnnealingTest {
 
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testCheckCriteria() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    final int numTasks = 3;
+    final int numCores = 2;
+    HeterogeneousComputingEnv envTest = new HeterogeneousComputingEnv(numTasks, numCores);
+    GraphNode[] tasks = new GraphNode[numTasks];
+
+    // Add all tasks
+    for (int i = 0; i < numTasks; i++) {
+      tasks[i] = envTest.addUnitExecutionTimeTask();
+    }
+
+    // Create dependencies
+    envTest.addDependency(tasks[0], tasks[1], 1);
+    envTest.addDependency(tasks[0], tasks[2], 1);
+    envTest.addDependency(tasks[1], tasks[2], 1);
+
+    ScheduleChromosome normal = new ScheduleChromosome(envTest);
+
+    // Guarantee that task 0 and 2 are in the same core and 1 in the other
+    normal.toSeq().get(0).mutate(ScheduleAllele.of(envTest, 0, 0));
+    normal.toSeq().get(1).mutate(ScheduleAllele.of(envTest, 1, 0));
+    normal.toSeq().get(2).mutate(ScheduleAllele.of(envTest, 2, 0));
+
+    ScheduleChromosome greater = new ScheduleChromosome(envTest);
+
+    // Guarantee that task 0 and 2 are in the same core and 1 in the other
+    greater.toSeq().get(0).mutate(ScheduleAllele.of(envTest, 0, 0));
+    greater.toSeq().get(1).mutate(ScheduleAllele.of(envTest, 1, 1));
+    greater.toSeq().get(2).mutate(ScheduleAllele.of(envTest, 2, 0));
+
+    ExecutionTimeFitnessCalculator fitnessCalc = new ExecutionTimeFitnessCalculator(envTest);
+
+    // Verify the fitness
+    assertEquals(3, fitnessCalc.getFitness(normal), EPSILON);
+    assertEquals(5, fitnessCalc.getFitness(greater), EPSILON);
+
+    // Create simulated annealing with Minimum technique
+    double gammaFactor = 0.8;
+    SimulatedAnnealing simAnn =
+        new SimulatedAnnealing(gammaFactor, 0, fitnessCalc, Optimize.MINIMUM);
+
+    assertTrue(simAnn.checkCriteria(greater, normal));
+    // Since temperature is zero
+    assertFalse(simAnn.checkCriteria(normal, greater));
+
+    // Create new simulated annealing with Maximim technique
+    simAnn = new SimulatedAnnealing(gammaFactor, 0, fitnessCalc, Optimize.MAXIMUM);
+
+    assertTrue(simAnn.checkCriteria(normal, greater));
+    // Since temperature is zero
+    assertFalse(simAnn.checkCriteria(greater, normal));
+
   }
 
   @Test
   public void testGetTemp() throws Exception {
     LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
     double gammaFactor = 0.8;
-    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc);
+    SimulatedAnnealing simAnn =
+        new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc, Optimize.MAXIMUM);
 
     assertEquals(randTemp, simAnn.getTemp(), EPSILON);
 
@@ -101,7 +155,8 @@ public class SimulatedAnnealingTest {
   public void testSetTemp() throws Exception {
     LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
     double gammaFactor = 0.8;
-    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc);
+    SimulatedAnnealing simAnn =
+        new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc, Optimize.MAXIMUM);
 
     double newTemp = randomGen.nextDouble() * MAX_TEMP;
 

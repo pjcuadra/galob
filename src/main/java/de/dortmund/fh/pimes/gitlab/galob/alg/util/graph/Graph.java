@@ -389,7 +389,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    *          id of the task
    * @return graph node with given id
    */
-  protected GraphNode getGraphNodeById(int id) {
+  public GraphNode getGraphNodeById(int id) {
     return nodeId.get(new Integer(id));
   }
 

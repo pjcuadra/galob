@@ -39,7 +39,7 @@ import org.jenetics.engine.EvolutionStatistics;
 
 /**
  * Example of execution time optimization.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
@@ -89,7 +89,7 @@ public class ExecutionTimeExample {
 
   /**
    * Main function.
-   * 
+   *
    * @param args
    *          command line parameters
    */
@@ -100,16 +100,19 @@ public class ExecutionTimeExample {
 
     // Set the simulated annealing to the environment
     env.setSimulatedAnnealing(
-        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, fitnessCalc));
+        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, fitnessCalc,
+            Optimize.MINIMUM));
 
     // Configure and build the evolution engine.
-    final Engine<ScheduleGene, Double> engine =
-        Engine.builder(fitnessCalc::getFitness, (new ScheduleCodec(env)).ofChromosome())
-            .populationSize(POPULATION_SIZE).optimize(Optimize.MINIMUM)
-            .selector(new RouletteWheelSelector<>())
-            .alterers(new ScheduleMutator(env, MUTATION_PROBABILITY),
-                new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
-            .build();
+    final Engine<ScheduleGene, Double> engine = Engine
+        .builder(fitnessCalc::getFitness, (new ScheduleCodec(env)).ofChromosome())
+          .populationSize(POPULATION_SIZE)
+          .optimize(Optimize.MINIMUM)
+          .selector(new RouletteWheelSelector<>())
+          .alterers(
+              new ScheduleMutator(env, MUTATION_PROBABILITY),
+              new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+          .build();
 
     // Create evolution statistics consumer.
     final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();

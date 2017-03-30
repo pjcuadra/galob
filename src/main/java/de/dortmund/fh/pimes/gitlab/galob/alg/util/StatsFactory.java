@@ -59,11 +59,11 @@ public class StatsFactory {
    */
   public Stats ofChromosome(ScheduleChromosome chromosome) {
 
+    assert chromosome != null : "Chromosome is null";
+
     if (chromosome.getStats() != null) {
       return chromosome.getStats();
     }
-
-    Util.createOmegaMatrix(chromosome.toSeq(), env.getNumberOfExecutors());
 
     Stats stats = new Stats(env, fitnessCalculator, chromosome);
 

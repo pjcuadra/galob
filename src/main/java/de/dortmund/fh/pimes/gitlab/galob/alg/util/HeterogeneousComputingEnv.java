@@ -37,6 +37,42 @@ public class HeterogeneousComputingEnv extends Graph {
    * Serial ID.
    */
   private static final long serialVersionUID = 11L;
+
+  /**
+   * Generates a completely random heterogeneous computing environment.
+   *
+   * @param numTasks
+   *          number of tasks
+   * @param numCores
+   *          number of cores
+   * @param maxProvided
+   *          numTasks and numCores are maximum values if true or exact values if false
+   * @return random heterogeneous computing environment
+   */
+  public static HeterogeneousComputingEnv ofRandom(
+      int numTasks,
+      int numCores,
+      boolean maxProvided) {
+    return Util.ofRandom(numTasks, numCores, maxProvided);
+  }
+
+  /**
+   * Generates a random heterogeneous computing environment with: unit execution time, unit
+   * communication costs and random dependencies.
+   *
+   * @param numTasks
+   *          number of tasks
+   * @param numCores
+   *          number of cores
+   * @return random heterogeneous computing environment
+   */
+  public static HeterogeneousComputingEnv ofRandomUnitary(
+      int numTasks,
+      int numCores,
+      boolean maxProvided) {
+    return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
+  }
+
   /**
    * Dependencies matrix.
    */
@@ -49,10 +85,12 @@ public class HeterogeneousComputingEnv extends Graph {
    * Communication costs matrix.
    */
   private double[][] commCost;
+
   /**
    * Simulated Annealing.
    */
   private SimulatedAnnealing simAnn;
+
   /**
    * Add tasks counter.
    */
@@ -164,21 +202,13 @@ public class HeterogeneousComputingEnv extends Graph {
   }
 
   /**
-   * Get the number of executors in the HCE.
+   * Get a copy of the communication costs matrix.
    *
-   * @return number of executors in the HCE
+   * @return a copy of the communication costs matrix
    */
-  public int getNumberOfExecutors() {
-    return etc[0].length;
-  }
-
-  /**
-   * Get the number of tasks in the HCE.
-   *
-   * @return number of tasks in the HCE
-   */
-  public int getNumberOfTasks() {
-    return delta.length;
+  public double[][] getCommunicationCostsMatrix() {
+    assert this.addedTasks > 0 : "No tasks added to the HCE";
+    return Util.copyMatrix(commCost);
   }
 
   /**
@@ -193,16 +223,6 @@ public class HeterogeneousComputingEnv extends Graph {
   }
 
   /**
-   * Get a copy of the communication costs matrix.
-   *
-   * @return a copy of the communication costs matrix
-   */
-  public double[][] getCommunicationCostsMatrix() {
-    assert this.addedTasks > 0 : "No tasks added to the HCE";
-    return Util.copyMatrix(commCost);
-  }
-
-  /**
    * Get a copy of the expected time to compute matrix.
    *
    * @return a copy of the expected time to compute matrix
@@ -210,35 +230,6 @@ public class HeterogeneousComputingEnv extends Graph {
   public double[][] getExpectedTimeToComputeMatrix() {
     assert this.addedTasks > 0 : "No tasks added to the HCE";
     return Util.copyMatrix(etc);
-  }
-
-  /**
-   * Get the enable state of simulated annealing.
-   *
-   * @return true if simulated annealing is enabled
-   */
-  public boolean getSimulatedAnnealingEnabled() {
-    return simAnn != null;
-  }
-
-  /**
-   * Set the simulated annealing to be used in the HCE.
-   *
-   * @param simAnn
-   *          simulated annealing object
-   */
-  public void setSimulatedAnnealing(SimulatedAnnealing simAnn) {
-    assert simAnn != null : "Null parameter";
-    this.simAnn = simAnn;
-  }
-
-  /**
-   * Get the simulated annealing object.
-   *
-   * @return simulated annealing object
-   */
-  public SimulatedAnnealing getSimulatedAnnealing() {
-    return simAnn;
   }
 
   /**
@@ -259,42 +250,54 @@ public class HeterogeneousComputingEnv extends Graph {
    * @return graph node with given id
    */
   @Override
-  protected GraphNode getGraphNodeById(int id) {
+  public GraphNode getGraphNodeById(int id) {
     return super.getGraphNodeById(id);
   }
 
   /**
-   * Generates a completely random heterogeneous computing environment.
+   * Get the number of executors in the HCE.
    *
-   * @param numTasks
-   *          number of tasks
-   * @param numCores
-   *          number of cores
-   * @param maxProvided
-   *          numTasks and numCores are maximum values if true or exact values if false
-   * @return random heterogeneous computing environment
+   * @return number of executors in the HCE
    */
-  public static HeterogeneousComputingEnv ofRandom(
-      int numTasks,
-      int numCores,
-      boolean maxProvided) {
-    return Util.ofRandom(numTasks, numCores, maxProvided);
+  public int getNumberOfExecutors() {
+    return etc[0].length;
   }
 
   /**
-   * Generates a random heterogeneous computing environment with: unit execution time, unit
-   * communication costs and random dependencies.
+   * Get the number of tasks in the HCE.
    *
-   * @param numTasks
-   *          number of tasks
-   * @param numCores
-   *          number of cores
-   * @return random heterogeneous computing environment
+   * @return number of tasks in the HCE
    */
-  public static HeterogeneousComputingEnv ofRandomUnitary(
-      int numTasks,
-      int numCores,
-      boolean maxProvided) {
-    return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
+  public int getNumberOfTasks() {
+    return delta.length;
+  }
+
+  /**
+   * Get the simulated annealing object.
+   *
+   * @return simulated annealing object
+   */
+  public SimulatedAnnealing getSimulatedAnnealing() {
+    return simAnn;
+  }
+
+  /**
+   * Get the enable state of simulated annealing.
+   *
+   * @return true if simulated annealing is enabled
+   */
+  public boolean getSimulatedAnnealingEnabled() {
+    return simAnn != null;
+  }
+
+  /**
+   * Set the simulated annealing to be used in the HCE.
+   *
+   * @param simAnn
+   *          simulated annealing object
+   */
+  public void setSimulatedAnnealing(SimulatedAnnealing simAnn) {
+    assert simAnn != null : "Null parameter";
+    this.simAnn = simAnn;
   }
 }

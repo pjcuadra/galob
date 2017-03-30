@@ -66,6 +66,10 @@ public class Stats {
    * Fitness calculator.
    */
   private FitnessCalculator fitnessCalculator;
+  /**
+   * Array of timespan of all cores.
+   */
+  private double[] timeSpan;
 
   /**
    * Constructor.
@@ -80,6 +84,7 @@ public class Stats {
     this.env = env;
     this.chromosome = chromosome;
     this.fitnessCalculator = fitnessCalculator;
+    this.timeSpan = new double[env.getNumberOfExecutors()];
   }
 
   /**
@@ -92,8 +97,8 @@ public class Stats {
    * @return actual finish time of the node
    */
   private double getActualFinishTime(Graph graph, GraphNode node) {
-
-    double startTime = 0;
+    int executorId = getExecutionUnit(node.getTaskId());
+    double finishTime = timeSpan[executorId];
 
     if (node.getCookie() != null) {
       return (double) node.getCookie();
@@ -105,22 +110,23 @@ public class Stats {
       Double tempStartTime = getActualFinishTime(graph, anc);
 
       // If were allocated in the same core don't add communications
-      if (getExecutionUnit(node.getTaskId()) != getExecutionUnit(anc.getTaskId())) {
+      if (executorId != getExecutionUnit(anc.getTaskId())) {
         // Add communication costs
         tempStartTime += graph.getEdgeWeight(inEdge);
       }
 
-      if (tempStartTime > startTime) {
-        startTime = tempStartTime;
+      if (tempStartTime > finishTime) {
+        finishTime = tempStartTime;
       }
 
     }
 
-    startTime += node.getExecutionTimeOnUnit(getExecutionUnit(node.getTaskId()));
+    finishTime += node.getExecutionTimeOnUnit(executorId);
 
-    node.setCookie(new Double(startTime));
+    node.setCookie(new Double(finishTime));
+    timeSpan[executorId] = finishTime;
 
-    return startTime;
+    return finishTime;
 
   }
 
@@ -199,19 +205,22 @@ public class Stats {
       return makespanK;
     }
 
-    makespanK = new double[chromosome.toSeq().size()];
+    makespanK = new double[env.getNumberOfExecutors()];
 
     Graph newGraph = env.getGraphCopy();
 
+    // Check for cycles first
+    if (newGraph.checkCycles()) {
+      throw new Graph.CycleException();
+    }
+
+    GraphNode curr;
+
     // This iteration is in topological order according to JGraphT
-    for (GraphNode curr : newGraph.vertexSet()) {
-      double currAft = 0;
+    for (ScheduleGene gene : chromosome) {
+      curr = newGraph.getGraphNodeById(gene.getAllele().getTaskId());
 
-      if (newGraph.checkCycles()) {
-        throw new Graph.CycleException();
-      }
-
-      currAft = getActualFinishTime(newGraph, curr);
+      double currAft = getActualFinishTime(newGraph, curr);
 
       if (currAft > makespanK[getExecutionUnit(curr.getTaskId())]) {
         makespanK[getExecutionUnit(curr.getTaskId())] = currAft;
