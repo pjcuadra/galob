@@ -25,7 +25,7 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
 /**
  * Graph statistics factory.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -41,7 +41,7 @@ public class StatsFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param env
    *          graph object
    */
@@ -52,7 +52,7 @@ public class StatsFactory {
 
   /**
    * Create a graph statistics from a given chromosome.
-   * 
+   *
    * @param chromosome
    *          chromosome
    * @return graph statistics
@@ -63,9 +63,9 @@ public class StatsFactory {
       return chromosome.getStats();
     }
 
-    int[][] omega = Util.createOmegaMatrix(chromosome.toSeq(), env.getNumberOfExecutors());
+    Util.createOmegaMatrix(chromosome.toSeq(), env.getNumberOfExecutors());
 
-    Stats stats = new Stats(env, fitnessCalculator, omega);
+    Stats stats = new Stats(env, fitnessCalculator, chromosome);
 
     chromosome.setStats(stats);
 

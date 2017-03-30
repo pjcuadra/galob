@@ -24,10 +24,12 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.Graph;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Graph statistic.
@@ -57,9 +59,9 @@ public class Stats {
    */
   private double[] makespanK;
   /**
-   * Allocation matrix.
+   * Chromosome.
    */
-  private int[][] omega;
+  private ScheduleChromosome chromosome;
   /**
    * Fitness calculator.
    */
@@ -70,12 +72,13 @@ public class Stats {
    *
    * @param env
    *          heterogeneous computing environment
-   * @param omega
-   *          allocation matrix
+   * @param chromosome
+   *          chromosome
    */
-  public Stats(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator, int[][] omega) {
+  public Stats(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator,
+      ScheduleChromosome chromosome) {
     this.env = env;
-    this.omega = omega;
+    this.chromosome = chromosome;
     this.fitnessCalculator = fitnessCalculator;
   }
 
@@ -140,6 +143,15 @@ public class Stats {
   }
 
   /**
+   * Get the chromosome object.
+   *
+   * @return chromosome object
+   */
+  public ScheduleChromosome getChromosome() {
+    return chromosome;
+  }
+
+  /**
    * Get execution unit of a given task.
    *
    * @param task
@@ -148,13 +160,14 @@ public class Stats {
    */
   private int getExecutionUnit(int task) {
 
-    assert omega[0].length > task : "Task index out of bound: " + omega[0].length + " maximum, "
-        + task + " provided.";
+    assert chromosome.toSeq().size() > task : "Task index out of bound: "
+        + chromosome.toSeq().size() + " maximum, " + task + " provided.";
 
-    for (int i = 0; i < omega.length; i++) {
-      if (omega[i][task] == 1) {
-        return i;
-      }
+    Optional<ScheduleGene> gene =
+        chromosome.toSeq().stream().filter(g -> g.getAllele().getTaskId() == task).findFirst();
+
+    if (gene.isPresent()) {
+      return gene.get().getAllele().getExecutorId();
     }
 
     return 0;
@@ -186,7 +199,7 @@ public class Stats {
       return makespanK;
     }
 
-    makespanK = new double[omega.length];
+    makespanK = new double[chromosome.toSeq().size()];
 
     Graph newGraph = env.getGraphCopy();
 
