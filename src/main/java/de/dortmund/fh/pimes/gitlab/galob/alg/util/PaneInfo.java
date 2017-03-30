@@ -39,8 +39,10 @@ public final class PaneInfo {
   /**
    * Constructor.
    *
-   * @param paneName Chart name
-   * @param cookie cookie object
+   * @param paneName
+   *          Chart name
+   * @param cookie
+   *          cookie object
    */
   public PaneInfo(String paneName, Object cookie) {
 
@@ -50,6 +52,7 @@ public final class PaneInfo {
 
   /**
    * Get the name of the pane.
+   * 
    * @return pane name
    */
   public String getPaneName() {
@@ -58,13 +61,16 @@ public final class PaneInfo {
 
   /**
    * Get cookie or pane.
+   * 
    * @return cookie or pane
    */
   public Object getCookie() {
     return cookie;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

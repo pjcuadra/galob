@@ -34,11 +34,12 @@ public abstract class FitnessCalculator {
    * Graph stats factory.
    */
   private StatsFactory statsFactory;
-  
+
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
+   * @param env
+   *          heterogeneous computing environment
    */
   public FitnessCalculator(HeterogeneousComputingEnv env) {
     setStatsFactory(new StatsFactory(env, this));
@@ -47,19 +48,21 @@ public abstract class FitnessCalculator {
   /**
    * Get fitness value of the chromosome.
    * 
-   * @param chromosome chromosome
+   * @param chromosome
+   *          chromosome
    * @return fitness value
    */
   public Double getFitness(ScheduleChromosome chromosome) {
     this.getGraphStatsFactory().ofChromosome(chromosome);
-    
+
     return calcFitness(chromosome);
   }
 
   /**
    * Calculate fitness function.
    * 
-   * @param chromosome chromosome
+   * @param chromosome
+   *          chromosome
    * @return fitness value
    */
   protected abstract Double calcFitness(ScheduleChromosome chromosome);
@@ -76,11 +79,12 @@ public abstract class FitnessCalculator {
   /**
    * Set graph stats factory.
    * 
-   * @param gsf graph stats factory
+   * @param gsf
+   *          graph stats factory
    */
   private void setStatsFactory(StatsFactory gsf) {
     assert gsf != null;
-    
+
     this.statsFactory = gsf;
   }
 

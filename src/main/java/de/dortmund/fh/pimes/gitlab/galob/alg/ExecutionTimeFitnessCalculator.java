@@ -34,25 +34,29 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
  *
  */
 public class ExecutionTimeFitnessCalculator extends FitnessCalculator {
-  
+
   /**
    * Constructor.
-   * @param env heterogeneous computing environment
+   * 
+   * @param env
+   *          heterogeneous computing environment
    */
   public ExecutionTimeFitnessCalculator(HeterogeneousComputingEnv env) {
     super(env);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see alg.util.graph.GraphStatsFactory#getFitness(alg.util.genetics.ScheduleChromosome)
    */
   @Override
   public Double calcFitness(ScheduleChromosome chromosome) {
-    
+
     assert chromosome != null;
-    
+
     Stats stats = chromosome.getStats();
-    
+
     return stats.getTotalTime();
   }
 

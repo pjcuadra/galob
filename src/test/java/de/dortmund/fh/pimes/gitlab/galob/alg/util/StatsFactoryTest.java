@@ -31,6 +31,5 @@ public class StatsFactoryTest {
   public void testOfChromosome() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
-  
 
 }

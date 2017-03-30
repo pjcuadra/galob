@@ -57,82 +57,86 @@ public class HeterogeneousComputingEnv extends Graph {
    * Add tasks counter.
    */
   private int addedTasks;
-  
+
   /**
    * Constructor.
    * 
-   * @param numTask number of tasks of the HCE
-   * @param numCore number of cores available in the HCE
+   * @param numTask
+   *          number of tasks of the HCE
+   * @param numCore
+   *          number of cores available in the HCE
    */
   public HeterogeneousComputingEnv(int numTask, int numCore) {
     super();
-    
+
     assert numTask > 0 : "Number of tasks shall be greater than 0";
     assert numCore > 0 : "Number of cores shall be greater than 0";
-    
+
     // Initalize empty matrices
     this.delta = Util.createEmptyMatrix(numTask, numTask);
     this.commCost = Util.createEmptyMatrix(numTask, numTask);
     this.etc = Util.createEmptyMatrix(numTask, numCore);
-    
+
     // Set added tasks counter to zero
     this.addedTasks = 0;
-    
+
   }
-  
+
   /**
    * Wrapper of add vertex to allow to add task to the graph.
    * 
-   * @param etcPerCore array containing the expected computing time for every core
+   * @param etcPerCore
+   *          array containing the expected computing time for every core
    */
   public GraphNode addTask(double[] etcPerCore) {
     // Verify parameters
     assert this.addedTasks < getNumberOfTasks() : "Tasks limit has been reached";
     assert etcPerCore.length == getNumberOfExecutors() : "ETC per core array with wrong size";
-    
+
     // Copy the ETC row to matrix
     etc[this.addedTasks] = etcPerCore.clone();
-    
+
     // Create the task node
     GraphNode taskNode = new GraphNode(this.addedTasks, etc[this.addedTasks]);
-    
+
     // Add the task as vertex to the graph
     addVertex(taskNode);
-    
+
     // Increase the task id counter
     this.addedTasks++;
-    
+
     return taskNode;
   }
-  
+
   /**
-   * Add a task with expected computing time equals to 1. 
+   * Add a task with expected computing time equals to 1.
    */
   public GraphNode addUnitExecutionTimeTask() {
     double[] etcRow;
-    
+
     // Create ones row
     etcRow = DoubleStream.generate(() -> 1).limit(getNumberOfExecutors()).toArray();
-    
+
     return addTask(etcRow);
   }
-  
-  /* (non-Javadoc)
-   * @see alg.util.graph.Graph#addDependency(alg.util.graph.GraphNode, 
-   *                                         alg.util.graph.GraphNode, 
-   *                                         double)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see alg.util.graph.Graph#addDependency(alg.util.graph.GraphNode, alg.util.graph.GraphNode,
+   * double)
    */
   @Override
   public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
-    
+
     // Verify parameters
     assert containsVertex(nodeSrc) : "Invalid task node";
     assert containsVertex(nodeDst) : "Invalid task node";
-    
+
     if (nodeSrc.getTaskId() == nodeDst.getTaskId()) {
       return;
     }
-    
+
     // Add dependency to the graph
     super.addDependency(nodeSrc, nodeDst, cost);
 
@@ -141,7 +145,7 @@ public class HeterogeneousComputingEnv extends Graph {
     this.commCost[nodeSrc.getTaskId()][nodeDst.getTaskId()] += cost;
 
   }
-  
+
   /**
    * Get the number of executors in the HCE.
    * 
@@ -167,7 +171,7 @@ public class HeterogeneousComputingEnv extends Graph {
    */
   public double[][] getDependencyMatrix() {
     assert this.addedTasks > 0 : "No tasks added to the HCE";
-    
+
     return Util.copyMatrix(delta);
   }
 
@@ -203,7 +207,8 @@ public class HeterogeneousComputingEnv extends Graph {
   /**
    * Set the simulated annealing to be used in the HCE.
    * 
-   * @param simAnn simulated annealing object
+   * @param simAnn
+   *          simulated annealing object
    */
   public void setSimulatedAnnealing(SimulatedAnnealing simAnn) {
     assert simAnn != null : "Null parameter";
@@ -218,7 +223,7 @@ public class HeterogeneousComputingEnv extends Graph {
   public SimulatedAnnealing getSimulatedAnnealing() {
     return simAnn;
   }
-  
+
   /**
    * Get a copy of the graph representation of the HCE.
    * 
@@ -228,43 +233,45 @@ public class HeterogeneousComputingEnv extends Graph {
     assert this.addedTasks > 0 : "No tasks added to the HCE";
     return (Graph) ((Graph) this).clone();
   }
-  
-  
+
   /**
    * Get graph node by it's internal id. (For testing)
    * 
-   * @param id id of the task
+   * @param id
+   *          id of the task
    * @return graph node with given id
    */
   protected GraphNode getGraphNodeById(int id) {
     return super.getGraphNodeById(id);
   }
-  
+
   /**
    * Generates a completely random heterogeneous computing environment.
    * 
-   * @param numTasks number of tasks
-   * @param numCores number of cores
-   * @param maxProvided numTasks and numCores are maximum values if 
-   *      true or exact values if false
+   * @param numTasks
+   *          number of tasks
+   * @param numCores
+   *          number of cores
+   * @param maxProvided
+   *          numTasks and numCores are maximum values if true or exact values if false
    * @return random heterogeneous computing environment
    */
-  public static HeterogeneousComputingEnv ofRandom(int numTasks, 
-      int numCores, 
+  public static HeterogeneousComputingEnv ofRandom(int numTasks, int numCores,
       boolean maxProvided) {
     return Util.ofRandom(numTasks, numCores, maxProvided);
   }
-  
+
   /**
-   * Generates a random heterogeneous computing environment with: unit execution time, 
-   * unit communication costs and random dependencies.
+   * Generates a random heterogeneous computing environment with: unit execution time, unit
+   * communication costs and random dependencies.
    * 
-   * @param numTasks number of tasks
-   * @param numCores number of cores
+   * @param numTasks
+   *          number of tasks
+   * @param numCores
+   *          number of cores
    * @return random heterogeneous computing environment
    */
-  public static HeterogeneousComputingEnv ofRandomUnitary(int numTasks, 
-      int numCores, 
+  public static HeterogeneousComputingEnv ofRandomUnitary(int numTasks, int numCores,
       boolean maxProvided) {
     return Util.ofRandomUnitary(numTasks, numCores, maxProvided);
   }

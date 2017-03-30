@@ -62,19 +62,21 @@ public class SimulatedAnnealingTest {
    * Heterogeneous Computing environment.
    */
   private HeterogeneousComputingEnv env;
-  
+
   /**
    * Set up test.
-   * @throws Exception when fails
+   * 
+   * @throws Exception
+   *           when fails
    */
   @Before
   public void setUp() throws Exception {
 
     randomGen = new Random();
 
-    randTemp =  randomGen.nextDouble() * MAX_TEMP;
-    
-    env = new HeterogeneousComputingEnv(1 + randomGen.nextInt(MAX_NUM_TASKS), 
+    randTemp = randomGen.nextDouble() * MAX_TEMP;
+
+    env = new HeterogeneousComputingEnv(1 + randomGen.nextInt(MAX_NUM_TASKS),
         1 + randomGen.nextInt(MAX_NUM_CORES));
 
   }
@@ -89,27 +91,23 @@ public class SimulatedAnnealingTest {
   public void testGetTemp() throws Exception {
     LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
     double gammaFactor = 0.8;
-    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, 
-        randTemp,
-        lbFitnessCalc);
-    
+    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc);
+
     assertEquals(randTemp, simAnn.getTemp(), EPSILON);
-    
+
   }
 
   @Test
   public void testSetTemp() throws Exception {
     LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
     double gammaFactor = 0.8;
-    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, 
-        randTemp,
-        lbFitnessCalc);
-    
+    SimulatedAnnealing simAnn = new SimulatedAnnealing(gammaFactor, randTemp, lbFitnessCalc);
+
     double newTemp = randomGen.nextDouble() * MAX_TEMP;
-    
+
     simAnn.setTemp(newTemp);
     assertEquals(newTemp, simAnn.getTemp(), EPSILON);
-    
+
   }
 
 }

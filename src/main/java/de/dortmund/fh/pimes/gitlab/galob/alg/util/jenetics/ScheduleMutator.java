@@ -47,26 +47,30 @@ public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
-   * @param probMutator mutating probability 
+   * @param env
+   *          heterogeneous computing environment
+   * @param probMutator
+   *          mutating probability
    */
   public ScheduleMutator(HeterogeneousComputingEnv env, double probMutator) {
     super(probMutator);
     this.env = env;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.SwapMutator#mutate(org.jenetics.util.MSeq, double)
    */
   @Override
   public int mutate(final MSeq<ScheduleGene> genes, final double prob) {
     Random randomGen = new Random();
-    
+
     // If probability not meet return and don't mutate
     if (randomGen.nextDouble() < prob) {
       return 0;
     }
-    
+
     int randLevel = randomGen.nextInt(env.getMaxTopologicalLevel());
     int firstGeneLocus = 0;
     int secondGeneLocus = 0;
@@ -80,7 +84,7 @@ public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
     Collections.shuffle(level);
     final Integer firstGene = level.get(0).getTaskId();
     final Integer secondGene = level.get(1).getTaskId();
-    
+
     // Get the locus of the genes
     for (int i = 0; i < genes.size(); i++) {
       if (genes.get(i).getAllele().getTaskId() == firstGene) {
@@ -91,23 +95,23 @@ public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
         secondGeneLocus = i;
       }
     }
-    
+
     // Apply mutation
     if (secondGeneLocus != firstGeneLocus) {
       ScheduleChromosome chrFac = new ScheduleChromosome(env);
-      
+
       ScheduleChromosome oldChr = chrFac.newInstance(genes.toISeq().copy().toISeq());
       //
       genes.swap(firstGeneLocus, secondGeneLocus);
-      
+
       ScheduleChromosome newChr = chrFac.newInstance(genes.toISeq());
       //
-      //check if simulated annealing is required
+      // check if simulated annealing is required
       if (env.getSimulatedAnnealingEnabled()) {
         if (env.getSimulatedAnnealing().checkCriteria(oldChr, newChr)) {
           return 2;
         }
-        
+
         // If criteria not meet unswap genes
         genes.swap(firstGeneLocus, secondGeneLocus);
         return 0;
@@ -117,8 +121,7 @@ public class ScheduleMutator extends SwapMutator<ScheduleGene, Double> {
     }
 
     return 2;
-    
-  }
 
+  }
 
 }

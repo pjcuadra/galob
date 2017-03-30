@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
 /**
  * Schedule Chromosome unit testing.
  * 
@@ -36,17 +35,18 @@ import org.junit.Test;
  */
 public class GraphTest {
 
-  //  private Random randomGen;
+  // private Random randomGen;
 
   /**
    * Unit testing set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception
+   *           falure exception
    */
   @Before
   public void setUp() throws Exception {
 
-    //    randomGen = new Random();
+    // randomGen = new Random();
 
   }
 
@@ -101,7 +101,7 @@ public class GraphTest {
   public void testGetNodeTopologicalLevel() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
-  
+
   @Ignore("Note yet implemented")
   @Test
   public void testCycleDetection() throws Exception {

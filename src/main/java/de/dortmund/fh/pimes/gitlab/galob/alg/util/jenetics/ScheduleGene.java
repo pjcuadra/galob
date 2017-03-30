@@ -21,6 +21,8 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
+
 import org.jenetics.Gene;
 
 /**
@@ -35,42 +37,23 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
    */
   private ScheduleAllele allele;
   /**
-   * Number of tasks.
+   * Heterogeneous Computing Environment.
    */
-  private int numTasks;
-  /**
-   * Number of executing units.
-   */
-  private int numExecutors;
+  private HeterogeneousComputingEnv env;
 
   /**
    * Constructor.
    * 
-   * @param numTasks number of tasks
-   * @param numExecutors number of executing units
+   * @param env
+   *          Heterogeneous Computing Environment
    */
-  public ScheduleGene(int numTasks, int numExecutors) {
-    this.numTasks = numTasks;
-    this.numExecutors = numExecutors;
-
-    allele = new ScheduleAllele(numTasks, numExecutors);
+  public ScheduleGene(HeterogeneousComputingEnv env) {
+    this.env = env;
   }
 
-  /**
-   * Constructor.
+  /*
+   * (non-Javadoc)
    * 
-   * @param numTasks number of tasks
-   * @param numExecutors number of executing units
-   * @param allele existing allele
-   */
-  public ScheduleGene(int numTasks, int numExecutors, ScheduleAllele allele) {
-    this.numTasks = numTasks;
-    this.numExecutors = numExecutors;
-
-    this.allele = allele;
-  }
-
-  /* (non-Javadoc)
    * @see org.jenetics.util.Verifiable#isValid()
    */
   @Override
@@ -78,7 +61,9 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
     return true;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Gene#getAllele()
    */
   @Override
@@ -86,24 +71,29 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
     return allele;
   }
 
-
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Gene#newInstance()
    */
   @Override
   public ScheduleGene newInstance() {
-    return new ScheduleGene(numTasks, numExecutors);
+    return ScheduleGene.ofRandom(env);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Gene#newInstance(java.lang.Object)
    */
   @Override
-  public ScheduleGene newInstance(ScheduleAllele value) {
-    return new ScheduleGene(numTasks, numExecutors, value);
+  public ScheduleGene newInstance(ScheduleAllele allele) {
+    return ScheduleGene.ofAllele(env, allele);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   public String toString() {
@@ -111,39 +101,60 @@ public class ScheduleGene implements Gene<ScheduleAllele, ScheduleGene> {
   }
 
   /**
-   * Static constructor.
+   * Random gene builder.
    * 
-   * @param numTasks number of tasks
-   * @param numExecutors number of executors
+   * @param env
+   *          Heterogeneous Computing Environment
    * @return newly created gene
    */
-  public static ScheduleGene of(int numTasks, int numExecutors) {
-    return new ScheduleGene(numTasks, numExecutors);
+  public static ScheduleGene ofRandom(HeterogeneousComputingEnv env) {
+    ScheduleGene gene = new ScheduleGene(env);
+    gene.allele = ScheduleAllele.ofRandom(env);
+    return gene;
+  }
+
+  /**
+   * Gene builder for a given Allele.
+   * 
+   * @param env
+   *          Heterogeneous Computing Environment
+   * @param allele
+   *          allele to be assigned to the gene
+   * @return newly created gene
+   */
+  public static ScheduleGene ofAllele(HeterogeneousComputingEnv env, ScheduleAllele allele) {
+    ScheduleGene gene = new ScheduleGene(env);
+    gene.allele = allele;
+    return gene;
   }
 
   /**
    * Mutate a gene by setting a new allele.
    * 
-   * @param value new allele
+   * @param allele
+   *          new allele
    */
-  public void mutate(ScheduleAllele value) {
-    allele = value;
+  public void mutate(ScheduleAllele allele) {
+    this.allele = allele;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object object) {
     ScheduleGene gene;
-    
+
     if (!(object instanceof ScheduleGene)) {
       return false;
     }
-    
+
     gene = (ScheduleGene) object;
-    
+
     return gene.allele.equals(this.allele);
-    
+
   }
+
 }

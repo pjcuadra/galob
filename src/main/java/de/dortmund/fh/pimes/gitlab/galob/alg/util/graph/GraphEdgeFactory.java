@@ -31,8 +31,10 @@ import org.jgrapht.graph.DefaultWeightedEdge;
  *
  */
 public class GraphEdgeFactory implements EdgeFactory<GraphNode, DefaultWeightedEdge> {
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jgrapht.EdgeFactory#createEdge(java.lang.Object, java.lang.Object)
    */
   @Override

@@ -45,15 +45,19 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
-   * @param probCrossover crossing over probability
+   * @param env
+   *          heterogeneous computing environment
+   * @param probCrossover
+   *          crossing over probability
    */
   public ScheduleCrossover(HeterogeneousComputingEnv env, double probCrossover) {
     super(probCrossover);
     this.env = env;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.SinglePointCrossover#crossover(org.jenetics.util.MSeq,
    * org.jenetics.util.MSeq)
    */
@@ -65,17 +69,12 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
     int crossoverSiteLocus = randomGen.nextInt(min(that.length(), other.length()));
     ScheduleChromosome chrFac = new ScheduleChromosome(env);
     int modified = 0;
-    int thatTopLevel = env.getNodeTopologicalLevel(that
-        .get(crossoverSiteLocus)
-        .getAllele()
-        .getTaskId());
-    int otherTopLevel = env.getNodeTopologicalLevel(other
-        .get(crossoverSiteLocus)
-        .getAllele()
-        .getTaskId());
+    int thatTopLevel =
+        env.getNodeTopologicalLevel(that.get(crossoverSiteLocus).getAllele().getTaskId());
+    int otherTopLevel =
+        env.getNodeTopologicalLevel(other.get(crossoverSiteLocus).getAllele().getTaskId());
 
-
-    //cond1: the tasks immediately before the crossover point must be of same level
+    // cond1: the tasks immediately before the crossover point must be of same level
     if (thatTopLevel != otherTopLevel) {
       return modified;
     }
@@ -85,7 +84,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
     if ((!that.equals(tempthat)) && (!that.equals(other)) && (!other.equals(tempother))) {
       if (env.getSimulatedAnnealingEnabled()) {
         // temp: parent sequence, that : child sequemce
-        if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempthat.toISeq()), 
+        if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempthat.toISeq()),
             chrFac.newInstance(that.toISeq()))) {
           modified++;
         } else {
@@ -93,7 +92,7 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
           that = tempthat.copy();
         }
 
-        if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempother.toISeq()), 
+        if (env.getSimulatedAnnealing().checkCriteria(chrFac.newInstance(tempother.toISeq()),
             chrFac.newInstance(other.toISeq()))) {
           modified++;
         } else {
@@ -103,11 +102,10 @@ public class ScheduleCrossover extends SinglePointCrossover<ScheduleGene, Double
       } else {
         modified = 2;
       }
-      
+
     }
-      
-    return modified;    
+
+    return modified;
   }
 
 }
-

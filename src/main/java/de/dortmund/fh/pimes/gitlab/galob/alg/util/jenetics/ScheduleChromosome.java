@@ -45,7 +45,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Scheduling sequence of ScheduleItem's genes.
    */
-  public ISeq<ScheduleGene> scheduleSeq;
+  private ISeq<ScheduleGene> scheduleSeq;
   /**
    * Heterogeneous computing environment.
    */
@@ -58,35 +58,36 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
+   * @param env
+   *          heterogeneous computing environment
    */
   public ScheduleChromosome(HeterogeneousComputingEnv env) {
     ArrayList<ScheduleAllele> toSchedule = new ArrayList<ScheduleAllele>();
     ArrayList<ScheduleGene> myList = new ArrayList<ScheduleGene>();
     ArrayList<ScheduleAllele> allocable = null;
-    ScheduleGene gene =  null;
+    ScheduleGene gene = null;
     this.env = env;
-    double[][] deltaTemp =  env.getDependencyMatrix();
-    
+    double[][] deltaTemp = env.getDependencyMatrix();
+
     // Check for cycles first!
     if (env.checkCycles()) {
       throw new Graph.CycleException();
     }
-    
+
     // Create a gene to use it as factory
-    gene =  ScheduleGene.of(env.getNumberOfTasks(), env.getNumberOfExecutors());
-    
+    gene = ScheduleGene.ofRandom(env);
+
     // Initialize the alleles list
-    for (int i = 0; i < env.getNumberOfTasks(); i++) {
-      toSchedule.add(new ScheduleAllele(env.getNumberOfTasks(), env.getNumberOfExecutors(), i));
+    for (int taskId = 0; taskId < env.getNumberOfTasks(); taskId++) {
+      toSchedule.add(ScheduleAllele.ofTask(env, taskId));
     }
 
     // Finish until everything is allocated (assuming no cycles)
     while (!toSchedule.isEmpty()) {
       // New allocable list
-      allocable =  new ArrayList<ScheduleAllele>();
+      allocable = new ArrayList<ScheduleAllele>();
 
-      for (ScheduleAllele currItem: toSchedule) {
+      for (ScheduleAllele currItem : toSchedule) {
         // If no dependency pending is allocable
         if (!(Util.checkColZero(deltaTemp, currItem.getTaskId()))) {
           continue;
@@ -110,7 +111,6 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
       Util.clearRow(deltaTemp, allocable.get(0).getTaskId());
     }
 
-
     // Convert to Sequence
     scheduleSeq = ISeq.of(myList);
 
@@ -119,8 +119,10 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
-   * @param genes sequence of already created genes
+   * @param env
+   *          heterogeneous computing environment
+   * @param genes
+   *          sequence of already created genes
    */
   public ScheduleChromosome(HeterogeneousComputingEnv env, ISeq<ScheduleGene> genes) {
 
@@ -129,11 +131,12 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     scheduleSeq = genes;
 
   }
-  
+
   /**
    * Constructor.
    * 
-   * @param chromosome already existing chromosome
+   * @param chromosome
+   *          already existing chromosome
    */
   public ScheduleChromosome(ScheduleChromosome chromosome) {
 
@@ -142,25 +145,26 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     scheduleSeq = chromosome.toSeq().copy().toISeq();
 
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.util.Verifiable#isValid()
    */
   @Override
   public boolean isValid() {
 
     int numtasks = env.getNumberOfTasks();
-    double[][]tempmat = new double[numtasks][numtasks];
+    double[][] tempmat = new double[numtasks][numtasks];
     int numofones = 0;
 
     tempmat = Util.copyMatrix(env.getDependencyMatrix());
 
-    //only execute as long as order is valid
-    for (ScheduleGene gene: scheduleSeq) {
-      for (int i = 0; i < numtasks ;i++) {
+    // only execute as long as order is valid
+    for (ScheduleGene gene : scheduleSeq) {
+      for (int i = 0; i < numtasks; i++) {
         /*
-         * check if there is a dependency with a successive task
-         * check for ones in the column
+         * check if there is a dependency with a successive task check for ones in the column
          */
         numofones += tempmat[i][gene.getAllele().getTaskId()];
       }
@@ -169,7 +173,7 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
         return false;
       }
 
-      //to clear the elements of the row
+      // to clear the elements of the row
       Util.clearRow(tempmat, gene.getAllele().getTaskId());
 
       tempmat[gene.getAllele().getTaskId()][gene.getAllele().getTaskId()] = 1;
@@ -178,9 +182,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return true;
   }
 
-  
-
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Iterable#iterator()
    */
   @Override
@@ -188,9 +192,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return scheduleSeq.iterator();
   }
 
-
-
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.util.Factory#newInstance()
    */
   @Override
@@ -199,7 +203,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
 
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Chromosome#newInstance(org.jenetics.util.ISeq)
    */
   @Override
@@ -207,7 +213,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return new ScheduleChromosome(env, genes);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Chromosome#getGene(int)
    */
   @Override
@@ -215,7 +223,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return scheduleSeq.get(index);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Chromosome#length()
    */
   @Override
@@ -223,7 +233,9 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
     return scheduleSeq.length();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.jenetics.Chromosome#toSeq()
    */
   @Override
@@ -234,14 +246,17 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   /**
    * Static constructor.
    * 
-   * @param env heterogeneous computing environment
+   * @param env
+   *          heterogeneous computing environment
    * @return newly created chromosome
    */
   public static ScheduleChromosome of(HeterogeneousComputingEnv env) {
     return new ScheduleChromosome(env);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
@@ -257,23 +272,24 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   public ScheduleChromosome clone() {
     ArrayList<ScheduleGene> genesList = new ArrayList<ScheduleGene>();
 
-    for  (ScheduleGene gene : scheduleSeq) {
+    for (ScheduleGene gene : scheduleSeq) {
       genesList.add(gene.newInstance(gene.getAllele()));
     }
 
     return new ScheduleChromosome(env, ISeq.of(genesList));
 
   }
-  
+
   /**
    * Set statistics object.
    * 
-   * @param stats statistics object
+   * @param stats
+   *          statistics object
    */
   public void setStats(Stats stats) {
     this.stats = stats;
   }
-  
+
   /**
    * Get statistics object.
    * 
@@ -282,10 +298,10 @@ public class ScheduleChromosome implements Chromosome<ScheduleGene> {
   public Stats getStats() {
     return this.stats;
   }
-  
+
   /**
    * Check if the chromosome has statistics set.
-   *  
+   * 
    * @return true if the chromosome has statistics set false otherwise
    */
   public boolean hasStats() {
