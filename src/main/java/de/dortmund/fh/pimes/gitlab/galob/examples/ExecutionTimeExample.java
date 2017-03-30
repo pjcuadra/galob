@@ -84,45 +84,39 @@ public class ExecutionTimeExample {
   /**
    * Heterogeneous Computing Environment.
    */
-  static final HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(NUM_TASKS, 
-      NUM_EXECUTORS, 
-      false);
+  static final HeterogeneousComputingEnv env =
+      HeterogeneousComputingEnv.ofRandom(NUM_TASKS, NUM_EXECUTORS, false);
 
   /**
    * Main function.
-   * @param args command line parameters
+   * 
+   * @param args
+   *          command line parameters
    */
   public static void main(String[] args) {
-    
+
     // Create a code
     ExecutionTimeFitnessCalculator fitnessCalc = new ExecutionTimeFitnessCalculator(env);
 
     // Set the simulated annealing to the environment
-    env.setSimulatedAnnealing(new  SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
-        SA_INITIAL_TEMPERATURE,
-        fitnessCalc));
+    env.setSimulatedAnnealing(
+        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, fitnessCalc));
 
     // Configure and build the evolution engine.
-    final Engine<ScheduleGene, Double> engine = Engine
-        .builder(
-            fitnessCalc::getFitness,
-            (new ScheduleCodec(env)).ofChromosome())
-        .populationSize(POPULATION_SIZE)
-        .optimize(Optimize.MINIMUM)
-        .selector(new RouletteWheelSelector<>())
-        .alterers(
-            new ScheduleMutator(env, MUTATION_PROBABILITY),
-            new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
-        .build();
+    final Engine<ScheduleGene, Double> engine =
+        Engine.builder(fitnessCalc::getFitness, (new ScheduleCodec(env)).ofChromosome())
+            .populationSize(POPULATION_SIZE).optimize(Optimize.MINIMUM)
+            .selector(new RouletteWheelSelector<>())
+            .alterers(new ScheduleMutator(env, MUTATION_PROBABILITY),
+                new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+            .build();
 
     // Create evolution statistics consumer.
     final EvolutionStatistics<Double, ?> statistics = EvolutionStatistics.ofNumber();
 
     // Run the evolution stream
-    final Phenotype<ScheduleGene, Double> best = engine.stream()
-        .limit(GEN_LIMIT)
-        .peek(statistics)
-        .collect(toBestPhenotype());
+    final Phenotype<ScheduleGene, Double> best =
+        engine.stream().limit(GEN_LIMIT).peek(statistics).collect(toBestPhenotype());
 
     System.out.println(statistics);
     System.out.println("Solution:");

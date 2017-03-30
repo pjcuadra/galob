@@ -25,4 +25,3 @@
  * @author Pedro Cuadra
  */
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
-

@@ -38,11 +38,11 @@ public class StatsTest {
   /**
    * Random generator.
    */
-//  private Random randomGen;
+  // private Random randomGen;
   /**
    * Number of tasks.
    */
-//  private int numTask;
+  // private int numTask;
   /**
    * Max. number of tasks.
    */
@@ -55,7 +55,8 @@ public class StatsTest {
   /**
    * Test environment set-up.
    * 
-   * @throws Exception failure exception
+   * @throws Exception
+   *           failure exception
    */
   @Before
   public void setUp() throws Exception {

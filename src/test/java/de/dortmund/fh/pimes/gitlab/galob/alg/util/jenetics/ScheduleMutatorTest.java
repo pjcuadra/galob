@@ -57,9 +57,9 @@ public class ScheduleMutatorTest {
 
   private Random randomGen;
 
-  static final int maxNumTask = 16 /* Actual max*/;
-  static final int maxNumExecutors = 16 /* Actual max*/;
-  static final int maxPopulation = 50 /* Actual max*/;
+  static final int maxNumTask = 16 /* Actual max */;
+  static final int maxNumExecutors = 16 /* Actual max */;
+  static final int maxPopulation = 50 /* Actual max */;
   private ScheduleMutator mutator;
   HeterogeneousComputingEnv env;
 
@@ -74,22 +74,21 @@ public class ScheduleMutatorTest {
   /**
    * Unit testing set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception
+   *           falure exception
    */
   @Before
   public void setUp() throws Exception {
-    
+
     randomGen = new Random();
 
-    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
-        maxNumExecutors, 
-        false);
-    
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, maxNumExecutors, false);
+
     LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 0.6);
     SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal);
-    
+
     env.setSimulatedAnnealing(simAnne);
-   
+
     // Always mutate probability 1
     mutator = new ScheduleMutator(env, 0.6);
 
@@ -99,7 +98,7 @@ public class ScheduleMutatorTest {
   public void tearDown() throws Exception {
   }
 
-  private int countAltersOfChromosome(Chromosome<ScheduleGene> originalChromosome, 
+  private int countAltersOfChromosome(Chromosome<ScheduleGene> originalChromosome,
       Chromosome<ScheduleGene> mutatedChromosome) {
     int alterationsCount = 0;
     ScheduleGene expected;
@@ -107,8 +106,8 @@ public class ScheduleMutatorTest {
     // Count number of alterations
     for (int locus = 0; locus < originalChromosome.toSeq().size(); locus++) {
 
-      expected =  originalChromosome.getGene(locus);
-      actual =  mutatedChromosome.getGene(locus);
+      expected = originalChromosome.getGene(locus);
+      actual = mutatedChromosome.getGene(locus);
 
       if (!expected.equals(actual)) {
         alterationsCount++;
@@ -122,19 +121,16 @@ public class ScheduleMutatorTest {
   @Test
   public void populationMutattion() {
     ArrayList<Phenotype<ScheduleGene, Double>> phenoList;
-    
+
     ExecutionTimeFitnessCalculator myOpt = new ExecutionTimeFitnessCalculator(env);
     ScheduleCodec codec = new ScheduleCodec(env);
     Phenotype<ScheduleGene, Double> phenoFactory;
-    int populationSize;  
+    int populationSize;
     int alterationsCount = 0;
 
     // Create a phenotype to be used as factory for others
-    phenoFactory = Phenotype.of(
-        Genotype.of(ScheduleChromosome.of(env)), 
-        0, 
-        gt -> myOpt.getFitness(codec.ofChromosome().decode(gt))
-        );
+    phenoFactory = Phenotype.of(Genotype.of(ScheduleChromosome.of(env)), 0,
+        gt -> myOpt.getFitness(codec.ofChromosome().decode(gt)));
 
     // Random population size
     populationSize = 1 + randomGen.nextInt(maxPopulation);
@@ -142,8 +138,7 @@ public class ScheduleMutatorTest {
     // Create random population
     phenoList = new ArrayList<Phenotype<ScheduleGene, Double>>();
     for (int individualIdx = 0; individualIdx < populationSize; individualIdx++) {
-      phenoList.add(
-          phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(env))));
+      phenoList.add(phenoFactory.newInstance(Genotype.of(new ScheduleChromosome(env))));
     }
 
     Population<ScheduleGene, Double> originalPopulation = Population.empty();
@@ -163,8 +158,7 @@ public class ScheduleMutatorTest {
       for (int chromosomeIdx = 0; chromosomeIdx < chromosomeSize; chromosomeIdx++) {
         alterationsCount += countAltersOfChromosome(
             originalPopulation.get(individualIdx).getGenotype().getChromosome(chromosomeIdx),
-            mutatedPopulation.get(individualIdx).getGenotype().getChromosome(chromosomeIdx)
-            );
+            mutatedPopulation.get(individualIdx).getGenotype().getChromosome(chromosomeIdx));
       }
     }
 
@@ -181,13 +175,13 @@ public class ScheduleMutatorTest {
 
     // Mutate the chromosome
     alterations = mutator.mutate(mutationSeq, 1);
-    
+
     // Create mutated chromosome
     ScheduleChromosome mutatedChromosome = originalChromosome.newInstance(mutationSeq.toISeq());
 
     // Count alterations
     alterationsCount = countAltersOfChromosome(originalChromosome, mutatedChromosome);
-    
+
     assertEquals(alterationsCount, alterations);
   }
 }

@@ -35,19 +35,21 @@ public class GraphNode {
    */
   private int taskId;
   /**
-   * Expected time to compute for the different cores. 
+   * Expected time to compute for the different cores.
    */
   private double[] etcRow;
   /**
    * Custom stored value.
    */
   private Object cookie;
-  
+
   /**
    * Constructor.
    * 
-   * @param taskId task ID
-   * @param etcRow expected time to compute for the different cores
+   * @param taskId
+   *          task ID
+   * @param etcRow
+   *          expected time to compute for the different cores
    */
   public GraphNode(int taskId, double[] etcRow) {
     this.setTaskId(taskId);
@@ -66,7 +68,8 @@ public class GraphNode {
   /**
    * Set task ID of the graph node.
    * 
-   * @param taskId task ID
+   * @param taskId
+   *          task ID
    */
   private void setTaskId(int taskId) {
     this.taskId = taskId;
@@ -84,21 +87,23 @@ public class GraphNode {
   /**
    * Set the expected time to compute for all cores.
    * 
-   * @param etcRow expected time to compute for all cores
+   * @param etcRow
+   *          expected time to compute for all cores
    */
   private void setEtcRow(double[] etcRow) {
     this.etcRow = etcRow;
   }
-  
+
   /**
    * Set custom value.
    * 
-   * @param cookie custom value
+   * @param cookie
+   *          custom value
    */
   public void setCookie(Object cookie) {
     this.cookie = cookie;
   }
-  
+
   /**
    * Get custom value.
    * 
@@ -107,26 +112,31 @@ public class GraphNode {
   public Object getCookie() {
     return this.cookie;
   }
-  
+
   /**
    * Get expected time to compute of a given core.
    * 
-   * @param exeUnit core ID
+   * @param exeUnit
+   *          core ID
    * @return expected time to computes of the given core
    */
   public double getExecutionTimeOnUnit(int exeUnit) {
     return this.etcRow[exeUnit];
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#clone()
    */
   @Override
   public GraphNode clone() {
     return new GraphNode(this.taskId, this.etcRow);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

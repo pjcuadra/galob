@@ -44,9 +44,9 @@ import org.junit.Test;
  */
 public class ScheduleCrossoverTest {
 
-  static final int maxNumTask = 9 /* Actual max*/;
-  static final int maxNumExecutors = 6 /* Actual max*/;
-  static final int maxPopulation = 50 /* Actual max*/;
+  static final int maxNumTask = 9 /* Actual max */;
+  static final int maxNumExecutors = 6 /* Actual max */;
+  static final int maxPopulation = 50 /* Actual max */;
   private ScheduleCrossover crossover;
   HeterogeneousComputingEnv env;
 
@@ -61,15 +61,14 @@ public class ScheduleCrossoverTest {
   /**
    * Unit testing set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception
+   *           falure exception
    */
   @Before
   public void setUp() throws Exception {
 
     // Create a random HCE
-    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask,
-        maxNumExecutors, 
-        true);
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, maxNumExecutors, true);
 
     // Always crossover
     crossover = new ScheduleCrossover(env, 1);
@@ -104,7 +103,5 @@ public class ScheduleCrossoverTest {
 
     assertEquals(alterationsCount, alterations);
   }
-
-
 
 }

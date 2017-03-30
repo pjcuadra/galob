@@ -50,28 +50,27 @@ public class LoadBalancingFitnessCalculatorTest {
   /**
    * Max number of tasks.
    */
-  static final int MAX_NUM_TASKS = 16 /* Actual max*/;
+  static final int MAX_NUM_TASKS = 16 /* Actual max */;
   /**
    * Max number cores.
    */
-  static final int MAX_NUM_CORES = 16 /* Actual max*/;
-  
+  static final int MAX_NUM_CORES = 16 /* Actual max */;
+
   /**
    * Test Set-up.
    * 
-   * @throws Exception failure exception
+   * @throws Exception
+   *           failure exception
    */
   @Before
   public void setUp() throws Exception {
-    
-    env = HeterogeneousComputingEnv.ofRandomUnitary(MAX_NUM_TASKS, 
-        MAX_NUM_CORES, 
-        true);
-    
+
+    env = HeterogeneousComputingEnv.ofRandomUnitary(MAX_NUM_TASKS, MAX_NUM_CORES, true);
+
     chromosome = new ScheduleChromosome(env);
 
   }
-  
+
   @Test
   public void testCalcFitness() throws Exception {
     LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);

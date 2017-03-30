@@ -45,28 +45,27 @@ public class ExecutionTimeFitnessCalculatorTest {
   /**
    * Maximum number of tasks.
    */
-  private static final int maxNumTask = 16 /* Actual max*/;
+  private static final int maxNumTask = 16 /* Actual max */;
   /**
    * Maximum number of executors.
    */
-  private static final int maxNumExecutors = 16 /* Actual max*/;
+  private static final int maxNumExecutors = 16 /* Actual max */;
   /**
    * Heterogeneous Computing Environment.
    */
   private HeterogeneousComputingEnv env;
-  
+
   /**
    * Test Set-up.
    * 
-   * @throws Exception failure exception
+   * @throws Exception
+   *           failure exception
    */
   @Before
   public void setUp() throws Exception {
-    
-    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, 
-        maxNumExecutors, 
-        true);
-    
+
+    env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, maxNumExecutors, true);
+
     chromosome = new ScheduleChromosome(env);
 
   }

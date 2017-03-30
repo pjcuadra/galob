@@ -52,8 +52,8 @@ public class ScheduleChromosomeTest {
   private Random randomGen;
 
   private int numTask;
-  static final int maxNumTask = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
-  static final int maxNumExecutors = 16 /* Actual max*/  /* 0 is not possible so add 1 after*/;
+  static final int maxNumTask = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
+  static final int maxNumExecutors = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -66,14 +66,15 @@ public class ScheduleChromosomeTest {
   /**
    * Unit testing set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception
+   *           falure exception
    */
   @Before
   public void setUp() throws Exception {
 
     randomGen = new Random();
 
-    numTask =  1 + randomGen.nextInt(maxNumTask);
+    numTask = 1 + randomGen.nextInt(maxNumTask);
 
   }
 
@@ -90,11 +91,11 @@ public class ScheduleChromosomeTest {
 
     // Create the HCE
     HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(numTasks, numTask);
-    
+
     for (int i = 0; i < numTasks; i++) {
       tasks[i] = env.addUnitExecutionTimeTask();
     }
-    
+
     // Define a delta matrix
     env.addDependency(tasks[0], tasks[1], 0);
     env.addDependency(tasks[0], tasks[2], 0);
@@ -103,10 +104,10 @@ public class ScheduleChromosomeTest {
     env.addDependency(tasks[2], tasks[3], 0);
 
     // Already known valid solution
-    int[] chromosomeSeq1 = {0, 1, 2, 3};
+    int[] chromosomeSeq1 = { 0, 1, 2, 3 };
 
     // Create first chromosome
-    for (int task: chromosomeSeq1) {
+    for (int task : chromosomeSeq1) {
       allele = ScheduleAllele.ofTask(env, task);
       alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
@@ -115,13 +116,12 @@ public class ScheduleChromosomeTest {
     chromosome = new ScheduleChromosome(env, ISeq.of(alleleList));
     assertEquals(true, chromosome.isValid());
 
-
     // Already known invalid solution
-    int[] chromosomeSeq2 = {0, 2, 1, 3};
+    int[] chromosomeSeq2 = { 0, 2, 1, 3 };
 
     // Create second chromosom
     alleleList = new ArrayList<ScheduleGene>();
-    for (int task: chromosomeSeq2) {
+    for (int task : chromosomeSeq2) {
       allele = ScheduleAllele.ofTask(env, task);
       alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
@@ -130,11 +130,11 @@ public class ScheduleChromosomeTest {
     assertEquals(false, chromosome.isValid());
 
     // Already known invalid solution (repeat task)
-    int[] chromosomeSeq3 = {0,1,2,0};
+    int[] chromosomeSeq3 = { 0, 1, 2, 0 };
 
     // Create second chromosome
     alleleList = new ArrayList<ScheduleGene>();
-    for (int task: chromosomeSeq3) {
+    for (int task : chromosomeSeq3) {
       allele = ScheduleAllele.ofTask(env, task);
       alleleList.add(ScheduleGene.ofAllele(env, allele));
     }
@@ -146,65 +146,62 @@ public class ScheduleChromosomeTest {
 
   @Test
   public void createCheckValid() {
-    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(maxNumTask, 
-        maxNumExecutors, 
-        true);
+    HeterogeneousComputingEnv env =
+        HeterogeneousComputingEnv.ofRandom(maxNumTask, maxNumExecutors, true);
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
     // This shall be true everytime. If not we are creating invalid solutions
     assertEquals(chromosome.isValid(), true);
 
   }
-  
+
   @Test
   public void cloneChromosome() {
-    HeterogeneousComputingEnv env = HeterogeneousComputingEnv.ofRandom(maxNumTask, 
-        maxNumExecutors, 
-        true);
+    HeterogeneousComputingEnv env =
+        HeterogeneousComputingEnv.ofRandom(maxNumTask, maxNumExecutors, true);
     ScheduleChromosome chromosomeOrg = new ScheduleChromosome(env);
     ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
     ScheduleGene original;
     ScheduleGene cloned;
 
     for (int locus = 0; locus < chromosomeOrg.toSeq().size(); locus++) {
-      
-      original =  chromosomeOrg.getGene(locus);
-      cloned =  chromosomeClone.getGene(locus);
+
+      original = chromosomeOrg.getGene(locus);
+      cloned = chromosomeClone.getGene(locus);
       assertEquals(original, cloned);
     }
-   
 
   }
-  
+
   @Test
   public void knowChromosome() {
     GraphNode src;
     GraphNode dst;
-    
+
     HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(5, 3);
-    
+
     /* (1) -> (2) -> (3) -> (4) -> (5) */
     src = env.addUnitExecutionTimeTask();
     dst = env.addUnitExecutionTimeTask();
     env.addDependency(src, dst, 0);
-    
+
     src = dst;
     dst = env.addUnitExecutionTimeTask();
     env.addDependency(src, dst, 0);
-    
+
     src = dst;
     dst = env.addUnitExecutionTimeTask();
     env.addDependency(src, dst, 0);
-    
+
     src = dst;
     dst = env.addUnitExecutionTimeTask();
     env.addDependency(src, dst, 0);
-    
+
     ScheduleChromosome chromosome = new ScheduleChromosome(env);
 
-    for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene ++) {
+    for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene++) {
       assertEquals(chromosome.toSeq().get(currGene).getAllele().getTaskId(), currGene);
-      
+
     }
 
   }

@@ -23,5 +23,5 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
 public class FitnessCalculatorTest {
 
-  // This is an abstract class add only static method's tests here 
+  // This is an abstract class add only static method's tests here
 }

@@ -72,17 +72,18 @@ public class UtilTest {
   /**
    * Test environment set-up.
    * 
-   * @throws Exception falure exception
+   * @throws Exception
+   *           falure exception
    */
   @Before
   public void setUp() throws Exception {
 
     randomGen = new Random();
 
-    numTask =  1 + randomGen.nextInt(MAX_NUM_TASKS);
-    numCores =  1 + randomGen.nextInt(MAX_NUM_TASKS);
+    numTask = 1 + randomGen.nextInt(MAX_NUM_TASKS);
+    numCores = 1 + randomGen.nextInt(MAX_NUM_TASKS);
   }
-  
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -93,17 +94,17 @@ public class UtilTest {
   public void testCreateOnesMatrix() {
     double[][] matrix;
 
-    matrix = Util.createOnesMatrix(numTask, numCores); 
-    
+    matrix = Util.createOnesMatrix(numTask, numCores);
+
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
-    
+
     for (int i = 0; i < numTask; i++) {
       assertEquals(numCores, Util.getRowSum(matrix, i), EPSILON);
     }
-    
+
   }
-  
+
   /**
    * Tests createEmptyMatrix.
    */
@@ -111,17 +112,17 @@ public class UtilTest {
   public void testCreateEmptyMatrix() {
     double[][] matrix;
 
-    matrix = Util.createEmptyMatrix(numTask, numCores); 
-    
+    matrix = Util.createEmptyMatrix(numTask, numCores);
+
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
-    
+
     for (int i = 0; i < numTask; i++) {
       assertEquals(0, Util.getRowSum(matrix, i), EPSILON);
     }
-    
+
   }
-  
+
   /**
    * Tests graphBuilder.
    */
@@ -129,16 +130,15 @@ public class UtilTest {
   @Test
   public void testGraphBuilder() {
   }
-  
+
   @Test
   public void testCreateRandomDependencyMatrix() throws Exception {
     double[][] matrix;
     matrix = Util.createRandomDependencyMatrix(numTask);
-    
+
     assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
   }
 
-  
   @Ignore("Note yet implemented")
   @Test
   public void testCreateRandomCommunicationCostsMatrix() throws Exception {
@@ -150,7 +150,7 @@ public class UtilTest {
     double[][] matrix = Util.createRandomMatrix(numTask, numTask);
     double[][] maskMatrix = Util.createRandomDependencyMatrix(numTask);
     double[][] resMatrix = Util.matrixParallelMultiply(matrix, maskMatrix);
-    
+
     // Check that the values where correctly masked
     for (int i = 0; i < numTask; i++) {
       for (int j = 0; j < numTask; j++) {
@@ -161,13 +161,13 @@ public class UtilTest {
         }
       }
     }
-   
+
     // Catch exception
     thrown.expect(AssertionError.class);
     thrown.expectMessage("Invalid matrices dimensions");
-    
+
     double[][] wrongSizeMatrix = Util.createRandomDependencyMatrix(numTask + 1);
-    
+
     Util.matrixParallelMultiply(matrix, wrongSizeMatrix);
   }
 
@@ -199,7 +199,7 @@ public class UtilTest {
 
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
-    
+
     for (int i = 0; i < numCores; i++) {
       assertTrue(Util.checkColZero(matrix, i));
     }
@@ -221,26 +221,26 @@ public class UtilTest {
   public void testCopyMatrix() throws Exception {
     double[][] matrix = Util.createRandomMatrix(numTask, numCores);
     double[][] matrixCopy = Util.copyMatrix(matrix);
-    
+
     // Check the size
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
-    
+
     assertEquals(numTask, matrixCopy.length);
     assertEquals(numCores, matrixCopy[0].length);
-    
+
     // Check the values
     for (int i = 0; i < numTask; i++) {
       assertArrayEquals(matrix[i], matrixCopy[i], EPSILON);
     }
-    
+
     // Change all values
     for (int i = 0; i < numTask; i++) {
       for (int j = 0; j < numCores; j++) {
         matrixCopy[i][j] = matrixCopy[i][j] + 1;
       }
     }
-    
+
     // Check that the values are different
     for (int i = 0; i < numTask; i++) {
       for (int j = 0; j < numCores; j++) {
@@ -255,7 +255,7 @@ public class UtilTest {
     double[][] matrix;
 
     matrix = Util.createRandomMatrix(numTask, numCores);
-    
+
     // Check the size
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
@@ -298,5 +298,5 @@ public class UtilTest {
   public void testCheckCycle() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
-  
+
 }

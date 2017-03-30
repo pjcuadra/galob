@@ -44,7 +44,8 @@ public class ScheduleCodec {
   /**
    * Constructor.
    * 
-   * @param env heterogeneous computing environment
+   * @param env
+   *          heterogeneous computing environment
    */
   public ScheduleCodec(HeterogeneousComputingEnv env) {
     this.env = env;
@@ -58,11 +59,10 @@ public class ScheduleCodec {
   public Codec<int[][], ScheduleGene> ofOmega() {
     int numExecutors = env.getNumberOfExecutors();
 
-    return Codec.of(
-        Genotype.of(ScheduleChromosome.of(env)), /*Encoder*/ 
-        gt -> Util.createOmegaMatrix(((ScheduleChromosome)gt.getChromosome()).toSeq(), 
-            numExecutors) /*Decoder*/
-        );
+    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
+        gt -> Util.createOmegaMatrix(((ScheduleChromosome) gt.getChromosome()).toSeq(),
+            numExecutors) /* Decoder */
+    );
   }
 
   /**
@@ -71,10 +71,9 @@ public class ScheduleCodec {
    * @return Jenetics codec
    */
   public Codec<ISeq<ScheduleGene>, ScheduleGene> ofSeq() {
-    return Codec.of(
-        Genotype.of(ScheduleChromosome.of(env)), /*Encoder*/ 
-        gt -> ((ScheduleChromosome)gt.getChromosome()).toSeq() /*Decoder*/
-        );
+    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
+        gt -> ((ScheduleChromosome) gt.getChromosome()).toSeq() /* Decoder */
+    );
   }
 
   /**
@@ -83,10 +82,9 @@ public class ScheduleCodec {
    * @return Jenetics codec
    */
   public Codec<ScheduleChromosome, ScheduleGene> ofChromosome() {
-    return Codec.of(
-        Genotype.of(ScheduleChromosome.of(env)), /*Encoder*/ 
-        gt -> ((ScheduleChromosome)gt.getChromosome()) /*Decoder*/
-        );
+    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
+        gt -> ((ScheduleChromosome) gt.getChromosome()) /* Decoder */
+    );
   }
 
 }

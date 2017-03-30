@@ -21,147 +21,159 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
-import java.util.Random;
-
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
+
+import java.util.Random;
 
 /**
  * Genetics algorithm's gene.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
- * 
+ *
  */
 public class ScheduleAllele {
+  /**
+   * Allele builder.
+   *
+   * @param env
+   *          heterogeneous computing environment
+   * @param taskId
+   *          task ID
+   * @param executorId
+   *          executor ID
+   * @return allele with the provided executor ID
+   */
+  public static ScheduleAllele of(HeterogeneousComputingEnv env, int taskId, int executorId) {
+    ScheduleAllele allele = new ScheduleAllele();
+
+    // Set values
+    allele.executorId = executorId;
+    allele.taskId = taskId;
+
+    return allele;
+  }
+
+  /**
+   * Allele builder for a given executor id.
+   *
+   * @param env
+   *          heterogeneous computing environment
+   * @param executorId
+   *          executor ID
+   * @return allele with the provided executor ID
+   */
+  public static ScheduleAllele ofExecutor(HeterogeneousComputingEnv env, int executorId) {
+    ScheduleAllele allele = new ScheduleAllele();
+    Random randGen = new Random();
+
+    // Set values
+    allele.executorId = executorId;
+    allele.taskId = randGen.nextInt(env.getNumberOfTasks());
+
+    return allele;
+  }
+
+  /**
+   * Random allele builder.
+   *
+   * @param env
+   *          heterogeneous computing environment
+   * @return allele with the provided executor ID
+   */
+  public static ScheduleAllele ofRandom(HeterogeneousComputingEnv env) {
+    ScheduleAllele allele = new ScheduleAllele();
+    Random randGen = new Random();
+
+    // Set values
+    allele.executorId = randGen.nextInt(env.getNumberOfExecutors());
+    allele.taskId = randGen.nextInt(env.getNumberOfTasks());
+
+    return allele;
+  }
+
+  /**
+   * Allele builder for a given task id.
+   *
+   * @param env
+   *          heterogeneous computing environment
+   * @param taskId
+   *          task ID
+   * @return allele with the provided task ID
+   */
+  public static ScheduleAllele ofTask(HeterogeneousComputingEnv env, int taskId) {
+    ScheduleAllele allele = new ScheduleAllele();
+    Random randGen = new Random();
+
+    // Set values
+    allele.executorId = randGen.nextInt(env.getNumberOfExecutors());
+    allele.taskId = taskId;
+
+    return allele;
+  }
+
   /**
    * ID of the task.
    */
   private int taskId;
+
   /**
    * ID of the executor.
    */
   private int executorId;
-  
-  /**
-   * Get task ID.
-   * 
-   * @return task ID
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
    */
-  public int getTaskId() {
-    return taskId;
+  @Override
+  public boolean equals(Object object) {
+    ScheduleAllele allele;
+
+    if (!(object instanceof ScheduleAllele)) {
+      return false;
+    }
+
+    allele = (ScheduleAllele) object;
+
+    if (allele.executorId != this.executorId) {
+      return false;
+    }
+
+    if (allele.taskId != this.taskId) {
+      return false;
+    }
+
+    return true;
+
   }
 
   /**
    * Get executor ID.
-   * 
+   *
    * @return executor ID
    */
   public int getExecutorId() {
     return executorId;
   }
 
-  /* (non-Javadoc)
+  /**
+   * Get task ID.
+   *
+   * @return task ID
+   */
+  public int getTaskId() {
+    return taskId;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
    * @see java.lang.Object#toString()
    */
-  public String toString() {
-    return "{ " + taskId + " : " + executorId + " }" ;
-  }
-  
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
-  public boolean equals(Object object) {
-    ScheduleAllele allele;
-    
-    if (!(object instanceof ScheduleAllele)) {
-      return false;
-    }
-    
-    allele = (ScheduleAllele) object;
-    
-    if (allele.executorId != this.executorId) {
-      return false;
-    }
-    
-    if (allele.taskId != this.taskId) {
-      return false;
-    }
-    
-    return true;
-    
-  }
-  
-  /**
-   * Allele builder for a given task id.
-   * 
-   * @param env heterogeneous computing environment
-   * @param taskId task ID
-   * @return allele with the provided task ID
-   */
-  static public ScheduleAllele ofTask(HeterogeneousComputingEnv env, int taskId) {
-    ScheduleAllele allele = new ScheduleAllele();
-    Random randGen = new Random();
-    
-    // Set values
-    allele.executorId = randGen.nextInt(env.getNumberOfExecutors());
-    allele.taskId = taskId;
-    
-    return allele;
-  }
-  
-  /**
-   * Allele builder for a given executor id.
-   * 
-   * @param env heterogeneous computing environment
-   * @param executorId executor ID
-   * @return allele with the provided executor ID
-   */
-  static public ScheduleAllele ofExecutor(HeterogeneousComputingEnv env, int executorId) {
-    ScheduleAllele allele = new ScheduleAllele();
-    Random randGen = new Random();
-    
-    // Set values
-    allele.executorId = executorId;
-    allele.taskId = randGen.nextInt(env.getNumberOfTasks());
-    
-    return allele;
-  }
-  
-  /**
-   * Allele builder.
-   * 
-   * @param env heterogeneous computing environment
-   * @param taskId task ID
-   * @param executorId executor ID
-   * @return allele with the provided executor ID
-   */
-  static public ScheduleAllele of(HeterogeneousComputingEnv env, int taskId, int executorId) {
-    ScheduleAllele allele = new ScheduleAllele();
-    
-    // Set values
-    allele.executorId = executorId;
-    allele.taskId = taskId;
-    
-    return allele;
-  }
-  
-  /**
-   * Random allele builder.
-   * 
-   * @param env heterogeneous computing environment
-   * @param taskId task ID
-   * @param executorId executor ID
-   * @return allele with the provided executor ID
-   */
-  static public ScheduleAllele ofRandom(HeterogeneousComputingEnv env) {
-    ScheduleAllele allele = new ScheduleAllele();
-    Random randGen = new Random();
-    
-    // Set values
-    allele.executorId = randGen.nextInt(env.getNumberOfExecutors());
-    allele.taskId = randGen.nextInt(env.getNumberOfTasks());
-    
-    return allele;
+  public String toString() {
+    return "{ " + taskId + " : " + executorId + " }";
   }
 }

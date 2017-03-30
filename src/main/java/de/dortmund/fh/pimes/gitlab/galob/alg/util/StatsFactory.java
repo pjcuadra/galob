@@ -23,7 +23,6 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
-
 /**
  * Graph statistics factory.
  * 
@@ -43,7 +42,8 @@ public class StatsFactory {
   /**
    * Constructor.
    * 
-   * @param env graph object
+   * @param env
+   *          graph object
    */
   public StatsFactory(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator) {
     this.env = env;
@@ -53,22 +53,22 @@ public class StatsFactory {
   /**
    * Create a graph statistics from a given chromosome.
    * 
-   * @param chromosome chromosome
+   * @param chromosome
+   *          chromosome
    * @return graph statistics
    */
   public Stats ofChromosome(ScheduleChromosome chromosome) {
-    
+
     if (chromosome.getStats() != null) {
       return chromosome.getStats();
     }
-    
-    int[][] omega = Util.createOmegaMatrix(chromosome.toSeq(), 
-        env.getNumberOfExecutors());
-    
+
+    int[][] omega = Util.createOmegaMatrix(chromosome.toSeq(), env.getNumberOfExecutors());
+
     Stats stats = new Stats(env, fitnessCalculator, omega);
-    
+
     chromosome.setStats(stats);
-    
+
     return stats;
 
   }

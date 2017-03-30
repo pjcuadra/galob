@@ -82,88 +82,74 @@ public class LoadBalancingExample {
    * Initial population size.
    */
   static final int POPULATION_SIZE = 15;
-  /** 
-   * Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example). 
+  /**
+   * Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example).
    */
-  static final double[][] ETC = {{14, 16, 9},
-                                 {13, 19, 18},
-                                 {11, 13, 19},
-                                 {13, 8, 17},
-                                 {12, 13, 10},
-                                 {13, 16, 9},
-                                 {7, 15, 11},
-                                 {5, 11, 14},
-                                 {18, 12, 20},
-                                 {21, 7, 16}};
+  static final double[][] ETC = { { 14, 16, 9 }, { 13, 19, 18 }, { 11, 13, 19 }, { 13, 8, 17 },
+      { 12, 13, 10 }, { 13, 16, 9 }, { 7, 15, 11 }, { 5, 11, 14 }, { 18, 12, 20 }, { 21, 7, 16 } };
   /**
    * Heterogeneous Computing Environment.
    */
-  static final HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(NUM_TASKS, 
-      NUM_EXECUTORS);
+  static final HeterogeneousComputingEnv env =
+      new HeterogeneousComputingEnv(NUM_TASKS, NUM_EXECUTORS);
 
   /**
    * Main function.
-   * @param args command line parameters
+   * 
+   * @param args
+   *          command line parameters
    */
   public static void main(String[] args) {
-    
+
     // Initialize dependency matrix
     buildEnvironment();
-    
+
     // Draw graph to visually verify
     env.drawGraph();
-    
+
     // Create load balancing statistics calculator
-    LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 
-        ALPHA_FILTERING_FACTOR);
-    
+    LoadBalancingFitnessCalculator loadBal =
+        new LoadBalancingFitnessCalculator(env, ALPHA_FILTERING_FACTOR);
+
     // Add simulated annealing to the environment
-    env.setSimulatedAnnealing(new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, 
-        SA_INITIAL_TEMPERATURE,
-        loadBal));
+    env.setSimulatedAnnealing(
+        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, loadBal));
 
     // Configure and build the evolution engine.
-    final Engine<ScheduleGene, Double> engine = Engine
-        .builder(
-            loadBal::getFitness,
-            (new ScheduleCodec(env)).ofChromosome())
-        .populationSize(POPULATION_SIZE)
-        .optimize(Optimize.MINIMUM)
-        .selector(new RouletteWheelSelector<>())
-        .alterers(
-            new ScheduleMutator(env, MUTATION_PROBABILITY),
-            new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
-        .individualCreationRetries(1)
-        .build();
+    final Engine<ScheduleGene, Double> engine =
+        Engine.builder(loadBal::getFitness, (new ScheduleCodec(env)).ofChromosome())
+            .populationSize(POPULATION_SIZE).optimize(Optimize.MINIMUM)
+            .selector(new RouletteWheelSelector<>())
+            .alterers(new ScheduleMutator(env, MUTATION_PROBABILITY),
+                new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+            .individualCreationRetries(1).build();
 
     // Create evolution statistics consumer.
     final ScheduleStatistics statistics = new ScheduleStatistics(env);
 
     // Run evolution stream
-    final Phenotype<ScheduleGene, Double> best = engine.stream()
-        .peek(statistics)
-        .limit(GEN_LIMIT)
-        .collect(toBestPhenotype());
+    final Phenotype<ScheduleGene, Double> best =
+        engine.stream().peek(statistics).limit(GEN_LIMIT).collect(toBestPhenotype());
 
     statistics.showStats();
     System.out.println("Loadbalanced solution:");
     System.out.println(best);
   }
-  
+
   /**
    * Initialize the HCE.
    */
-  private static void buildEnvironment() { 
+  private static void buildEnvironment() {
     GraphNode[] tasks = new GraphNode[NUM_TASKS];
-    
+
     // Create all tasks
     for (int i = 0; i < ETC.length; i++) {
       tasks[i] = env.addTask(ETC[i]);
     }
-        
+
     // Create dependencies
     /* Taken from MasterESM_DPS_06.pdf page 33 (HEFT scheduling example) */
-    
+
     // From task 0
     env.addDependency(tasks[0], tasks[1], 18);
     env.addDependency(tasks[0], tasks[2], 12);
@@ -174,7 +160,7 @@ public class LoadBalancingExample {
     // From task 1
     env.addDependency(tasks[1], tasks[7], 19);
     env.addDependency(tasks[1], tasks[8], 16);
-    
+
     // From task 2
     env.addDependency(tasks[2], tasks[6], 23);
 
@@ -195,5 +181,3 @@ public class LoadBalancingExample {
   }
 
 }
-
-
