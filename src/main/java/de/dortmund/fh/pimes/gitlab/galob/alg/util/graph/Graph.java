@@ -135,8 +135,12 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
           // Add parent in case it wasn't already added
           insertNode(parent);
 
-          mxgraph.insertEdge(defParent, null, graph.getEdgeWeight(graph.getEdge(parent, node)),
-              parent.getCookie(), node.getCookie());
+          mxgraph.insertEdge(
+              defParent,
+              null,
+              graph.getEdgeWeight(graph.getEdge(parent, node)),
+              parent.getCookie(),
+              node.getCookie());
         }
       }
     }
@@ -156,8 +160,8 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       Object defParent = mxgraph.getDefaultParent();
 
       // Add node as vertex
-      Object v1 = mxgraph.insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT,
-          "shape=ellipse");
+      Object v1 = mxgraph
+          .insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT, "shape=ellipse");
 
       // Set resulting object as cookie
       node.setCookie(v1);
@@ -345,6 +349,28 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       return 0;
     }
     return this.getEdgeWeight(this.getEdge(nodeSrc, nodeDst));
+  }
+
+  /**
+   * Remove dependency.
+   *
+   * @param nodeSrc
+   *          source node
+   * @param nodeDst
+   *          destination node
+   */
+  public void removeDependency(GraphNode nodeSrc, GraphNode nodeDst) {
+    DefaultWeightedEdge edge = this.getEdge(nodeSrc, nodeDst);
+
+    if (edge == null) {
+      return;
+    }
+
+    // Remove edge from grahp
+    this.removeEdge(edge);
+
+    // Remove edge from list
+    this.edges.remove(edge);
   }
 
   /**
