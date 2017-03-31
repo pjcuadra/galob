@@ -21,22 +21,13 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.graph;
 
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.view.mxGraph;
-
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 /**
  * Graph representation of a HCE.
@@ -62,112 +53,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    * @author Pedro Cuadra
    *
    */
-  private class GraphDrawer extends JPanel {
-    /**
-     * Serial UID.
-     */
-    private static final long serialVersionUID = -2707712944901661771L;
-    /**
-     * Node's width.
-     */
-    private static final int NODE_WIDTH = 40;
-    /**
-     * Node's height.
-     */
-    private static final int NODE_HEIGHT = 40;
-    /**
-     * Graph class.
-     */
-    protected mxGraph mxgraph;
-
-    /**
-     * Constructor.
-     */
-    public GraphDrawer() {
-      super();
-
-      mxgraph = new mxGraph();
-
-      // Begin adding all graph's elements
-      mxgraph.getModel().beginUpdate();
-
-      try {
-
-        // Add nodes per level
-        buildGraph();
-
-      } finally {
-
-        // Finish adding graph's elements
-        mxgraph.getModel().endUpdate();
-      }
-
-      // Set the hierarchical layout
-      mxHierarchicalLayout layout = new mxHierarchicalLayout(mxgraph);
-      layout.execute(mxgraph.getDefaultParent());
-
-      // Create graph component and add graph to it
-      mxGraphComponent graphComponent = new mxGraphComponent(mxgraph);
-      this.add(graphComponent);
-
-      mxgraph.setCellsEditable(false);
-    }
-
-    /**
-     * Insert all vertex and edges of a topological level.
-     *
-     * @param level
-     *          topological level
-     */
-    private void buildGraph() {
-      Object defParent = mxgraph.getDefaultParent();
-
-      Graph graph = getGraph().clone();
-
-      // Iterate over all node
-      for (GraphNode node : graph.vertexSet()) {
-        insertNode(node);
-
-        // Add all incomming edges
-        for (DefaultWeightedEdge inEdges : graph.incomingEdgesOf(node)) {
-          GraphNode parent = graph.getEdgeSource(inEdges);
-
-          // Add parent in case it wasn't already added
-          insertNode(parent);
-
-          mxgraph.insertEdge(
-              defParent,
-              null,
-              graph.getEdgeWeight(graph.getEdge(parent, node)),
-              parent.getCookie(this),
-              node.getCookie(this));
-        }
-      }
-    }
-
-    /**
-     * Insert node if wasn't already added.
-     *
-     * @param node
-     *          node to be inserted
-     */
-    private void insertNode(GraphNode node) {
-
-      if (node.getCookie(this) != null) {
-        return;
-      }
-
-      Object defParent = mxgraph.getDefaultParent();
-
-      // Add node as vertex
-      Object v1 = mxgraph
-          .insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT, "shape=ellipse");
-
-      // Set resulting object as cookie
-      node.setCookie(this, v1);
-    }
-
-  }
 
   /**
    * Serial version UID.
@@ -324,23 +209,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
   }
 
   /**
-   * Draw graph.
-   */
-  public void drawGraph() {
-    // Create and set up the window.
-    JFrame frame = new JFrame("Graph Representation of HCE");
-
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-    // Add content to the window.
-    frame.add(getGraphPanel());
-
-    // Display the window.
-    frame.pack();
-    frame.setVisible(true);
-  }
-
-  /**
    * Get communication cost between to tasks.
    *
    * @param nodeSrc
@@ -412,23 +280,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    */
   public GraphNode getGraphNodeById(int id) {
     return nodeId.get(new Integer(id));
-  }
-
-  /**
-   * Get the graph panel.
-   *
-   * @return graph panel
-   */
-  public Component getGraphPanel() {
-    JPanel panel = new GraphDrawer();
-
-    // add the panel to a JScrollPane
-    JScrollPane scrollPane = new JScrollPane(panel);
-    // only a configuration to the jScrollPane...
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-    return scrollPane;
   }
 
   /**
