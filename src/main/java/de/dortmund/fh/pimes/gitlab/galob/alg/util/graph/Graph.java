@@ -59,10 +59,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Edges list.
-   */
-  private ArrayList<DefaultWeightedEdge> edges;
-  /**
    * Levels partitioning of dependencies.
    */
   private HashMap<Integer, ArrayList<GraphNode>> levels;
@@ -84,8 +80,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    */
   public Graph() {
     super(new GraphEdgeFactory());
-
-    edges = new ArrayList<DefaultWeightedEdge>();
 
     nodeLevelMap = new HashMap<GraphNode, Integer>();
 
@@ -132,7 +126,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
     // Multiple edges are merged together summing their costs
     if (!this.containsEdge(nodeSrc, nodeDst)) {
       addEdge(nodeSrc, nodeDst, edge);
-      edges.add(edge);
     }
 
     setEdgeWeight(this.getEdge(nodeSrc, nodeDst), prevCommCost + cost);
@@ -203,7 +196,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
     }
 
     // Copy all edges
-    for (DefaultWeightedEdge edge : edges) {
+    for (DefaultWeightedEdge edge : this.edgeSet()) {
       GraphNode src = this.getEdgeSource(edge);
       GraphNode dst = this.getEdgeTarget(edge);
 
@@ -273,8 +266,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       levels = null;
     }
 
-    // Remove edge from list
-    this.edges.remove(edge);
   }
 
   /**

@@ -119,7 +119,7 @@ public class GraphNodeTest {
     GraphNode clone = testNode.clone();
 
     assertEquals(testNode, testNode.getCookie(this));
-    assertEquals(testNode, clone.getCookie(this));
+    assertEquals(null, clone.getCookie(this));
 
     // Update cookie of clone
     clone.setCookie(this, clone);
