@@ -28,7 +28,7 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
 /**
  * Load balancing fitness calculator.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -40,7 +40,7 @@ public class LoadBalancingFitnessCalculator extends FitnessCalculator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param env
    *          heterogeneous computing environment
    */
@@ -51,7 +51,7 @@ public class LoadBalancingFitnessCalculator extends FitnessCalculator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param env
    *          heterogeneous computing environment
    * @param alpha
@@ -64,7 +64,7 @@ public class LoadBalancingFitnessCalculator extends FitnessCalculator {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see alg.util.graph.GraphStatsFactory#getFitness(alg.util.genetics.ScheduleChromosome)
    */
   @Override

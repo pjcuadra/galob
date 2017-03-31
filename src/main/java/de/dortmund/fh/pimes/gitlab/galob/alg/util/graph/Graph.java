@@ -59,10 +59,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Edges list.
-   */
-  private ArrayList<DefaultWeightedEdge> edges;
-  /**
    * Levels partitioning of dependencies.
    */
   private HashMap<Integer, ArrayList<GraphNode>> levels;
@@ -70,12 +66,10 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    * Node to topological level mapping.
    */
   private HashMap<GraphNode, Integer> nodeLevelMap;
-
   /**
    * Id to nod map.
    */
   private HashMap<Integer, GraphNode> nodeId;
-
   /**
    * Has cycles flag.
    */
@@ -86,8 +80,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    */
   public Graph() {
     super(new GraphEdgeFactory());
-
-    edges = new ArrayList<DefaultWeightedEdge>();
 
     nodeLevelMap = new HashMap<GraphNode, Integer>();
 
@@ -108,21 +100,35 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    *           cycle found
    */
   public void addDependency(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
+    addDependencySafe(nodeSrc, nodeDst, cost);
+
+    CycleDetector<GraphNode, DefaultWeightedEdge> cd =
+        new CycleDetector<GraphNode, DefaultWeightedEdge>(this);
+
+    hasCycles = cd.detectCycles();
+
+  }
+
+  /**
+   * Add dependency without checking for cycles.
+   *
+   * @param nodeSrc
+   *          source node
+   * @param nodeDst
+   *          destination node
+   * @param cost
+   *          communication cost
+   */
+  private void addDependencySafe(GraphNode nodeSrc, GraphNode nodeDst, double cost) {
     DefaultWeightedEdge edge = this.getEdgeFactory().createEdge(nodeSrc, nodeDst);
     double prevCommCost = getCommunicationCost(nodeSrc, nodeDst);
 
     // Multiple edges are merged together summing their costs
     if (!this.containsEdge(nodeSrc, nodeDst)) {
       addEdge(nodeSrc, nodeDst, edge);
-      edges.add(edge);
     }
 
     setEdgeWeight(this.getEdge(nodeSrc, nodeDst), prevCommCost + cost);
-
-    CycleDetector<GraphNode, DefaultWeightedEdge> cd =
-        new CycleDetector<GraphNode, DefaultWeightedEdge>(this);
-
-    hasCycles = cd.detectCycles();
 
   }
 
@@ -182,13 +188,15 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
   public Graph clone() {
     Graph graph = new Graph();
 
+    assert !this.hasCycles;
+
     // Copy all vertex
     for (GraphNode node : this.vertexSet()) {
       graph.addVertex(node.clone());
     }
 
     // Copy all edges
-    for (DefaultWeightedEdge edge : edges) {
+    for (DefaultWeightedEdge edge : this.edgeSet()) {
       GraphNode src = this.getEdgeSource(edge);
       GraphNode dst = this.getEdgeTarget(edge);
 
@@ -198,7 +206,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       src = graph.getGraphNodeById(src.getTaskId());
       dst = graph.getGraphNodeById(dst.getTaskId());
 
-      graph.addDependency(src, dst, weight);
+      graph.addDependencySafe(src, dst, weight);
 
     }
 
@@ -258,8 +266,6 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       levels = null;
     }
 
-    // Remove edge from list
-    this.edges.remove(edge);
   }
 
   /**

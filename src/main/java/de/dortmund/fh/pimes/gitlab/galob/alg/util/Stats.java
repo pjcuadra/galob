@@ -296,7 +296,7 @@ public class Stats {
 
   /**
    * Return the graph populated with cookies with stats values.
-   * 
+   *
    * @return graph
    */
   public Graph getStatsGraph() {

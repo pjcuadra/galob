@@ -135,7 +135,7 @@ public class GraphNode {
   public GraphNode clone() {
     GraphNode newClone = new GraphNode(this.taskId, this.etcRow);
 
-    newClone.cookieHash = new HashMap<Object, Object>(this.cookieHash);
+    // newClone.cookieHash = new HashMap<Object, Object>(this.cookieHash);
 
     return newClone;
   }
