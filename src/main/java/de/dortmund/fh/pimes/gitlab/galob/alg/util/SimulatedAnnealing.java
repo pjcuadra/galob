@@ -84,6 +84,7 @@ public class SimulatedAnnealing {
     // Random probability factor
     probFactor = randomGen.nextDouble();
 
+    double diff;
     double fitNew = fitnessCalculator.getFitness(newChromosom);
     double fitOld = fitnessCalculator.getFitness(oldChromosome);
 
@@ -91,19 +92,22 @@ public class SimulatedAnnealing {
     switch (opt) {
       case MINIMUM:
         cond = fitNew <= fitOld;
+        diff = fitNew - fitOld;
         break;
       case MAXIMUM:
         cond = fitNew >= fitOld;
+        diff = fitOld - fitNew;
         break;
       default:
         cond = fitNew >= fitOld;
+        diff = fitOld - fitNew;
     }
 
     if (cond) {
       return true;
     } else {
       // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-Math.abs(fitOld - fitNew) / this.temp)))) > probFactor) {
+      if ((Math.min(1, (Math.exp(-diff / this.temp)))) > probFactor) {
         this.temp = this.gamma * this.temp;
         return true;
       }

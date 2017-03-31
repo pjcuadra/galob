@@ -105,14 +105,7 @@ public class Util {
    * @return cloned matrix from matrix1
    */
   public static double[][] copyMatrix(double[][] matrix) {
-    double[][] copy = new double[matrix.length][matrix[0].length];
-
-    for (int i = 0; i < matrix.length; i++) {
-      copy[i] = Arrays.copyOf(matrix[i], matrix[i].length);
-    }
-
-    return copy;
-
+    return Arrays.stream(matrix).map(x -> x.clone()).toArray(double[][]::new);
   }
 
   /**
