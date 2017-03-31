@@ -157,13 +157,14 @@ public class GraphDrawer extends JPanel {
 
     // Create graph component and add graph to it
     mxGraphComponent graphComponent = new mxGraphComponent(mxgraph);
-    graphComponent.setBorder(BorderFactory.createEmptyBorder(30, 30, 0, 0));
     this.add(graphComponent);
 
     if (!isAllocationVisualization) {
       // Set the hierarchical layout
       mxHierarchicalLayout layout = new mxHierarchicalLayout(mxgraph);
       layout.execute(mxgraph.getDefaultParent());
+    } else {
+      graphComponent.setBorder(BorderFactory.createEmptyBorder(30, 30, 0, 0));
     }
 
     mxgraph.setCellsEditable(false);

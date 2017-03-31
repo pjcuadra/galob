@@ -79,7 +79,7 @@ public class LoadBalancingExample {
   /**
    * Generations limit.
    */
-  static final int GEN_LIMIT = 10;
+  static final int GEN_LIMIT = 10000;
   /**
    * Initial population size.
    */
