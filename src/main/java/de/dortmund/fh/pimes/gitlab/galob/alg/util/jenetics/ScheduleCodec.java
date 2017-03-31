@@ -25,7 +25,6 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
 
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
-import org.jenetics.util.ISeq;
 
 /**
  * Scheduler class abstraction.
@@ -48,18 +47,6 @@ public class ScheduleCodec {
    */
   public ScheduleCodec(HeterogeneousComputingEnv env) {
     this.env = env;
-  }
-
-  /**
-   * Create a Jenetics codec for schedule sequence encoding/decoding.
-   *
-   * @return Jenetics codec
-   */
-  public Codec<ISeq<ScheduleGene>, ScheduleGene> ofSeq() {
-    return Codec.of(
-        Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
-        gt -> ((ScheduleChromosome) gt.getChromosome()).toSeq() /* Decoder */
-    );
   }
 
   /**

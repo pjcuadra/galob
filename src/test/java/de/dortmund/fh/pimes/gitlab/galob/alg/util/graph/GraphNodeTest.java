@@ -76,28 +76,28 @@ public class GraphNodeTest {
 
   @Test
   public void testSetCookie() throws Exception {
-    assertEquals(null, testNode.getCookie());
+    assertEquals(null, testNode.getCookie(this));
 
     // Add itself as cookie
-    testNode.setCookie(testNode);
+    testNode.setCookie(this, testNode);
 
-    assertEquals(testNode, testNode.getCookie());
+    assertEquals(testNode, testNode.getCookie(this));
 
     // Update cookie with ETC row
-    testNode.setCookie(ETC_ROW);
+    testNode.setCookie(this, ETC_ROW);
 
-    assertEquals(ETC_ROW, testNode.getCookie());
+    assertEquals(ETC_ROW, testNode.getCookie(this));
 
   }
 
   @Test
   public void testGetCookie() throws Exception {
-    assertEquals(null, testNode.getCookie());
+    assertEquals(null, testNode.getCookie(this));
 
     // Add itself as cookie
-    testNode.setCookie(testNode);
+    testNode.setCookie(this, testNode);
 
-    assertEquals(testNode, testNode.getCookie());
+    assertEquals(testNode, testNode.getCookie(this));
 
   }
 
@@ -111,21 +111,21 @@ public class GraphNodeTest {
 
   @Test
   public void testClone() throws Exception {
-    assertEquals(null, testNode.getCookie());
+    assertEquals(null, testNode.getCookie(this));
 
     // Add itself as cookie
-    testNode.setCookie(testNode);
+    testNode.setCookie(this, testNode);
 
     GraphNode clone = testNode.clone();
 
-    assertEquals(testNode, testNode.getCookie());
-    assertEquals(testNode, clone.getCookie());
+    assertEquals(testNode, testNode.getCookie(this));
+    assertEquals(testNode, clone.getCookie(this));
 
     // Update cookie of clone
-    clone.setCookie(clone);
+    clone.setCookie(this, clone);
 
-    assertEquals(testNode, testNode.getCookie());
-    assertEquals(clone, clone.getCookie());
+    assertEquals(testNode, testNode.getCookie(this));
+    assertEquals(clone, clone.getCookie(this));
   }
 
 }

@@ -100,8 +100,8 @@ public class Stats {
     int executorId = getExecutionUnit(node.getTaskId());
     double finishTime = timeSpan[executorId];
 
-    if (node.getCookie() != null) {
-      return (double) node.getCookie();
+    if (node.getCookie(this) != null) {
+      return (double) node.getCookie(this);
     }
 
     // Get earliest start time
@@ -123,7 +123,7 @@ public class Stats {
 
     finishTime += node.getExecutionTimeOnUnit(executorId);
 
-    node.setCookie(new Double(finishTime));
+    node.setCookie(this, new Double(finishTime));
     timeSpan[executorId] = finishTime;
 
     return finishTime;
@@ -166,8 +166,8 @@ public class Stats {
    */
   private int getExecutionUnit(int task) {
 
-    assert chromosome.toSeq().size() > task : "Task index out of bound: "
-        + chromosome.toSeq().size() + " maximum, " + task + " provided.";
+    assert chromosome.length() > task : "Task index out of bound: " + chromosome.length()
+        + " maximum, " + task + " provided.";
 
     Optional<ScheduleGene> gene =
         chromosome.toSeq().stream().filter(g -> g.getAllele().getTaskId() == task).findFirst();

@@ -22,6 +22,7 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.graph;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Graph node.
@@ -39,9 +40,9 @@ public class GraphNode {
    */
   private double[] etcRow;
   /**
-   * Custom stored value.
+   * Custom stored values.
    */
-  private Object cookie;
+  private HashMap<Object, Object> cookieHash;
 
   /**
    * Constructor.
@@ -54,6 +55,7 @@ public class GraphNode {
   public GraphNode(int taskId, double[] etcRow) {
     this.setTaskId(taskId);
     this.setEtcRow(Arrays.stream(etcRow).toArray());
+    cookieHash = new HashMap<Object, Object>();
   }
 
   /**
@@ -100,8 +102,8 @@ public class GraphNode {
    * @param cookie
    *          custom value
    */
-  public void setCookie(Object cookie) {
-    this.cookie = cookie;
+  public void setCookie(Object owner, Object cookie) {
+    this.cookieHash.put(owner, cookie);
   }
 
   /**
@@ -109,8 +111,8 @@ public class GraphNode {
    *
    * @return custom value
    */
-  public Object getCookie() {
-    return this.cookie;
+  public Object getCookie(Object owner) {
+    return this.cookieHash.get(owner);
   }
 
   /**
@@ -133,7 +135,7 @@ public class GraphNode {
   public GraphNode clone() {
     GraphNode newClone = new GraphNode(this.taskId, this.etcRow);
 
-    newClone.setCookie(this.getCookie());
+    newClone.cookieHash = new HashMap<Object, Object>(this.cookieHash);
 
     return newClone;
   }

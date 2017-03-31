@@ -22,50 +22,64 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.Stats;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.StatsFactory;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleAllele;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
 
 import org.jenetics.util.ISeq;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
  * Schedule Chromosome unit testing.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
  */
 public class ScheduleChromosomeTest {
-
+  /**
+   * Random generator.
+   */
   private Random randomGen;
-
+  /**
+   * Number of tasks.
+   */
   private int numTask;
-  static final int maxNumTask = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
-  static final int maxNumExecutors = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
-
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-  }
+  /**
+   * Maximum number of tasks.
+   */
+  static final int MAX_NUM_TASKS = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
+  /**
+   * Maximum number of executors.
+   */
+  static final int MAX_NUM_CORES = 16 /* Actual max */ /* 0 is not possible so add 1 after */;
+  /**
+   * HCE.
+   */
+  private HeterogeneousComputingEnv env;
+  /**
+   * Test Chromosome.
+   */
+  private ScheduleChromosome testChromosome;
+  /**
+   * Stats factory.
+   */
+  private StatsFactory sf;
 
   /**
    * Unit testing set-up.
-   * 
+   *
    * @throws Exception
    *           falure exception
    */
@@ -74,7 +88,13 @@ public class ScheduleChromosomeTest {
 
     randomGen = new Random();
 
-    numTask = 1 + randomGen.nextInt(maxNumTask);
+    numTask = 1 + randomGen.nextInt(MAX_NUM_TASKS);
+
+    env = HeterogeneousComputingEnv.ofRandom(MAX_NUM_TASKS, MAX_NUM_CORES, true);
+    testChromosome = new ScheduleChromosome(env);
+    LoadBalancingFitnessCalculator fitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
+
+    sf = new StatsFactory(env, fitnessCalc);
 
   }
 
@@ -83,8 +103,45 @@ public class ScheduleChromosomeTest {
   }
 
   @Test
-  public void checkvalidity() {
+  public void knowChromosome() {
+    GraphNode src;
+    GraphNode dst;
+
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(5, 3);
+
+    /* (1) -> (2) -> (3) -> (4) -> (5) */
+    src = env.addUnitExecutionTimeTask();
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+
+    src = dst;
+    dst = env.addUnitExecutionTimeTask();
+    env.addDependency(src, dst, 0);
+
+    ScheduleChromosome chromosome = new ScheduleChromosome(env);
+
+    for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene++) {
+      assertEquals(chromosome.toSeq().get(currGene).getAllele().getTaskId(), currGene);
+
+    }
+
+  }
+
+  @Test
+  public void testIsValid() throws Exception {
     final int numTasks = 4;
+
+    // This shall be true everytime. If not we are creating invalid solutions
+    assertEquals(testChromosome.isValid(), true);
+
     ArrayList<ScheduleGene> alleleList = new ArrayList<ScheduleGene>();
     ScheduleAllele allele = null;
     GraphNode[] tasks = new GraphNode[numTasks];
@@ -145,20 +202,80 @@ public class ScheduleChromosomeTest {
   }
 
   @Test
-  public void createCheckValid() {
-    HeterogeneousComputingEnv env =
-        HeterogeneousComputingEnv.ofRandom(maxNumTask, maxNumExecutors, true);
-    ScheduleChromosome chromosome = new ScheduleChromosome(env);
+  public void testIterator() throws Exception {
+    ScheduleChromosome clone = testChromosome.clone();
+    Iterator<ScheduleGene> itChr = testChromosome.iterator();
+    Iterator<ScheduleGene> itClone = clone.iterator();
 
-    // This shall be true everytime. If not we are creating invalid solutions
-    assertEquals(chromosome.isValid(), true);
+    // Iterate over all elements
+    while (itChr.hasNext()) {
+      ScheduleGene testGene = itChr.next();
+      ScheduleGene cloneGene = itClone.next();
+
+      assertEquals(testGene, cloneGene);
+    }
+  }
+
+  @Test
+  public void testNewInstance() throws Exception {
+    ScheduleChromosome chr = testChromosome.newInstance();
+
+    // Assert dimensions
+    assertEquals(env.getNumberOfTasks(), chr.length());
+    assertEquals(testChromosome.length(), chr.length());
+
+    for (ScheduleGene gene : chr) {
+      assertTrue(gene.getAllele().getExecutorId() < env.getNumberOfExecutors());
+    }
+
+    chr = testChromosome.newInstance(testChromosome.toSeq());
+
+    // Assert dimensions
+    assertEquals(env.getNumberOfTasks(), chr.length());
+    assertEquals(testChromosome.length(), chr.length());
+
+    // Check that it's the same sequence
+    for (int i = 0; i < testChromosome.length(); i++) {
+      assertEquals(testChromosome.getGene(i), chr.getGene(i));
+    }
 
   }
 
   @Test
-  public void cloneChromosome() {
+  public void testGetGene() throws Exception {
+
+    for (int i = 0; i < testChromosome.length(); i++) {
+      assertEquals(testChromosome.toSeq().get(i), testChromosome.getGene(i));
+    }
+
+  }
+
+  @Test
+  public void testLength() throws Exception {
+    assertEquals(testChromosome.length(), testChromosome.toSeq().size());
+  }
+
+  @Test
+  public void testToSeq() throws Exception {
+    assertEquals(testChromosome.length(), testChromosome.toSeq().size());
+  }
+
+  @Test
+  public void testOf() throws Exception {
+    ScheduleChromosome newChr = ScheduleChromosome.of(env);
+
+    assertEquals(env.getNumberOfTasks(), newChr.length());
+
+    for (ScheduleGene gene : newChr) {
+      assertTrue(gene.getAllele().getExecutorId() < env.getNumberOfExecutors());
+    }
+
+  }
+
+  @Test
+  public void testClone() throws Exception {
     HeterogeneousComputingEnv env =
-        HeterogeneousComputingEnv.ofRandom(maxNumTask, maxNumExecutors, true);
+        HeterogeneousComputingEnv.ofRandom(MAX_NUM_TASKS, MAX_NUM_CORES, true);
     ScheduleChromosome chromosomeOrg = new ScheduleChromosome(env);
     ScheduleChromosome chromosomeClone = chromosomeOrg.clone();
     ScheduleGene original;
@@ -170,105 +287,34 @@ public class ScheduleChromosomeTest {
       cloned = chromosomeClone.getGene(locus);
       assertEquals(original, cloned);
     }
-
   }
 
-  @Test
-  public void knowChromosome() {
-    GraphNode src;
-    GraphNode dst;
-
-    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(5, 3);
-
-    /* (1) -> (2) -> (3) -> (4) -> (5) */
-    src = env.addUnitExecutionTimeTask();
-    dst = env.addUnitExecutionTimeTask();
-    env.addDependency(src, dst, 0);
-
-    src = dst;
-    dst = env.addUnitExecutionTimeTask();
-    env.addDependency(src, dst, 0);
-
-    src = dst;
-    dst = env.addUnitExecutionTimeTask();
-    env.addDependency(src, dst, 0);
-
-    src = dst;
-    dst = env.addUnitExecutionTimeTask();
-    env.addDependency(src, dst, 0);
-
-    ScheduleChromosome chromosome = new ScheduleChromosome(env);
-
-    for (int currGene = 0; currGene < chromosome.toSeq().size(); currGene++) {
-      assertEquals(chromosome.toSeq().get(currGene).getAllele().getTaskId(), currGene);
-
-    }
-
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testIsValid() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testIterator() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testNewInstance() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testGetGene() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testLength() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testToSeq() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testOf() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
-  @Test
-  public void testClone() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
   @Test
   public void testSetStats() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    testGetStats();
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testGetStats() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    // By default chromosome don't have stats
+    assertEquals(null, testChromosome.getStats());
+
+    Stats stats = sf.ofChromosome(testChromosome);
+
+    this.testChromosome.setStats(stats);
+
+    assertEquals(stats, testChromosome.getStats());
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testHasStats() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    // By default chromosome don't have stats
+    assertFalse(testChromosome.hasStats());
+    assertEquals(null, testChromosome.getStats());
+
+    this.testChromosome.setStats(sf.ofChromosome(testChromosome));
+
+    assertTrue(testChromosome.hasStats());
+
   }
 }

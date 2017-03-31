@@ -179,14 +179,14 @@ public class GraphTest {
     // Assert all nodes
     for (int i = 0; i < NUM_NODES; i++) {
       // Set the cookie to store the original node
-      testGraph.getGraphNodeById(i).setCookie(testGraph.getGraphNodeById(i));
+      testGraph.getGraphNodeById(i).setCookie(this, testGraph.getGraphNodeById(i));
 
       // Check that nodes were cloned
       assertEquals(testGraph.getGraphNodeById(i), clone.getGraphNodeById(i));
 
       // Cookies shall not be cloned
-      assertEquals(testGraph.getGraphNodeById(i), testGraph.getGraphNodeById(i).getCookie());
-      assertEquals(null, clone.getGraphNodeById(i).getCookie());
+      assertEquals(testGraph.getGraphNodeById(i), testGraph.getGraphNodeById(i).getCookie(this));
+      assertEquals(null, clone.getGraphNodeById(i).getCookie(this));
     }
 
     // Assert all edges

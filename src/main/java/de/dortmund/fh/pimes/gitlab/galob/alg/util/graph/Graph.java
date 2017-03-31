@@ -139,8 +139,8 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
               defParent,
               null,
               graph.getEdgeWeight(graph.getEdge(parent, node)),
-              parent.getCookie(),
-              node.getCookie());
+              parent.getCookie(this),
+              node.getCookie(this));
         }
       }
     }
@@ -153,7 +153,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
      */
     private void insertNode(GraphNode node) {
 
-      if (node.getCookie() != null) {
+      if (node.getCookie(this) != null) {
         return;
       }
 
@@ -164,7 +164,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
           .insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT, "shape=ellipse");
 
       // Set resulting object as cookie
-      node.setCookie(v1);
+      node.setCookie(this, v1);
     }
 
   }
@@ -269,7 +269,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
 
     // First clean all cookies
     for (GraphNode currNode : this.vertexSet()) {
-      currNode.setCookie(null);
+      currNode.setCookie(this, null);
     }
 
     // Get topological level of every node
@@ -495,8 +495,8 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
     assert !checkCycles() : "Cycle found!";
 
     // If cookie already set
-    if (node.getCookie() != null) {
-      return (Integer) node.getCookie();
+    if (node.getCookie(this) != null) {
+      return (Integer) node.getCookie(this);
     }
 
     // Get maximum level inherited from predecessors
@@ -504,11 +504,11 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       GraphNode depNode = this.getEdgeSource(inEdge);
 
       if (nodeLevel < (getTopologicalLevel(depNode) + 1)) {
-        nodeLevel = ((Integer) depNode.getCookie()) + 1;
+        nodeLevel = ((Integer) depNode.getCookie(this)) + 1;
       }
     }
 
-    node.setCookie(nodeLevel);
+    node.setCookie(this, nodeLevel);
 
     // If level doesn't exist create it
     if (levels.get(nodeLevel) == null) {
