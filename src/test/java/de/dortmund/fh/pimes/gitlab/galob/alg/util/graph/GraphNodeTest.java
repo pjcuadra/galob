@@ -21,57 +21,111 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.graph;
 
-import org.junit.Ignore;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class GraphNodeTest {
+  /**
+   * Node ID.
+   */
+  private static final int NODE_ID = 3;
+  /**
+   * ETC row.
+   */
+  private static final double[] ETC_ROW = { 1, 2, 3 };
+  /**
+   * Test node.
+   */
+  private GraphNode testNode;
+  /**
+   * Delta for double comparison.
+   */
+  private static final double EPSILON = 0.00001;
 
-  @Ignore("Note yet implemented")
+  /**
+   * Unit testing set-up.
+   *
+   * @throws Exception
+   *           failure exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    testNode = new GraphNode(NODE_ID, ETC_ROW);
+  }
+
   @Test
   public void testGetTaskId() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertEquals(NODE_ID, testNode.getTaskId());
   }
 
-  @Ignore("Note yet implemented")
-  @Test
-  public void testSetTaskId() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
   @Test
   public void testGetEtcRow() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertArrayEquals(ETC_ROW, testNode.getEtcRow(), EPSILON);
+
+    // Try to alter the ETC values
+    testNode.getEtcRow()[0] = 5;
+    testNode.getEtcRow()[1] = 6;
+    testNode.getEtcRow()[2] = 7;
+
+    // Shouldn't be changed
+    assertArrayEquals(ETC_ROW, testNode.getEtcRow(), EPSILON);
   }
 
-  @Ignore("Note yet implemented")
-  @Test
-  public void testSetEtcRow() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
   @Test
   public void testSetCookie() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertEquals(null, testNode.getCookie());
+
+    // Add itself as cookie
+    testNode.setCookie(testNode);
+
+    assertEquals(testNode, testNode.getCookie());
+
+    // Update cookie with ETC row
+    testNode.setCookie(ETC_ROW);
+
+    assertEquals(ETC_ROW, testNode.getCookie());
+
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testGetCookie() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertEquals(null, testNode.getCookie());
+
+    // Add itself as cookie
+    testNode.setCookie(testNode);
+
+    assertEquals(testNode, testNode.getCookie());
+
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testGetExecutionTimeOnUnit() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    int core = 0;
+    for (double i : ETC_ROW) {
+      assertEquals(i, testNode.getExecutionTimeOnUnit(core++), EPSILON);
+    }
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testClone() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertEquals(null, testNode.getCookie());
+
+    // Add itself as cookie
+    testNode.setCookie(testNode);
+
+    GraphNode clone = testNode.clone();
+
+    assertEquals(testNode, testNode.getCookie());
+    assertEquals(testNode, clone.getCookie());
+
+    // Update cookie of clone
+    clone.setCookie(clone);
+
+    assertEquals(testNode, testNode.getCookie());
+    assertEquals(clone, clone.getCookie());
   }
 
 }

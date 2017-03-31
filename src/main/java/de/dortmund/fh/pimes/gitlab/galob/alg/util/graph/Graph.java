@@ -267,7 +267,12 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       throw new CycleException();
     }
 
-    // Assumes that the nodes are topologically ordered
+    // First clean all cookies
+    for (GraphNode currNode : this.vertexSet()) {
+      currNode.setCookie(null);
+    }
+
+    // Get topological level of every node
     for (GraphNode currNode : this.vertexSet()) {
       getTopologicalLevel(currNode);
     }
@@ -360,14 +365,30 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    *          destination node
    */
   public void removeDependency(GraphNode nodeSrc, GraphNode nodeDst) {
+    // Assert that the vertexes are part of the Graph
+    assert this.containsVertex(nodeSrc);
+    assert this.containsVertex(nodeDst);
+
     DefaultWeightedEdge edge = this.getEdge(nodeSrc, nodeDst);
 
     if (edge == null) {
       return;
     }
 
-    // Remove edge from grahp
+    // Remove edge from graph
     this.removeEdge(edge);
+
+    // Check for cycles
+    CycleDetector<GraphNode, DefaultWeightedEdge> cd =
+        new CycleDetector<GraphNode, DefaultWeightedEdge>(this);
+
+    hasCycles = cd.detectCycles();
+
+    // Force topological level rebuild
+    if (levels != null) {
+      levels.clear();
+      levels = null;
+    }
 
     // Remove edge from list
     this.edges.remove(edge);

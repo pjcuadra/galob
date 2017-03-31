@@ -26,7 +26,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 /**
  * Graph edge factory.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -34,11 +34,14 @@ public class GraphEdgeFactory implements EdgeFactory<GraphNode, DefaultWeightedE
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.jgrapht.EdgeFactory#createEdge(java.lang.Object, java.lang.Object)
    */
   @Override
   public DefaultWeightedEdge createEdge(GraphNode sourceVertex, GraphNode targetVertex) {
+    assert sourceVertex != null : "Source vertex is null";
+    assert targetVertex != null : "Target vertex is null";
+
     return new DefaultWeightedEdge();
   }
 

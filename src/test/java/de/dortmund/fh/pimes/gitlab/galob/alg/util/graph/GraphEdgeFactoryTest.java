@@ -21,15 +21,37 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.graph;
 
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GraphEdgeFactoryTest {
 
-  @Ignore("Note yet implemented")
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   @Test
   public void testCreateEdge() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    GraphEdgeFactory ef = new GraphEdgeFactory();
+
+    // Catch exception
+    thrown.expect(AssertionError.class);
+    thrown.expectMessage("Source vertex is null");
+
+    ef.createEdge(null, null);
+
+    ef.createEdge(new GraphNode(0, new double[2]), null);
+  }
+
+  @Test
+  public void testCreateEdge2() throws Exception {
+    GraphEdgeFactory ef = new GraphEdgeFactory();
+
+    // Catch exception
+    thrown.expect(AssertionError.class);
+    thrown.expectMessage("Target vertex is null");
+
+    ef.createEdge(new GraphNode(0, new double[2]), null);
   }
 
 }
