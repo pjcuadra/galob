@@ -25,7 +25,7 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
 /**
  * Graph statistics factory.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -37,7 +37,7 @@ public abstract class FitnessCalculator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param env
    *          heterogeneous computing environment
    */
@@ -47,7 +47,7 @@ public abstract class FitnessCalculator {
 
   /**
    * Get fitness value of the chromosome.
-   * 
+   *
    * @param chromosome
    *          chromosome
    * @return fitness value
@@ -60,7 +60,7 @@ public abstract class FitnessCalculator {
 
   /**
    * Calculate fitness function.
-   * 
+   *
    * @param chromosome
    *          chromosome
    * @return fitness value
@@ -69,16 +69,16 @@ public abstract class FitnessCalculator {
 
   /**
    * Get graph stats factory.
-   * 
+   *
    * @return graph stats factory
    */
-  public StatsFactory getGraphStatsFactory() {
+  private StatsFactory getGraphStatsFactory() {
     return statsFactory;
   }
 
   /**
    * Set graph stats factory.
-   * 
+   *
    * @param gsf
    *          graph stats factory
    */

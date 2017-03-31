@@ -135,8 +135,12 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
           // Add parent in case it wasn't already added
           insertNode(parent);
 
-          mxgraph.insertEdge(defParent, null, graph.getEdgeWeight(graph.getEdge(parent, node)),
-              parent.getCookie(), node.getCookie());
+          mxgraph.insertEdge(
+              defParent,
+              null,
+              graph.getEdgeWeight(graph.getEdge(parent, node)),
+              parent.getCookie(this),
+              node.getCookie(this));
         }
       }
     }
@@ -149,18 +153,18 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
      */
     private void insertNode(GraphNode node) {
 
-      if (node.getCookie() != null) {
+      if (node.getCookie(this) != null) {
         return;
       }
 
       Object defParent = mxgraph.getDefaultParent();
 
       // Add node as vertex
-      Object v1 = mxgraph.insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT,
-          "shape=ellipse");
+      Object v1 = mxgraph
+          .insertVertex(defParent, null, node, 0, 0, NODE_WIDTH, NODE_HEIGHT, "shape=ellipse");
 
       // Set resulting object as cookie
-      node.setCookie(v1);
+      node.setCookie(this, v1);
     }
 
   }
@@ -263,7 +267,12 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       throw new CycleException();
     }
 
-    // Assumes that the nodes are topologically ordered
+    // First clean all cookies
+    for (GraphNode currNode : this.vertexSet()) {
+      currNode.setCookie(this, null);
+    }
+
+    // Get topological level of every node
     for (GraphNode currNode : this.vertexSet()) {
       getTopologicalLevel(currNode);
     }
@@ -348,6 +357,44 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
   }
 
   /**
+   * Remove dependency.
+   *
+   * @param nodeSrc
+   *          source node
+   * @param nodeDst
+   *          destination node
+   */
+  public void removeDependency(GraphNode nodeSrc, GraphNode nodeDst) {
+    // Assert that the vertexes are part of the Graph
+    assert this.containsVertex(nodeSrc);
+    assert this.containsVertex(nodeDst);
+
+    DefaultWeightedEdge edge = this.getEdge(nodeSrc, nodeDst);
+
+    if (edge == null) {
+      return;
+    }
+
+    // Remove edge from graph
+    this.removeEdge(edge);
+
+    // Check for cycles
+    CycleDetector<GraphNode, DefaultWeightedEdge> cd =
+        new CycleDetector<GraphNode, DefaultWeightedEdge>(this);
+
+    hasCycles = cd.detectCycles();
+
+    // Force topological level rebuild
+    if (levels != null) {
+      levels.clear();
+      levels = null;
+    }
+
+    // Remove edge from list
+    this.edges.remove(edge);
+  }
+
+  /**
    * Get the graph object.
    *
    * @return graph object
@@ -363,7 +410,7 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
    *          id of the task
    * @return graph node with given id
    */
-  protected GraphNode getGraphNodeById(int id) {
+  public GraphNode getGraphNodeById(int id) {
     return nodeId.get(new Integer(id));
   }
 
@@ -448,8 +495,8 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
     assert !checkCycles() : "Cycle found!";
 
     // If cookie already set
-    if (node.getCookie() != null) {
-      return (Integer) node.getCookie();
+    if (node.getCookie(this) != null) {
+      return (Integer) node.getCookie(this);
     }
 
     // Get maximum level inherited from predecessors
@@ -457,11 +504,11 @@ public class Graph extends DefaultDirectedGraph<GraphNode, DefaultWeightedEdge> 
       GraphNode depNode = this.getEdgeSource(inEdge);
 
       if (nodeLevel < (getTopologicalLevel(depNode) + 1)) {
-        nodeLevel = ((Integer) depNode.getCookie()) + 1;
+        nodeLevel = ((Integer) depNode.getCookie(this)) + 1;
       }
     }
 
-    node.setCookie(nodeLevel);
+    node.setCookie(this, nodeLevel);
 
     // If level doesn't exist create it
     if (levels.get(nodeLevel) == null) {

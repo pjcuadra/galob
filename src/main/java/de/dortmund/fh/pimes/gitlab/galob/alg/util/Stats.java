@@ -24,10 +24,12 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.Graph;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Graph statistic.
@@ -57,26 +59,32 @@ public class Stats {
    */
   private double[] makespanK;
   /**
-   * Allocation matrix.
+   * Chromosome.
    */
-  private int[][] omega;
+  private ScheduleChromosome chromosome;
   /**
    * Fitness calculator.
    */
   private FitnessCalculator fitnessCalculator;
+  /**
+   * Array of timespan of all cores.
+   */
+  private double[] timeSpan;
 
   /**
    * Constructor.
    *
    * @param env
    *          heterogeneous computing environment
-   * @param omega
-   *          allocation matrix
+   * @param chromosome
+   *          chromosome
    */
-  public Stats(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator, int[][] omega) {
+  public Stats(HeterogeneousComputingEnv env, FitnessCalculator fitnessCalculator,
+      ScheduleChromosome chromosome) {
     this.env = env;
-    this.omega = omega;
+    this.chromosome = chromosome;
     this.fitnessCalculator = fitnessCalculator;
+    this.timeSpan = new double[env.getNumberOfExecutors()];
   }
 
   /**
@@ -89,11 +97,11 @@ public class Stats {
    * @return actual finish time of the node
    */
   private double getActualFinishTime(Graph graph, GraphNode node) {
+    int executorId = getExecutionUnit(node.getTaskId());
+    double finishTime = timeSpan[executorId];
 
-    double startTime = 0;
-
-    if (node.getCookie() != null) {
-      return (double) node.getCookie();
+    if (node.getCookie(this) != null) {
+      return (double) node.getCookie(this);
     }
 
     // Get earliest start time
@@ -102,22 +110,23 @@ public class Stats {
       Double tempStartTime = getActualFinishTime(graph, anc);
 
       // If were allocated in the same core don't add communications
-      if (getExecutionUnit(node.getTaskId()) != getExecutionUnit(anc.getTaskId())) {
+      if (executorId != getExecutionUnit(anc.getTaskId())) {
         // Add communication costs
         tempStartTime += graph.getEdgeWeight(inEdge);
       }
 
-      if (tempStartTime > startTime) {
-        startTime = tempStartTime;
+      if (tempStartTime > finishTime) {
+        finishTime = tempStartTime;
       }
 
     }
 
-    startTime += node.getExecutionTimeOnUnit(getExecutionUnit(node.getTaskId()));
+    finishTime += node.getExecutionTimeOnUnit(executorId);
 
-    node.setCookie(new Double(startTime));
+    node.setCookie(this, new Double(finishTime));
+    timeSpan[executorId] = finishTime;
 
-    return startTime;
+    return finishTime;
 
   }
 
@@ -140,6 +149,15 @@ public class Stats {
   }
 
   /**
+   * Get the chromosome object.
+   *
+   * @return chromosome object
+   */
+  public ScheduleChromosome getChromosome() {
+    return chromosome;
+  }
+
+  /**
    * Get execution unit of a given task.
    *
    * @param task
@@ -148,13 +166,14 @@ public class Stats {
    */
   private int getExecutionUnit(int task) {
 
-    assert omega[0].length > task : "Task index out of bound: " + omega[0].length + " maximum, "
-        + task + " provided.";
+    assert chromosome.length() > task : "Task index out of bound: " + chromosome.length()
+        + " maximum, " + task + " provided.";
 
-    for (int i = 0; i < omega.length; i++) {
-      if (omega[i][task] == 1) {
-        return i;
-      }
+    Optional<ScheduleGene> gene =
+        chromosome.toSeq().stream().filter(g -> g.getAllele().getTaskId() == task).findFirst();
+
+    if (gene.isPresent()) {
+      return gene.get().getAllele().getExecutorId();
     }
 
     return 0;
@@ -186,19 +205,22 @@ public class Stats {
       return makespanK;
     }
 
-    makespanK = new double[omega.length];
+    makespanK = new double[env.getNumberOfExecutors()];
 
     Graph newGraph = env.getGraphCopy();
 
+    // Check for cycles first
+    if (newGraph.checkCycles()) {
+      throw new Graph.CycleException();
+    }
+
+    GraphNode curr;
+
     // This iteration is in topological order according to JGraphT
-    for (GraphNode curr : newGraph.vertexSet()) {
-      double currAft = 0;
+    for (ScheduleGene gene : chromosome) {
+      curr = newGraph.getGraphNodeById(gene.getAllele().getTaskId());
 
-      if (newGraph.checkCycles()) {
-        throw new Graph.CycleException();
-      }
-
-      currAft = getActualFinishTime(newGraph, curr);
+      double currAft = getActualFinishTime(newGraph, curr);
 
       if (currAft > makespanK[getExecutionUnit(curr.getTaskId())]) {
         makespanK[getExecutionUnit(curr.getTaskId())] = currAft;

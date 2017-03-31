@@ -27,13 +27,10 @@ import de.dortmund.fh.pimes.gitlab.galob.alg.ExecutionTimeFitnessCalculator;
 import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.SimulatedAnnealing;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleCodec;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleMutator;
 
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
+import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.Population;
 import org.jenetics.util.MSeq;
@@ -48,7 +45,7 @@ import java.util.Random;
 
 /**
  * Schedule Mutator unit testing.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
@@ -73,7 +70,7 @@ public class ScheduleMutatorTest {
 
   /**
    * Unit testing set-up.
-   * 
+   *
    * @throws Exception
    *           falure exception
    */
@@ -85,7 +82,7 @@ public class ScheduleMutatorTest {
     env = HeterogeneousComputingEnv.ofRandomUnitary(maxNumTask, maxNumExecutors, false);
 
     LoadBalancingFitnessCalculator loadBal = new LoadBalancingFitnessCalculator(env, 0.6);
-    SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal);
+    SimulatedAnnealing simAnne = new SimulatedAnnealing(0.8, 900, loadBal, Optimize.MAXIMUM);
 
     env.setSimulatedAnnealing(simAnne);
 
@@ -98,7 +95,8 @@ public class ScheduleMutatorTest {
   public void tearDown() throws Exception {
   }
 
-  private int countAltersOfChromosome(Chromosome<ScheduleGene> originalChromosome,
+  private int countAltersOfChromosome(
+      Chromosome<ScheduleGene> originalChromosome,
       Chromosome<ScheduleGene> mutatedChromosome) {
     int alterationsCount = 0;
     ScheduleGene expected;
@@ -129,7 +127,9 @@ public class ScheduleMutatorTest {
     int alterationsCount = 0;
 
     // Create a phenotype to be used as factory for others
-    phenoFactory = Phenotype.of(Genotype.of(ScheduleChromosome.of(env)), 0,
+    phenoFactory = Phenotype.of(
+        Genotype.of(ScheduleChromosome.of(env)),
+        0,
         gt -> myOpt.getFitness(codec.ofChromosome().decode(gt)));
 
     // Random population size

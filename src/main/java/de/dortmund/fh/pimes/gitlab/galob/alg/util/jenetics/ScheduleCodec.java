@@ -22,15 +22,13 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.Util;
 
 import org.jenetics.Genotype;
 import org.jenetics.engine.Codec;
-import org.jenetics.util.ISeq;
 
 /**
  * Scheduler class abstraction.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
@@ -43,7 +41,7 @@ public class ScheduleCodec {
 
   /**
    * Constructor.
-   * 
+   *
    * @param env
    *          heterogeneous computing environment
    */
@@ -52,37 +50,13 @@ public class ScheduleCodec {
   }
 
   /**
-   * Create a Jenetics codec for allocation matrix encoding/decoding.
-   * 
-   * @return Jenetics codec
-   */
-  public Codec<int[][], ScheduleGene> ofOmega() {
-    int numExecutors = env.getNumberOfExecutors();
-
-    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
-        gt -> Util.createOmegaMatrix(((ScheduleChromosome) gt.getChromosome()).toSeq(),
-            numExecutors) /* Decoder */
-    );
-  }
-
-  /**
-   * Create a Jenetics codec for schedule sequence encoding/decoding.
-   * 
-   * @return Jenetics codec
-   */
-  public Codec<ISeq<ScheduleGene>, ScheduleGene> ofSeq() {
-    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
-        gt -> ((ScheduleChromosome) gt.getChromosome()).toSeq() /* Decoder */
-    );
-  }
-
-  /**
    * Create a Jenetics codec for ScheduleChromosome encoding/decoding.
-   * 
+   *
    * @return Jenetics codec
    */
   public Codec<ScheduleChromosome, ScheduleGene> ofChromosome() {
-    return Codec.of(Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
+    return Codec.of(
+        Genotype.of(ScheduleChromosome.of(env)), /* Encoder */
         gt -> ((ScheduleChromosome) gt.getChromosome()) /* Decoder */
     );
   }

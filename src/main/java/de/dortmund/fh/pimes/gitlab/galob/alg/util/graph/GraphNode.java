@@ -22,10 +22,11 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util.graph;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Graph node.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -39,13 +40,13 @@ public class GraphNode {
    */
   private double[] etcRow;
   /**
-   * Custom stored value.
+   * Custom stored values.
    */
-  private Object cookie;
+  private HashMap<Object, Object> cookieHash;
 
   /**
    * Constructor.
-   * 
+   *
    * @param taskId
    *          task ID
    * @param etcRow
@@ -54,11 +55,12 @@ public class GraphNode {
   public GraphNode(int taskId, double[] etcRow) {
     this.setTaskId(taskId);
     this.setEtcRow(Arrays.stream(etcRow).toArray());
+    cookieHash = new HashMap<Object, Object>();
   }
 
   /**
    * Get task ID.
-   * 
+   *
    * @return task ID
    */
   public int getTaskId() {
@@ -67,7 +69,7 @@ public class GraphNode {
 
   /**
    * Set task ID of the graph node.
-   * 
+   *
    * @param taskId
    *          task ID
    */
@@ -77,16 +79,16 @@ public class GraphNode {
 
   /**
    * Get the expected time to compute for all cores.
-   * 
+   *
    * @return expected time to compute for all cores
    */
   public double[] getEtcRow() {
-    return etcRow;
+    return Arrays.stream(etcRow).toArray();
   }
 
   /**
    * Set the expected time to compute for all cores.
-   * 
+   *
    * @param etcRow
    *          expected time to compute for all cores
    */
@@ -96,26 +98,26 @@ public class GraphNode {
 
   /**
    * Set custom value.
-   * 
+   *
    * @param cookie
    *          custom value
    */
-  public void setCookie(Object cookie) {
-    this.cookie = cookie;
+  public void setCookie(Object owner, Object cookie) {
+    this.cookieHash.put(owner, cookie);
   }
 
   /**
    * Get custom value.
-   * 
+   *
    * @return custom value
    */
-  public Object getCookie() {
-    return this.cookie;
+  public Object getCookie(Object owner) {
+    return this.cookieHash.get(owner);
   }
 
   /**
    * Get expected time to compute of a given core.
-   * 
+   *
    * @param exeUnit
    *          core ID
    * @return expected time to computes of the given core
@@ -126,21 +128,46 @@ public class GraphNode {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#clone()
    */
   @Override
   public GraphNode clone() {
-    return new GraphNode(this.taskId, this.etcRow);
+    GraphNode newClone = new GraphNode(this.taskId, this.etcRow);
+
+    newClone.cookieHash = new HashMap<Object, Object>(this.cookieHash);
+
+    return newClone;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return "(" + this.taskId + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof GraphNode)) {
+      return false;
+    }
+
+    GraphNode otherNode = (GraphNode) other;
+
+    if (otherNode.getTaskId() != this.getTaskId()) {
+      return false;
+    }
+
+    for (int i = 0; i < this.etcRow.length; i++) {
+      if (otherNode.getEtcRow()[i] != this.getEtcRow()[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

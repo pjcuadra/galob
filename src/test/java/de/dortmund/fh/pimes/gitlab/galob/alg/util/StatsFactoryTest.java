@@ -21,15 +21,60 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+
+import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class StatsFactoryTest {
+  /**
+   * Max. number of tasks.
+   */
+  static final int MAX_NUM_TASKS = 16;
+  /**
+   * Max. number cores.
+   */
+  static final int MAX_NUM_CORES = 16;
 
-  @Ignore("Note yet implemented")
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   @Test
   public void testOfChromosome() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    HeterogeneousComputingEnv env =
+        HeterogeneousComputingEnv.ofRandomUnitary(MAX_NUM_TASKS, MAX_NUM_CORES, true);
+    ScheduleChromosome chromosome = new ScheduleChromosome(env);
+    LoadBalancingFitnessCalculator lbFitnessCalc = new LoadBalancingFitnessCalculator(env, 0);
+
+    // Create the factory
+    StatsFactory sf = new StatsFactory(env, lbFitnessCalc);
+
+    // Create a stat instance
+    Stats stat = sf.ofChromosome(chromosome);
+
+    // Check that the stats were added to the chromosome
+    assertEquals(stat, chromosome.getStats());
+
+    // And viceversa
+    assertEquals(chromosome, stat.getChromosome());
+
+    // Try to create a new stat for the same chromosome
+    Stats newStat = sf.ofChromosome(chromosome);
+
+    // Stats shall be the same
+    assertEquals(stat, newStat);
+
+    // Catch exception
+    thrown.expect(AssertionError.class);
+    thrown.expectMessage("Chromosome is null");
+
+    // This shall throw an exception
+    sf.ofChromosome(null);
+
   }
 
 }

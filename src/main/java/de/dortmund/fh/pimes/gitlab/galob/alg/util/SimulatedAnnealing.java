@@ -23,11 +23,13 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 
+import org.jenetics.Optimize;
+
 import java.util.Random;
 
 /**
  * Simulated Annealing class.
- * 
+ *
  * @author Pedro Cuadra
  *
  */
@@ -44,25 +46,31 @@ public class SimulatedAnnealing {
    * Fitness calculator.
    */
   private FitnessCalculator fitnessCalculator;
+  /**
+   * Optimization technique.
+   */
+  private Optimize opt;
 
   /**
    * Constructor.
-   * 
+   *
    * @param gamma
    *          temperature used in simulated annealing.
    * @param temp
    *          initial temperature
-   * 
+   *
    */
-  public SimulatedAnnealing(double gamma, double temp, FitnessCalculator fitnessCalculator) {
+  public SimulatedAnnealing(double gamma, double temp, FitnessCalculator fitnessCalculator,
+      Optimize opt) {
     this.gamma = gamma;
     this.temp = temp;
     this.fitnessCalculator = fitnessCalculator;
+    this.opt = opt;
   }
 
   /**
    * Check the validity based on simulated annealing.
-   * 
+   *
    * @param oldChromosome
    *          the schedule sequence of parent chromosome
    * @param newChromosom
@@ -70,7 +78,7 @@ public class SimulatedAnnealing {
    * @return true if the criteria for simulated annealing is satisfied
    */
   public boolean checkCriteria(ScheduleChromosome oldChromosome, ScheduleChromosome newChromosom) {
-
+    boolean cond;
     double probFactor;
     Random randomGen = new Random();
     // Random probability factor
@@ -79,11 +87,23 @@ public class SimulatedAnnealing {
     double fitNew = fitnessCalculator.getFitness(newChromosom);
     double fitOld = fitnessCalculator.getFitness(oldChromosome);
 
-    if (fitNew > fitOld) {
+    // Consider optimization technique to determine what best fitness is
+    switch (opt) {
+      case MINIMUM:
+        cond = fitNew <= fitOld;
+        break;
+      case MAXIMUM:
+        cond = fitNew >= fitOld;
+        break;
+      default:
+        cond = fitNew >= fitOld;
+    }
+
+    if (cond) {
       return true;
     } else {
       // The max value allowed for both sides of inequality is 1
-      if ((Math.min(1, (Math.exp(-(fitOld - fitNew) / this.temp)))) > probFactor) {
+      if ((Math.min(1, (Math.exp(-Math.abs(fitOld - fitNew) / this.temp)))) > probFactor) {
         this.temp = this.gamma * this.temp;
         return true;
       }
@@ -94,7 +114,7 @@ public class SimulatedAnnealing {
 
   /**
    * Get current temperature of the simulated annealing object.
-   * 
+   *
    * @return current temperature of the simulated annealing object
    */
   public double getTemp() {
@@ -103,7 +123,7 @@ public class SimulatedAnnealing {
 
   /**
    * Set the current temperature of the simulated annealing object.
-   * 
+   *
    * @param temp
    *          temperature of the simulated annealing object
    */

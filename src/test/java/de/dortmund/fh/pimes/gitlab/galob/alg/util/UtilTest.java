@@ -26,10 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.Util;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,7 +35,7 @@ import java.util.Random;
 
 /**
  * Utils unit testing.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
@@ -71,7 +68,7 @@ public class UtilTest {
 
   /**
    * Test environment set-up.
-   * 
+   *
    * @throws Exception
    *           falure exception
    */
@@ -123,26 +120,28 @@ public class UtilTest {
 
   }
 
-  /**
-   * Tests graphBuilder.
-   */
-  @Ignore("Note yet implemented")
-  @Test
-  public void testGraphBuilder() {
-  }
-
   @Test
   public void testCreateRandomDependencyMatrix() throws Exception {
     double[][] matrix;
     matrix = Util.createRandomDependencyMatrix(numTask);
 
+    // Verify dimensions
+    assertEquals(numTask, matrix.length);
+    assertEquals(numTask, matrix[0].length);
+
     assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testCreateRandomCommunicationCostsMatrix() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    double[][] delta = Util.createRandomDependencyMatrix(numTask);
+    double[][] matrix = Util.createRandomCommunicationCostsMatrix(delta);
+
+    // Verify dimensions
+    assertEquals(numTask, matrix.length);
+    assertEquals(numTask, matrix[0].length);
+
+    assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
   }
 
   @Test
@@ -197,6 +196,7 @@ public class UtilTest {
   public void testCheckColZero() throws Exception {
     double[][] matrix = Util.createEmptyMatrix(numTask, numCores);
 
+    // Verify dimensions
     assertEquals(numTask, matrix.length);
     assertEquals(numCores, matrix[0].length);
 
@@ -205,16 +205,32 @@ public class UtilTest {
     }
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testGetColSum() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    double[][] matrix;
+
+    matrix = Util.createOnesMatrix(numTask, numCores);
+
+    assertEquals(numTask, matrix.length);
+    assertEquals(numCores, matrix[0].length);
+
+    for (int i = 0; i < numCores; i++) {
+      assertEquals(numTask, Util.getColSum(matrix, i), EPSILON);
+    }
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testGetRowSum() throws Exception {
-    testCreateOnesMatrix();
+    double[][] matrix;
+
+    matrix = Util.createOnesMatrix(numTask, numCores);
+
+    assertEquals(numTask, matrix.length);
+    assertEquals(numCores, matrix[0].length);
+
+    for (int i = 0; i < numTask; i++) {
+      assertEquals(numCores, Util.getRowSum(matrix, i), EPSILON);
+    }
   }
 
   @Test
@@ -269,34 +285,45 @@ public class UtilTest {
     assertEquals(numTask, randomRow.length);
   }
 
-  @Ignore("Note yet implemented")
-  @Test
-  public void testCreateOmegaMatrix() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Ignore("Note yet implemented")
   @Test
   public void testOfRandomUnitary() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    HeterogeneousComputingEnvTest hceTest = new HeterogeneousComputingEnvTest();
+
+    hceTest.setUp();
+
+    // This test are already implemented by HCE that directly uses this method
+    hceTest.testOfRandomUnitary();
   }
 
-  @Ignore("Note yet implemented")
   @Test
   public void testOfRandom() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    HeterogeneousComputingEnvTest hceTest = new HeterogeneousComputingEnvTest();
+
+    hceTest.setUp();
+
+    // This test are already implemented by HCE that directly uses this method
+    hceTest.testOfRandom();
   }
 
-  @Ignore("Note yet implemented")
   @Test
-  public void testCreateRandomEnv() throws Exception {
-    throw new RuntimeException("not yet implemented");
-  }
+  public void testCheckCycleRandomDependencyMatrix() throws Exception {
+    double[][] matrix;
+    matrix = Util.createRandomDependencyMatrix(numTask);
 
-  @Ignore("Note yet implemented")
-  @Test
-  public void testCheckCycle() throws Exception {
-    throw new RuntimeException("not yet implemented");
+    assertEquals(false, Util.checkCycleRandomDependencyMatrix(matrix));
+
+    // Set a dependency in the lower triangular matrix
+    int src = 0;
+    while (src == 0) {
+      src = randomGen.nextInt(numTask);
+    }
+
+    int dst = randomGen.nextInt(src);
+
+    matrix[src][dst] = 1;
+
+    assertEquals(true, Util.checkCycleRandomDependencyMatrix(matrix));
+
   }
 
 }

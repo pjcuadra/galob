@@ -95,7 +95,7 @@ public class LoadBalancingExample {
 
   /**
    * Main function.
-   * 
+   *
    * @param args
    *          command line parameters
    */
@@ -113,16 +113,20 @@ public class LoadBalancingExample {
 
     // Add simulated annealing to the environment
     env.setSimulatedAnnealing(
-        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, loadBal));
+        new SimulatedAnnealing(SA_GAMMA_COOLING_FACTOR, SA_INITIAL_TEMPERATURE, loadBal,
+            Optimize.MINIMUM));
 
     // Configure and build the evolution engine.
-    final Engine<ScheduleGene, Double> engine =
-        Engine.builder(loadBal::getFitness, (new ScheduleCodec(env)).ofChromosome())
-            .populationSize(POPULATION_SIZE).optimize(Optimize.MINIMUM)
-            .selector(new RouletteWheelSelector<>())
-            .alterers(new ScheduleMutator(env, MUTATION_PROBABILITY),
-                new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
-            .individualCreationRetries(1).build();
+    final Engine<ScheduleGene, Double> engine = Engine
+        .builder(loadBal::getFitness, (new ScheduleCodec(env)).ofChromosome())
+          .populationSize(POPULATION_SIZE)
+          .optimize(Optimize.MINIMUM)
+          .selector(new RouletteWheelSelector<>())
+          .alterers(
+              new ScheduleMutator(env, MUTATION_PROBABILITY),
+              new ScheduleCrossover(env, CROSSOVER_PROBABILITY))
+          .individualCreationRetries(1)
+          .build();
 
     // Create evolution statistics consumer.
     final ScheduleStatistics statistics = new ScheduleStatistics(env);

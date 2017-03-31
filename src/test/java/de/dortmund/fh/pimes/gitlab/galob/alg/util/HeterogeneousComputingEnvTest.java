@@ -27,12 +27,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.SimulatedAnnealing;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.Util;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.Graph;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
 
+import org.jenetics.Optimize;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,7 +70,7 @@ public class HeterogeneousComputingEnvTest {
 
   /**
    * Unit testing set-up.
-   * 
+   *
    * @throws Exception
    *           failure exception
    */
@@ -387,7 +385,7 @@ public class HeterogeneousComputingEnvTest {
     double gammaFactor = 0.8;
     int initialTemp = 900;
     SimulatedAnnealing expectedSimAnn =
-        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc);
+        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc, Optimize.MINIMUM);
 
     assertEquals(false, env.getSimulatedAnnealingEnabled());
 
@@ -404,7 +402,7 @@ public class HeterogeneousComputingEnvTest {
     double gammaFactor = 0.8;
     int initialTemp = 900;
     SimulatedAnnealing expectedSimAnn =
-        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc);
+        new SimulatedAnnealing(gammaFactor, initialTemp, lbFitnessCalc, Optimize.MINIMUM);
 
     SimulatedAnnealing actualSimAnn;
 
@@ -431,12 +429,12 @@ public class HeterogeneousComputingEnvTest {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
 
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
-      assertEquals(node.getCookie(), envNode.getCookie());
+      assertEquals(node.getCookie(this), envNode.getCookie(this));
     }
 
     // Let's modify the copy
     for (GraphNode node : graphCopy.vertexSet()) {
-      node.setCookie(10);
+      node.setCookie(this, 10);
     }
 
     // Let's compare again
@@ -444,7 +442,7 @@ public class HeterogeneousComputingEnvTest {
       GraphNode envNode = env.getGraphNodeById(node.getTaskId());
 
       assertArrayEquals(node.getEtcRow(), envNode.getEtcRow(), EPSILON);
-      assertNotEquals(node.getCookie(), envNode.getCookie());
+      assertNotEquals(node.getCookie(this), envNode.getCookie(this));
     }
   }
 
@@ -504,6 +502,50 @@ public class HeterogeneousComputingEnvTest {
 
       }
     }
+  }
+
+  @Test
+  public void testRemoveDependency() throws Exception {
+    HeterogeneousComputingEnv env = new HeterogeneousComputingEnv(numTasks + 2, numCores);
+    GraphNode src;
+    GraphNode dst;
+
+    // Add the tasks
+    src = env.addUnitExecutionTimeTask();
+    dst = env.addUnitExecutionTimeTask();
+
+    // Check that was added to the graph
+    assertTrue(env.containsVertex(src));
+    assertTrue(env.containsVertex(dst));
+
+    double randomCost = randomGen.nextDouble();
+
+    env.addDependency(src, dst, randomCost);
+
+    // Check that the edge was added with the correct cost
+    assertEquals(randomCost, env.getEdgeWeight(env.getEdge(src, dst)), EPSILON);
+
+    // Check the dependency matrix
+    double[][] delta = env.getDependencyMatrix();
+    assertEquals(1, delta[src.getTaskId()][dst.getTaskId()], EPSILON);
+
+    // Check the communication costs matrix
+    double[][] commCosts = env.getCommunicationCostsMatrix();
+    assertEquals(randomCost, commCosts[src.getTaskId()][dst.getTaskId()], EPSILON);
+
+    // Remove the dependency and test everything again
+    env.removeDependency(src, dst);
+
+    // Check that the edge was removed
+    assertEquals(null, env.getEdge(src, dst));
+
+    // Check the dependency matrix
+    delta = env.getDependencyMatrix();
+    assertEquals(0, delta[src.getTaskId()][dst.getTaskId()], EPSILON);
+
+    // Check the communication costs matrix
+    commCosts = env.getCommunicationCostsMatrix();
+    assertEquals(0, commCosts[src.getTaskId()][dst.getTaskId()], EPSILON);
   }
 
 }
