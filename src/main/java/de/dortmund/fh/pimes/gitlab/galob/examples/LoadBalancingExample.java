@@ -26,7 +26,9 @@ import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculator;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.SimulatedAnnealing;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphDrawer;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleChromosome;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleCodec;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleCrossover;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
@@ -77,7 +79,7 @@ public class LoadBalancingExample {
   /**
    * Generations limit.
    */
-  static final int GEN_LIMIT = 10000;
+  static final int GEN_LIMIT = 10;
   /**
    * Initial population size.
    */
@@ -105,7 +107,7 @@ public class LoadBalancingExample {
     buildEnvironment();
 
     // Draw graph to visually verify
-    env.drawGraph();
+    GraphDrawer.ofGraph(env).draw();
 
     // Create load balancing statistics calculator
     LoadBalancingFitnessCalculator loadBal =
@@ -138,6 +140,8 @@ public class LoadBalancingExample {
     statistics.showStats();
     System.out.println("Loadbalanced solution:");
     System.out.println(best);
+
+    GraphDrawer.ofChromosome((ScheduleChromosome) best.getGenotype().getChromosome());
   }
 
   /**

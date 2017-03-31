@@ -70,6 +70,10 @@ public class Stats {
    * Array of timespan of all cores.
    */
   private double[] timeSpan;
+  /**
+   * Graph instance with all stats cookies.
+   */
+  private Graph myGraph;
 
   /**
    * Constructor.
@@ -100,8 +104,8 @@ public class Stats {
     int executorId = getExecutionUnit(node.getTaskId());
     double finishTime = timeSpan[executorId];
 
-    if (node.getCookie(this) != null) {
-      return (double) node.getCookie(this);
+    if (node.getCookie("aft") != null) {
+      return (double) node.getCookie("aft");
     }
 
     // Get earliest start time
@@ -116,14 +120,20 @@ public class Stats {
       }
 
       if (tempStartTime > finishTime) {
+
         finishTime = tempStartTime;
       }
 
     }
 
+    // Store start time as well
+    node.setCookie("st", new Double(finishTime));
+    node.setCookie("core", executorId);
+    node.setCookie("etc", node.getExecutionTimeOnUnit(executorId));
+
     finishTime += node.getExecutionTimeOnUnit(executorId);
 
-    node.setCookie(this, new Double(finishTime));
+    node.setCookie("aft", new Double(finishTime));
     timeSpan[executorId] = finishTime;
 
     return finishTime;
@@ -207,10 +217,10 @@ public class Stats {
 
     makespanK = new double[env.getNumberOfExecutors()];
 
-    Graph newGraph = env.getGraphCopy();
+    myGraph = env.getGraphCopy();
 
     // Check for cycles first
-    if (newGraph.checkCycles()) {
+    if (myGraph.checkCycles()) {
       throw new Graph.CycleException();
     }
 
@@ -218,9 +228,9 @@ public class Stats {
 
     // This iteration is in topological order according to JGraphT
     for (ScheduleGene gene : chromosome) {
-      curr = newGraph.getGraphNodeById(gene.getAllele().getTaskId());
+      curr = myGraph.getGraphNodeById(gene.getAllele().getTaskId());
 
-      double currAft = getActualFinishTime(newGraph, curr);
+      double currAft = getActualFinishTime(myGraph, curr);
 
       if (currAft > makespanK[getExecutionUnit(curr.getTaskId())]) {
         makespanK[getExecutionUnit(curr.getTaskId())] = currAft;
@@ -282,6 +292,15 @@ public class Stats {
 
     return makespan;
 
+  }
+
+  /**
+   * Return the graph populated with cookies with stats values.
+   * 
+   * @return graph
+   */
+  public Graph getStatsGraph() {
+    return this.myGraph;
   }
 
 }

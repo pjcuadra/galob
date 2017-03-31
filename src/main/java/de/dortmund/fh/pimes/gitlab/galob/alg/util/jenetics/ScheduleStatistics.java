@@ -23,6 +23,7 @@ package de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.HeterogeneousComputingEnv;
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.PaneInfo;
+import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphDrawer;
 
 import org.jenetics.Genotype;
 import org.jenetics.Phenotype;
@@ -40,6 +41,7 @@ import org.knowm.xchart.internal.chartpart.Chart;
 import org.knowm.xchart.style.PieStyler.AnnotationType;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -226,7 +228,7 @@ public class ScheduleStatistics extends JPanel
 
     // Create and set up the window.
     JFrame frame = new JFrame("Evolution stream statistics");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     // Add content to the window.
     frame.add(this);
@@ -331,7 +333,14 @@ public class ScheduleStatistics extends JPanel
         new DefaultMutableTreeNode(new PaneInfo("Time Distribution", pieChart));
     category.add(defaultMutableTreeNode);
 
-    defaultMutableTreeNode = new DefaultMutableTreeNode(new PaneInfo("Graph", env.getGraphPanel()));
+    GraphDrawer drawer = GraphDrawer.ofGraph(env);
+    defaultMutableTreeNode =
+        new DefaultMutableTreeNode(new PaneInfo("Graph", drawer.getPanel()));
+    category.add(defaultMutableTreeNode);
+
+    drawer = GraphDrawer.ofChromosome((ScheduleChromosome) bestPt.getGenotype().getChromosome());
+    defaultMutableTreeNode =
+        new DefaultMutableTreeNode(new PaneInfo("Simulation", drawer.getPanel()));
     category.add(defaultMutableTreeNode);
 
   }
@@ -525,7 +534,7 @@ public class ScheduleStatistics extends JPanel
       }
 
       // Get the plain JPanel
-      JPanel panel = (JPanel) pane;
+      Component panel = (Component) pane;
 
       // Other kind of panels
       splitPane.setBottomComponent(panel);
