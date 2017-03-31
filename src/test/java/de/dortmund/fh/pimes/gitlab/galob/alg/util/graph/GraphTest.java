@@ -28,7 +28,7 @@ import org.junit.Test;
 
 /**
  * Schedule Chromosome unit testing.
- * 
+ *
  * @author Pedro Cuadra
  * @author Sudheera Bandi
  *
@@ -39,7 +39,7 @@ public class GraphTest {
 
   /**
    * Unit testing set-up.
-   * 
+   *
    * @throws Exception
    *           falure exception
    */
@@ -106,6 +106,36 @@ public class GraphTest {
   @Test
   public void testCycleDetection() throws Exception {
     // This might also be done in testCheckCycles test
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testBuildGraph() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testBuildTopologicalLevels() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testRemoveDependency() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testGetGraphNodeById() throws Exception {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Ignore("Note yet implemented")
+  @Test
+  public void testGetTopologicalLevel() throws Exception {
     throw new RuntimeException("not yet implemented");
   }
 

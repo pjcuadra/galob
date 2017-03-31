@@ -22,10 +22,6 @@
 package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
 import de.dortmund.fh.pimes.gitlab.galob.alg.util.graph.GraphNode;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleAllele;
-import de.dortmund.fh.pimes.gitlab.galob.alg.util.jenetics.ScheduleGene;
-
-import org.jenetics.util.ISeq;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -76,7 +72,6 @@ public class Util {
     for (int col = 0; col < delta.length; col++) {
       for (int row = col + 1; row < delta.length; row++) {
         if (delta[row][col] != 0) {
-          System.out.println("Cycle detected => (" + row + ")->(" + col + ")");
           return true;
         }
       }
@@ -131,29 +126,6 @@ public class Util {
    */
   public static double[][] createEmptyMatrix(int rows, int cols) {
     return new double[rows][cols];
-  }
-
-  /**
-   * Calculate the allocation matrix from a gene sequence.
-   *
-   * @param scheduleSeq
-   *          genes sequence of a valid chromosome
-   * @param numCores
-   *          number of cores
-   *
-   * @return CONV matrix
-   */
-  public static int[][] createOmegaMatrix(ISeq<ScheduleGene> scheduleSeq, final int numCores) {
-    int[][] omega = new int[numCores][scheduleSeq.size()];
-    ScheduleAllele currAllel = null;
-
-    // Just set to one where it is allocated
-    for (ScheduleGene gene : scheduleSeq) {
-      currAllel = gene.getAllele();
-      omega[currAllel.getExecutorId()][currAllel.getTaskId()] = 1;
-    }
-
-    return omega;
   }
 
   /**

@@ -21,7 +21,24 @@
 
 package de.dortmund.fh.pimes.gitlab.galob.alg.util;
 
+import de.dortmund.fh.pimes.gitlab.galob.alg.ExecutionTimeFitnessCalculatorTest;
+import de.dortmund.fh.pimes.gitlab.galob.alg.LoadBalancingFitnessCalculatorTest;
+
+import org.junit.Test;
+
 public class FitnessCalculatorTest {
 
-  // This is an abstract class add only static method's tests here
+  // Just run the implementation's related tests
+  @Test
+  public void testGetFitness() throws Exception {
+    LoadBalancingFitnessCalculatorTest lbTest = new LoadBalancingFitnessCalculatorTest();
+
+    lbTest.setUp();
+    lbTest.testCalcFitness();
+
+    ExecutionTimeFitnessCalculatorTest excTest = new ExecutionTimeFitnessCalculatorTest();
+
+    excTest.setUp();
+    excTest.testCalcFitness();
+  }
 }

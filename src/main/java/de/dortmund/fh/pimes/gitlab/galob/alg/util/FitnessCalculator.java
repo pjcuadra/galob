@@ -72,7 +72,7 @@ public abstract class FitnessCalculator {
    *
    * @return graph stats factory
    */
-  public StatsFactory getGraphStatsFactory() {
+  private StatsFactory getGraphStatsFactory() {
     return statsFactory;
   }
 

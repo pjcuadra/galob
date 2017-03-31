@@ -247,8 +247,11 @@ public class ScheduleStatistics extends JPanel
     top.add(category);
 
     // Best fitness evolution
-    XYChart chart = new XYChartBuilder().title("Best fitness Evolution").xAxisTitle("Generations")
-        .yAxisTitle("Fitness Value").build();
+    XYChart chart = new XYChartBuilder()
+        .title("Best fitness Evolution")
+          .xAxisTitle("Generations")
+          .yAxisTitle("Fitness Value")
+          .build();
 
     chart.getStyler().setLegendFont(legendFont);
 
@@ -259,8 +262,11 @@ public class ScheduleStatistics extends JPanel
     category.add(defaultMutableTreeNode);
 
     // Fitness distribution
-    chart = new XYChartBuilder().title("Fitness distribution").xAxisTitle("Fitness")
-        .yAxisTitle("Frequency").build();
+    chart = new XYChartBuilder()
+        .title("Fitness distribution")
+          .xAxisTitle("Fitness")
+          .yAxisTitle("Frequency")
+          .build();
 
     chart.getStyler().setLegendVisible(true);
     chart.getStyler().setLegendFont(legendFont);
@@ -291,10 +297,13 @@ public class ScheduleStatistics extends JPanel
             / (this.actualFitnessHistory.size() - 1);
 
     chart
-        .addSeries("Fitness distribution\n" + "min = " + fitnessAxis.get(0) + "\n" + "max = "
-            + fitnessAxis.get(fitnessAxis.size() - 1) + "\n" + "mean = " + mean + "\n" + "var = "
-            + var + "\n" + "std = " + Math.sqrt(var), fitnessAxis, frequencyAxis)
-        .setMarker(SeriesMarkers.NONE);
+        .addSeries(
+            "Fitness distribution\n" + "min = " + fitnessAxis.get(0) + "\n" + "max = "
+                + fitnessAxis.get(fitnessAxis.size() - 1) + "\n" + "mean = " + mean + "\n"
+                + "var = " + var + "\n" + "std = " + Math.sqrt(var),
+            fitnessAxis,
+            frequencyAxis)
+          .setMarker(SeriesMarkers.NONE);
 
     defaultMutableTreeNode =
         new DefaultMutableTreeNode(new PaneInfo("Fitness distribution", chart));
@@ -308,11 +317,14 @@ public class ScheduleStatistics extends JPanel
     pieChart.getStyler().setAnnotationType(AnnotationType.Percentage);
     pieChart.getStyler().setLegendFont(legendFont);
 
-    pieChart.addSeries("Selection:\n" + statistics.getSelectionDuration().getSum() + "s",
+    pieChart.addSeries(
+        "Selection:\n" + statistics.getSelectionDuration().getSum() + "s",
         statistics.getSelectionDuration().getSum());
-    pieChart.addSeries("Altering:\n" + statistics.getAlterDuration().getSum() + "s",
+    pieChart.addSeries(
+        "Altering:\n" + statistics.getAlterDuration().getSum() + "s",
         statistics.getAlterDuration().getSum());
-    pieChart.addSeries("Fitness Calculation:\n" + statistics.getEvaluationDuration().getSum() + "s",
+    pieChart.addSeries(
+        "Fitness Calculation:\n" + statistics.getEvaluationDuration().getSum() + "s",
         statistics.getEvaluationDuration().getSum());
 
     defaultMutableTreeNode =
@@ -327,21 +339,24 @@ public class ScheduleStatistics extends JPanel
   /**
    * Show plots of makespan evolution.
    */
-  public void createMakespanItems(DefaultMutableTreeNode top) {
+  private void createMakespanItems(DefaultMutableTreeNode top) {
     // categories
     DefaultMutableTreeNode category = null;
     // General
     category = new DefaultMutableTreeNode("Makespan");
     top.add(category);
 
-    XYChart chart = new XYChartBuilder().title("Best schedule makespan Evolution")
-        .xAxisTitle("Generations").yAxisTitle("Time").build();
+    XYChart chart = new XYChartBuilder()
+        .title("Best schedule makespan Evolution")
+          .xAxisTitle("Generations")
+          .yAxisTitle("Time")
+          .build();
 
     chart.getStyler().setLegendFont(legendFont);
 
     for (int i = 0; i < env.getNumberOfExecutors(); i++) {
-      chart.addSeries("Core - " + i, generations, this.makespanK.get(i))
-          .setMarker(SeriesMarkers.NONE);
+      chart.addSeries("Core - " + i, generations, this.makespanK.get(i)).setMarker(
+          SeriesMarkers.NONE);
     }
 
     chart.addSeries("Total", generations, this.makespan).setMarker(SeriesMarkers.NONE);
@@ -351,8 +366,11 @@ public class ScheduleStatistics extends JPanel
     category.add(defaultMutableTreeNode);
 
     // Create Chart
-    CategoryChart catChart = new CategoryChartBuilder().title("Makespan per Computing Resources")
-        .xAxisTitle("Computing Resource").yAxisTitle("Time").build();
+    CategoryChart catChart = new CategoryChartBuilder()
+        .title("Makespan per Computing Resources")
+          .xAxisTitle("Computing Resource")
+          .yAxisTitle("Time")
+          .build();
 
     // Customize Chart
     catChart.getStyler().setLegendVisible(false);
@@ -368,7 +386,9 @@ public class ScheduleStatistics extends JPanel
     }
 
     // Series
-    catChart.addSeries("Makespan", new ArrayList<String>(Arrays.asList(cats)),
+    catChart.addSeries(
+        "Makespan",
+        new ArrayList<String>(Arrays.asList(cats)),
         new ArrayList<Double>(Arrays.asList(makespan)));
 
     defaultMutableTreeNode =
@@ -379,7 +399,7 @@ public class ScheduleStatistics extends JPanel
   /**
    * Show plots of simulated annealing evolution.
    */
-  public void createSimulatedAnnealingItems(DefaultMutableTreeNode top) {
+  private void createSimulatedAnnealingItems(DefaultMutableTreeNode top) {
 
     // categories
     DefaultMutableTreeNode category = null;
@@ -387,8 +407,11 @@ public class ScheduleStatistics extends JPanel
     category = new DefaultMutableTreeNode("Simulated Annealing");
     top.add(category);
 
-    XYChart chart = new XYChartBuilder().title("Simulated Annealing Temperature Evolution")
-        .xAxisTitle("Generations").yAxisTitle("Temperature").build();
+    XYChart chart = new XYChartBuilder()
+        .title("Simulated Annealing Temperature Evolution")
+          .xAxisTitle("Generations")
+          .yAxisTitle("Temperature")
+          .build();
 
     chart.getStyler().setLegendFont(legendFont);
 
@@ -472,7 +495,6 @@ public class ScheduleStatistics extends JPanel
   @Override
   public String toString() {
     return this.statistics.toString();
-
   }
 
   /*
