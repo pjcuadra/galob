@@ -11,6 +11,9 @@ The commit messages should have
 
 # Documentation
 
+The documentation can be accessed
+[here](http://galob.readthedocs.io/en/latest/index.html).
+
 The documentation was developed using
 [Sphinx](http://www.sphinx-doc.org/en/1.4.9/). To build the documentation follow
 the steps bellow.
