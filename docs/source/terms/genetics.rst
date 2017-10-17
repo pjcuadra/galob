@@ -5,7 +5,6 @@ The following class diagrams represents the relationships between
 important biological genetics terms. The figure was based on [#]_.
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true

@@ -10,7 +10,6 @@ Schedulers
 ++++++++++
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -60,7 +59,6 @@ Structure
 ~~~~~~~~~
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -135,7 +133,6 @@ Alterers
 ~~~~~~~~
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -185,7 +182,6 @@ Util
 ++++
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -213,7 +209,6 @@ Implementation View
 -------------------
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -230,7 +225,6 @@ Deployment View
 ---------------
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -258,7 +252,6 @@ Process View
 ------------
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
@@ -319,7 +312,6 @@ Use Case View
 -------------
 
 .. uml::
-  :scale: 50 %
   :align: center
 
   skinparam monochrome true
