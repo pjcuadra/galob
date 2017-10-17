@@ -10,10 +10,6 @@ Genetic algorithm for load balancing (galob) is a tool that allocates
 runnables with interdependencies to processing units, taking into account both
 load balancing and any communication overhead regarding load parallelism.
 
-Galob is the outcome of an assignment of the course **Distributed and Parallel
-Systems** on the first semester (winter semester of 2016/17) of the Master's
-program **Embedded Systems for Mechatronics**.
-
 .. toctree::
    :maxdepth: 2
 
